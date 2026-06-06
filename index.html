@@ -165,12 +165,15 @@ textarea{width:100%;background:#0d0802;border:1px solid #4a2e08;color:#e8d5a3;pa
     <div><div class="sv" id="stTk">0</div><div class="sl">Tanks</div></div><div class="vsep"></div>
     <div><div class="sv" id="stH">0</div><div class="sl">Healers</div></div><div class="vsep"></div>
     <div><div class="sv" id="stD">0</div><div class="sl">DPS</div></div><div class="vsep"></div>
-    <div><div class="sv" id="stG">0/8</div><div class="sl">Groups</div></div>
+    <div><div class="sv" id="stG">0/8</div><div class="sl">Groups</div></div><div class="vsep"></div>
+    <div><div class="sv" id="stBench">0</div><div class="sl">Benched</div></div><div class="vsep"></div>
+    <div><div class="sv" id="stTent">0</div><div class="sl">Tentative</div></div>
   </div>
   <div class="layout">
     <div>
       <div class="pool">
         <div class="ptitle">Raid Pool <span id="pcnt" style="color:#9a7030;font-size:.68rem"></span></div>
+        <div style="font-size:.6rem;color:#5a4020;font-style:italic;margin-bottom:.4rem">Active players shown first</div>
         <div class="fbtnrow">
           <button class="fbtn on" id="fAll">All</button>
           <button class="fbtn" id="fTank">Tank</button>
@@ -189,6 +192,7 @@ textarea{width:100%;background:#0d0802;border:1px solid #4a2e08;color:#e8d5a3;pa
           </div>
         </div>
         <div class="ggrid" id="ggrid"></div>
+        <div id="benchedDisplay"></div>
         <div class="logbox" id="logbox" style="display:none"></div>
       </div>
       <div class="assign-section">
@@ -451,6 +455,7 @@ var DEMO=[
 ];
 
 var players=[],groups=[],trashMarks=[],bossData={},puller=null,filt='all',sel=null,activeTab='trash';
+var benched=[],lateList=[],absentList=[],tentativeList=[];
 
 function deriveRole(cls,spec){
   var s=(spec||'').toLowerCase().replace(/\d+$/,''),c=(cls||'').toLowerCase();
@@ -476,6 +481,7 @@ function mkG(){groups=[];for(var i=0;i<8;i++){var s=[];for(var j=0;j<5;j++)s.pus
 function mkMarks(){
   trashMarks=TRASH_MARKS.map(function(m){return{name:m.name,col:m.col,tank:null,healer:null};});
   puller=null; bossData={};
+  benched=[];lateList=[];absentList=[];tentativeList=[];
   BOSSES.forEach(function(b){
     if(b.isTrash)return;
     var d={notes:''};
@@ -551,6 +557,10 @@ function rStats(){
   document.getElementById('stD').textContent=players.filter(function(p){return p.role==='dps';}).length;
   var gf=0;for(var i=0;i<groups.length;i++)for(var j=0;j<groups[i].slots.length;j++)if(groups[i].slots[j].p){gf++;break;}
   document.getElementById('stG').textContent=gf+'/8';
+  var bEl=document.getElementById('stBench');
+  if(bEl)bEl.textContent=benched.length;
+  var tEl=document.getElementById('stTent');
+  if(tEl)tEl.textContent=tentativeList.length;
 }
 
 function rPool(){
@@ -558,18 +568,86 @@ function rPool(){
   var list=players.filter(function(p){return filt==='all'||p.role===filt;});
   document.getElementById('pcnt').textContent=list.length;
   var h='';
+
+  /* Active players */
   for(var i=0;i<list.length;i++){
     var p=list[i],c=cd(p.cls);
     var dim=sel&&sel.t==='g'&&as[p.id];
     var canPick=!!sel&&!dim;
     h+='<div class="pc'+(dim?' dim':canPick?' pick':'')+'" data-pid="'+he(p.id)+'" style="background:'+c.bg+';border-color:'+c.bd+'">'
       +'<div class="pc-inner">'+ihtml(p.cls,18,p.role)
-      +'<span style="font-size:.86rem;font-weight:600;color:'+c.c+';flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+he(p.name)+'</span>'
-      +'<span style="font-size:.58rem;color:'+c.c+';opacity:.75;white-space:nowrap">'+he(p.spec||'')+'</span>'
-      +'<button class="bx" data-a="rmp" data-pid="'+he(p.id)+'">x</button>'
+      +'<span style="font-size:.82rem;font-weight:600;color:'+c.c+';flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+he(p.name)+'</span>'
+      +'<button class="bx" data-a="tobench" data-pid="'+he(p.id)+'" title="Move to bench" style="font-size:.55rem;padding:1px 4px">B</button>'
+      +'<button class="bx" data-a="rmp" data-pid="'+he(p.id)+'" title="Remove">x</button>'
       +'</div></div>';
   }
-  if(!h)h='<div style="color:#6a5020;font-size:.78rem;text-align:center;padding:.8rem">No players</div>';
+  if(!h&&filt==='all')h='<div style="color:#6a5020;font-size:.78rem;text-align:center;padding:.6rem">No players</div>';
+
+  /* Late section */
+  if(lateList.length||(filt==='all')){
+    h+='<div class="pool-sec-hdr" style="background:#1a1505;border-top:1px solid #5a4010;margin:4px -7px 3px;padding:3px 7px;font-family:Cinzel,serif;font-size:.6rem;color:#c08020;text-transform:uppercase;letter-spacing:.08em">&#128336; Late ('+lateList.length+')</div>';
+    if(lateList.length){
+      lateList.forEach(function(p){
+        var c=p.cls?cd(p.cls):{c:'#c09050',bg:'#1a1505',bd:'#5a4010'};
+        h+='<div class="pc" style="background:'+c.bg+';border-color:#5a4010">'
+          +'<div class="pc-inner">'+(p.cls?ihtml(p.cls,16,p.role):'<span style="width:16px;height:16px;flex-shrink:0;display:inline-block"></span>')
+          +'<span style="font-size:.8rem;color:'+c.c+';flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+he(p.name)+'</span>'
+          +'<button class="bx" data-a="topool" data-pid="'+he(p.id)+'" title="Move to pool" style="font-size:.55rem;padding:1px 4px;color:#80c040;border-color:#3a6010">&#8593;</button>'
+          +'</div></div>';
+      });
+    } else {
+      h+='<div style="color:#4a3a18;font-size:.7rem;font-style:italic;padding:2px 3px">None</div>';
+    }
+  }
+
+  /* Benched section */
+  if(benched.length||(filt==='all')){
+    h+='<div class="pool-sec-hdr" style="background:#0a1a0a;border-top:1px solid #1a4a1a;margin:4px -7px 3px;padding:3px 7px;font-family:Cinzel,serif;font-size:.6rem;color:#50a050;text-transform:uppercase;letter-spacing:.08em">&#128196; Bench ('+benched.length+')</div>';
+    if(benched.length){
+      benched.forEach(function(p){
+        var c=p.cls?cd(p.cls):{c:'#50a050',bg:'#0a1a0a',bd:'#1a4a1a'};
+        h+='<div class="pc" style="background:'+c.bg+';border-color:#1a4a1a">'
+          +'<div class="pc-inner">'+(p.cls?ihtml(p.cls,16,p.role):'<span style="width:16px;height:16px;flex-shrink:0;display:inline-block"></span>')
+          +'<span style="font-size:.8rem;color:'+c.c+';flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+he(p.name)+'</span>'
+          +'<button class="bx" data-a="topool" data-pid="'+he(p.id)+'" title="Move to active pool" style="font-size:.55rem;padding:1px 4px;color:#80c040;border-color:#3a6010">&#8593;</button>'
+          +'</div></div>';
+      });
+    } else {
+      h+='<div style="color:#4a3a18;font-size:.7rem;font-style:italic;padding:2px 3px">None</div>';
+    }
+  }
+
+  /* Absent section */
+  if(absentList.length||(filt==='all')){
+    h+='<div class="pool-sec-hdr" style="background:#1a0a0a;border-top:1px solid #4a1010;margin:4px -7px 3px;padding:3px 7px;font-family:Cinzel,serif;font-size:.6rem;color:#a04040;text-transform:uppercase;letter-spacing:.08em">&#10060; Absent ('+absentList.length+')</div>';
+    if(absentList.length){
+      absentList.forEach(function(p){
+        h+='<div class="pc" style="background:#1a0a0a;border-color:#4a1010">'
+          +'<div class="pc-inner"><span style="width:16px;height:16px;flex-shrink:0;display:inline-block"></span>'
+          +'<span style="font-size:.8rem;color:#804040;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+he(p.name)+'</span>'
+          +'</div></div>';
+      });
+    } else {
+      h+='<div style="color:#4a3a18;font-size:.7rem;font-style:italic;padding:2px 3px">None</div>';
+    }
+  }
+
+  /* Tentative section */
+  if(tentativeList.length||(filt==='all')){
+    h+='<div class="pool-sec-hdr" style="background:#1a1520;border-top:1px solid #4a3a70;margin:4px -7px 3px;padding:3px 7px;font-family:Cinzel,serif;font-size:.6rem;color:#8a70c0;text-transform:uppercase;letter-spacing:.08em">&#10067; Tentative ('+tentativeList.length+')</div>';
+    if(tentativeList.length){
+      tentativeList.forEach(function(p){
+        h+='<div class="pc" style="background:#1a1520;border-color:#4a3a70">'
+          +'<div class="pc-inner"><span style="width:16px;height:16px;flex-shrink:0;display:inline-block"></span>'
+          +'<span style="font-size:.8rem;color:#8a70c0;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+he(p.name)+'</span>'
+          +'<button class="bx" data-a="topool" data-pid="'+he(p.id)+'" title="Move to active pool" style="font-size:.55rem;padding:1px 4px;color:#80c040;border-color:#3a6010">&#8593;</button>'
+          +'</div></div>';
+      });
+    } else {
+      h+='<div style="color:#4a3a18;font-size:.7rem;font-style:italic;padding:2px 3px">None</div>';
+    }
+  }
+
   document.getElementById('poolList').innerHTML=h;
 }
 
@@ -587,6 +665,26 @@ function rGroups(){
     h+='</div></div>';
   }
   document.getElementById('ggrid').innerHTML=h;
+
+  /* Benched section below groups */
+  var bh='';
+  if(benched.length){
+    bh+='<div style="background:#0a1a0a;border:1px solid #1a4a1a;border-radius:7px;overflow:hidden;margin-top:.5rem">';
+    bh+='<div style="background:#0d1f0d;padding:4px 9px;font-family:Cinzel,serif;font-size:.72rem;color:#50a050;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #1a4a1a"><span>&#128196; Benched ('+benched.length+')</span><span style="font-size:.6rem;color:#3a6030">These players are available if needed</span></div>';
+    bh+='<div style="padding:5px 7px;display:flex;flex-wrap:wrap;gap:4px">';
+    benched.forEach(function(p){
+      var c=p.cls?cd(p.cls):{c:'#50a050',bg:'#0a1a0a',bd:'#1a4a1a'};
+      bh+='<div style="display:inline-flex;align-items:center;gap:4px;background:'+c.bg+';border:1px solid #1a4a1a;border-radius:4px;padding:3px 7px">'
+        +(p.cls?ihtml(p.cls,14,p.role):'')
+        +'<span style="font-size:.82rem;color:'+c.c+';font-weight:600">'+he(p.name)+'</span>'
+        +(p.spec?'<span style="font-size:.52rem;color:'+c.c+';opacity:.6">'+he(p.spec)+'</span>':'')
+        +'<button class="bx" data-a="topool" data-pid="'+he(p.id)+'" title="Move to active pool" style="font-size:.52rem;padding:1px 4px;color:#80c040;border-color:#3a6010">&#8593;</button>'
+        +'</div>';
+    });
+    bh+='</div></div>';
+  }
+  document.getElementById('benchedDisplay').innerHTML=bh;
+
   document.getElementById('mrtBox').textContent=buildMRT();
 }
 
@@ -725,23 +823,135 @@ function removeFromPool(pid){
   rAll();
 }
 
-function parseRHJson(data){
-  var slots=data.slots||[];
-  if(!slots.length){tip('No slots found in JSON',true);return;}
-  var cm={hunter:'Hunter',druid:'Druid',warrior:'Warrior',priest:'Priest',mage:'Mage',shaman:'Shaman',paladin:'Paladin',rogue:'Rogue',warlock:'Warlock',tank:'Warrior',bench:'Priest'};
-  mkG();mkMarks();sel=null;hideBan();players=[];
-  slots.sort(function(a,b){return (a.groupNumber-b.groupNumber)||((a.slotNumber||0)-(b.slotNumber||0));});
-  for(var i=0;i<slots.length;i++){
-    var s=slots[i],rawCls=s.className||'Warrior';
-    var cls=cm[rawCls.toLowerCase()]||'Warrior';
-    var spec=(s.specName||'').replace(/\d+$/,'');
-    var role=deriveRole(rawCls,s.specName||'');
-    var p={id:'rh'+i,name:s.name||'Unknown',cls:cls,spec:spec,role:role};
-    players.push(p);
-    var gn=(s.groupNumber||1)-1,sn=(s.slotNumber||1)-1;
-    if(gn>=0&&gn<8&&sn>=0&&sn<5)groups[gn].slots[sn].p=p;
+/* Move player between lists */
+function moveToPool(pid){
+  var p=findInAll(pid);if(!p)return;
+  benched=benched.filter(function(x){return x.id!==pid;});
+  lateList=lateList.filter(function(x){return x.id!==pid;});
+  absentList=absentList.filter(function(x){return x.id!==pid;});
+  tentativeList=tentativeList.filter(function(x){return x.id!==pid;});
+  if(!players.find(function(x){return x.id===pid;})){
+    p.isBench=false;p.overflowBench=false;
+    if(!p.cls)p.cls='Warrior';
+    if(!p.role)p.role='dps';
+    players.push(p);sortPlayers();
   }
-  sortPlayers();showUI();rAll();tip('Imported '+players.length+' players (groups pre-filled)');
+  rAll();
+}
+function moveToBench(pid){
+  var p=findInAll(pid);if(!p)return;
+  players=players.filter(function(x){return x.id!==pid;});
+  lateList=lateList.filter(function(x){return x.id!==pid;});
+  absentList=absentList.filter(function(x){return x.id!==pid;});
+  tentativeList=tentativeList.filter(function(x){return x.id!==pid;});
+  /* remove from groups/assignments */
+  for(var i=0;i<groups.length;i++)for(var j=0;j<groups[i].slots.length;j++)if(groups[i].slots[j].p&&groups[i].slots[j].p.id===pid)groups[i].slots[j].p=null;
+  if(!benched.find(function(x){return x.id===pid;})){
+    p.isBench=true;benched.push(p);sortBenched();
+  }
+  rAll();
+}
+function findInAll(pid){
+  var all=players.concat(benched,lateList,absentList,tentativeList);
+  for(var i=0;i<all.length;i++)if(all[i].id===pid)return all[i];
+  return null;
+}
+
+function parseRHJson(data){
+  var signUps=data.signUps||data.slots||[];
+  if(!signUps.length){tip('No signups found in JSON',true);return;}
+
+  var CLSMAP={warrior:'Warrior',druid:'Druid',paladin:'Paladin',rogue:'Rogue',hunter:'Hunter',
+    priest:'Priest',mage:'Mage',warlock:'Warlock',shaman:'Shaman',tank:'Warrior'};
+
+  mkG();mkMarks();sel=null;hideBan();
+  players=[];benched=[];lateList=[];absentList=[];tentativeList=[];
+
+  /* Sort by position (sign-up order) ascending — lower position = signed up earlier */
+  signUps.sort(function(a,b){return (a.position||9999)-(b.position||9999);});
+
+  var activeCount=0;
+
+  for(var i=0;i<signUps.length;i++){
+    var s=signUps[i];
+    var rawCls=(s.cClassName||s.className||'').toLowerCase();
+    var rawSpec=(s.cSpecName||s.specName||'').replace(/\d+$/,'');
+    var pname=s.name||'Unknown';
+    var pid='rh'+i;
+    var pos=s.position||9999;
+
+    /* Absence */
+    if(rawCls==='absence'){
+      absentList.push({id:pid,name:pname,cls:'',spec:'',role:'',pos:pos});
+      continue;
+    }
+
+    /* Tentative */
+    if(rawCls==='tentative'){
+      tentativeList.push({id:pid,name:pname,cls:'',spec:'',role:'',pos:pos});
+      continue;
+    }
+
+    /* Late — has a real class/spec */
+    if(rawCls==='late'){
+      var lateCls=CLSMAP[(s.cClassName||'').toLowerCase()]||'Warrior';
+      /* Try to get actual class from spec entry if present */
+      var lateRealCls=CLSMAP[rawCls]||'Warrior';
+      /* roleName gives us category hint */
+      var lateSpec=rawSpec;
+      var lateRole=deriveRole(lateRealCls,lateSpec);
+      lateList.push({id:pid,name:pname,cls:lateRealCls,spec:lateSpec,role:lateRole,pos:pos});
+      continue;
+    }
+
+    /* Bench */
+    if(rawCls==='bench'){
+      var bRole=(s.cRoleName||s.roleName||'').toLowerCase();
+      var bCls='Warrior';
+      if(bRole==='healers')bCls='Priest';
+      else if(bRole==='tanks')bCls='Warrior';
+      else if(bRole==='ranged')bCls='Mage';
+      else if(bRole==='melee')bCls='Warrior';
+      var bSpec=rawSpec;
+      var bRoleDerived=deriveRole(bCls,bSpec);
+      benched.push({id:pid,name:pname,cls:bCls,spec:bSpec,role:bRoleDerived,isBench:true,pos:pos});
+      continue;
+    }
+
+    /* Regular player — apply 40-player cap by sign-up order */
+    var cls=CLSMAP[rawCls]||'Warrior';
+    var spec=rawSpec;
+    var role=deriveRole(cls,spec);
+    var p={id:pid,name:pname,cls:cls,spec:spec,role:role,pos:pos};
+
+    if(activeCount<40){
+      players.push(p);
+      activeCount++;
+      /* Old format group pre-fill */
+      if(s.groupNumber!=null){
+        var gn=s.groupNumber-1,sn=(s.slotNumber||1)-1;
+        if(gn>=0&&gn<8&&sn>=0&&sn<5)groups[gn].slots[sn].p=p;
+      }
+    } else {
+      /* Overflow goes to bench */
+      p.isBench=true;p.overflowBench=true;
+      benched.push(p);
+    }
+  }
+
+  sortPlayers();
+  sortBenched();
+  showUI();rAll();
+  var overflowCount=benched.filter(function(p){return p.overflowBench;}).length;
+  var msg='Imported: '+players.length+' active, '+benched.length+' benched'+(overflowCount?' ('+overflowCount+' overflow)':'')+', '+lateList.length+' late, '+tentativeList.length+' tentative, '+absentList.length+' absent';
+  tip(msg);
+}
+
+function sortBenched(){
+  benched.sort(function(a,b){return (a.pos||9999)-(b.pos||9999);});
+  lateList.sort(function(a,b){return (a.pos||9999)-(b.pos||9999);});
+  absentList.sort(function(a,b){return a.name.toLowerCase()<b.name.toLowerCase()?-1:1;});
+  tentativeList.sort(function(a,b){return a.name.toLowerCase()<b.name.toLowerCase()?-1:1;});
 }
 
 /* ── Unified click handler ── */
@@ -755,6 +965,8 @@ document.addEventListener('click',function(e){
   if(!el)return;
   var a=el.dataset.a;
   if(a==='rmp'){removeFromPool(el.dataset.pid);return;}
+  if(a==='topool'){moveToPool(el.dataset.pid);return;}
+  if(a==='tobench'){moveToBench(el.dataset.pid);return;}
   if(a==='sg'){sel={t:'g',gi:+el.dataset.gi,si:+el.dataset.si};setBan('Group '+(+el.dataset.gi+1)+' slot '+(+el.dataset.si+1));rAll();return;}
   if(a==='rmg'){groups[+el.dataset.gi].slots[+el.dataset.si].p=null;rAll();return;}
   if(a==='st'){sel={t:'tm',mi:+el.dataset.mi};setBan(trashMarks[+el.dataset.mi].name+' \u2014 Tank');rAll();return;}
@@ -798,6 +1010,7 @@ document.getElementById('bJsonImport').addEventListener('click',function(){
   document.getElementById('jsonModal').className='modal-wrap';parseRHJson(data);
 });
 document.getElementById('bAuto').addEventListener('click',function(){
+  /* Auto-assign only uses the active players[] list — late/bench/tentative are excluded */
   mkG();var used={},log=[];
   function get(fn){var r=[];for(var i=0;i<players.length;i++)if(!used[players[i].id]&&fn(players[i]))r.push(players[i]);return r;}
   function take(arr,n){var r=arr.slice(0,n);for(var i=0;i<r.length;i++)used[r[i].id]=1;return r;}
@@ -867,6 +1080,10 @@ function buildSharePayload(){
   /* Encode minimal state: groups, trashMarks, bossData, puller */
   var payload={
     players: players.map(function(p){return{id:p.id,name:p.name,cls:p.cls,spec:p.spec,role:p.role};}),
+    benched: benched.map(function(p){return{id:p.id,name:p.name,cls:p.cls,spec:p.spec,role:p.role};}),
+    lateList: lateList.map(function(p){return{id:p.id,name:p.name,cls:p.cls,spec:p.spec,role:p.role};}),
+    absentList: absentList.map(function(p){return{id:p.id,name:p.name};}),
+    tentativeList: tentativeList.map(function(p){return{id:p.id,name:p.name};}),
     groups: groups.map(function(g){return g.slots.map(function(s){return s.p?s.p.id:null;});}),
     trash: trashMarks.map(function(m){return{tank:m.tank?m.tank.id:null,healer:m.healer?m.healer.id:null};}),
     puller: puller?puller.id:null,
@@ -983,7 +1200,16 @@ function renderViewMode(data){
   });
   h+='</div></div>';
 
-  /* Trash marks */
+  /* Benched / Late / Absent */
+  var benchedV=data.benched||[];
+  if(benchedV.length){
+    h+='<div class="section"><div class="sh">Roster Status</div>';
+    h+='<div class="blbl" style="color:#50a050">&#128196; Benched ('+benchedV.length+')</div>';
+    h+='<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:.5rem">';
+    benchedV.forEach(function(p){var c=p.cls?cd(p.cls):{c:'#50a050',bg:'#0a1a0a',bd:'#1a4a1a'};h+='<span style="display:inline-flex;align-items:center;gap:3px;background:'+c.bg+';border:1px solid '+c.bd+';border-radius:3px;padding:2px 6px;font-size:.82rem;color:'+c.c+'">'+(p.cls?ihtml(p.cls,13,p.role):'')+he(p.name)+'</span>';});
+    h+='</div>';
+    h+='</div>';
+  }
   h+='<div class="section"><div class="sh">Trash \u2014 Tank Marks &amp; Healing</div>';
   h+='<div class="mark-row">';
   TRASH_MARKS.forEach(function(m,i){
