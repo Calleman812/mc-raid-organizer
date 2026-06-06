@@ -583,14 +583,19 @@ function rPool(){
   document.getElementById('pcnt').textContent=list.length;
   var h='';
 
-  /* Active players */
+  /* Active players — highlight matching role when an assignment slot is active */
+  var selRole=sel?sel.role:null;
   for(var i=0;i<list.length;i++){
     var p=list[i],c=cd(p.cls);
     var dim=sel&&sel.t==='g'&&as[p.id];
     var canPick=!!sel&&!dim;
-    h+='<div class="pc'+(dim?' dim':canPick?' pick':'')+'" data-pid="'+he(p.id)+'" style="background:'+c.bg+';border-color:'+c.bd+'">'
+    var roleMatch=canPick&&selRole&&(selRole==='hunter'?p.cls==='Hunter':p.role===selRole);
+    var roleMismatch=canPick&&selRole&&(selRole==='hunter'?p.cls!=='Hunter':p.role!==selRole);
+    var extraStyle=roleMatch?'outline:2px solid #60cc80;outline-offset:1px;':roleMismatch?'opacity:.4;':'';
+    h+='<div class="pc'+(dim?' dim':canPick?' pick':'')+'" data-pid="'+he(p.id)+'" style="background:'+c.bg+';border-color:'+c.bd+';'+extraStyle+'">'
       +'<div class="pc-inner">'+ihtml(p.cls,18,p.role)
       +'<span style="font-size:1rem;font-weight:700;color:#f8f8f8;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+he(p.name)+'</span>'
+      +'<span style="font-size:.62rem;color:rgba(248,248,248,0.55);white-space:nowrap">'+he(p.spec||'')+'</span>'
       +(p.cls==='Warrior'?'<button class="bx" data-a="totank" data-pid="'+he(p.id)+'" title="'+(p.role==='tank'?'Convert to DPS':'Convert to Tank')+'" style="font-size:.55rem;padding:1px 4px;color:'+(p.role==='tank'?'#7ab0ff':'#e07020')+';border-color:'+(p.role==='tank'?'#2a4a90':'#804010')+'">'+(p.role==='tank'?'D':'T')+'</button>':'')
       +'<button class="bx" data-a="tobench" data-pid="'+he(p.id)+'" title="Move to bench" style="font-size:.55rem;padding:1px 4px">B</button>'
       +'<button class="bx" data-a="rmp" data-pid="'+he(p.id)+'" title="Remove">x</button>'
@@ -1018,15 +1023,15 @@ document.addEventListener('click',function(e){
   if(a==='topool'){moveToPool(el.dataset.pid);return;}
   if(a==='tobench'){moveToBench(el.dataset.pid);return;}
   if(a==='totank'){convertToTank(el.dataset.pid);return;}
-  if(a==='sg'){sel={t:'g',gi:+el.dataset.gi,si:+el.dataset.si};setBan('Group '+(+el.dataset.gi+1)+' slot '+(+el.dataset.si+1));rAll();return;}
+  if(a==='sg'){sel={t:'g',gi:+el.dataset.gi,si:+el.dataset.si,role:null};setBan('Group '+(+el.dataset.gi+1)+' slot '+(+el.dataset.si+1));rAll();return;}
   if(a==='rmg'){groups[+el.dataset.gi].slots[+el.dataset.si].p=null;rAll();return;}
-  if(a==='st'){sel={t:'tm',mi:+el.dataset.mi};setBan(trashMarks[+el.dataset.mi].name+' \u2014 Tank');rAll();return;}
-  if(a==='sh'){sel={t:'th',mi:+el.dataset.mi};setBan(trashMarks[+el.dataset.mi].name+' \u2014 Healer');rAll();return;}
+  if(a==='st'){sel={t:'tm',mi:+el.dataset.mi,role:'tank'};setBan(trashMarks[+el.dataset.mi].name+' — Tank');rAll();return;}
+  if(a==='sh'){sel={t:'th',mi:+el.dataset.mi,role:'healer'};setBan(trashMarks[+el.dataset.mi].name+' — Healer');rAll();return;}
   if(a==='rmt'){trashMarks[+el.dataset.mi].tank=null;rAll();return;}
   if(a==='rmh'){trashMarks[+el.dataset.mi].healer=null;rAll();return;}
-  if(a==='spu'){sel={t:'pu'};setBan('Puller');rAll();return;}
+  if(a==='spu'){sel={t:'pu',role:'hunter'};setBan('Puller');rAll();return;}
   if(a==='rpu'){puller=null;rAll();return;}
-  if(a==='sbs'){sel={t:'bs',bid:el.dataset.bid,key:el.dataset.key};setBan(el.dataset.bid+' \u2014 '+el.dataset.key);rAll();return;}
+  if(a==='sbs'){var bossRef=null;for(var bi2=0;bi2<BOSSES.length;bi2++)if(BOSSES[bi2].id===el.dataset.bid){bossRef=BOSSES[bi2];break;}var slotRole=null;if(bossRef){bossRef.segments.forEach(function(seg){seg.slots.forEach(function(sl){if(sl.key===el.dataset.key){slotRole=sl.isHealer?'healer':sl.isSheep?'dps':'tank';}});});}sel={t:'bs',bid:el.dataset.bid,key:el.dataset.key,role:slotRole};setBan(el.dataset.bid+' — '+el.dataset.key);rAll();return;}
   if(a==='rbs'){if(bossData[el.dataset.bid])bossData[el.dataset.bid][el.dataset.key]=null;rAll();return;}
   if(a==='copyTrash'){var box=document.getElementById('trashExpBox');if(box)navigator.clipboard.writeText(box.textContent.replace(/ !/g,'')).catch(function(){});return;}
   if(a==='copyBoss'){var box2=document.getElementById('bossExpBox_'+el.dataset.bid);if(box2)navigator.clipboard.writeText(box2.textContent).catch(function(){});return;}
@@ -1211,52 +1216,40 @@ document.getElementById('bCopyShareUrl').addEventListener('click',function(){
 
 /* ── READ-ONLY VIEW MODE ── */
 function renderViewMode(data){
-  /* Rebuild player map */
   var pmap={};
   (data.players||[]).forEach(function(p){pmap[p.id]=p;});
 
-  function pname(id){return id&&pmap[id]?pmap[id].name:'—';}
-  function prow(id,showSpec){
-    var p=pmap[id];if(!p)return '<span style="color:#4a3a18;font-style:italic">Unassigned</span>';
+  function vprow(id){
+    var p=pmap[id];if(!p)return '<span style="color:#3a5080;font-style:italic;font-size:.82rem">Unassigned</span>';
     var c=cd(p.cls);
-    return '<span style="display:inline-flex;align-items:center;gap:4px;background:'+c.bg+';border:1px solid '+c.bd+';border-radius:3px;padding:2px 6px">'
-      +ihtml(p.cls,14,p.role)
-      +'<span style="color:'+c.c+';font-weight:600;font-size:.85rem">'+he(p.name)+'</span>'
-      +(showSpec?'<span style="color:'+c.c+';opacity:.6;font-size:.6rem">'+he(p.spec||'')+'</span>':'')
-      +'</span>';
+    return '<div style="display:inline-flex;align-items:center;gap:5px;background:'+c.bg+';border:2px solid '+c.bd+';border-radius:5px;padding:4px 8px;min-width:0">'
+      +ihtml(p.cls,15,p.role)
+      +'<span style="font-size:1rem;font-weight:700;color:#f8f8f8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+he(p.name)+'</span>'
+      +'<span style="font-size:.6rem;color:rgba(248,248,248,0.5);white-space:nowrap">'+he(p.spec||'')+'</span>'
+      +'</div>';
   }
 
-  /* Build groups */
   var viewGroups=[];
   (data.groups||[]).forEach(function(slotIds,gi){
-    var filled=slotIds.filter(function(id){return id&&pmap[id];});
-    if(filled.length)viewGroups.push({idx:gi+1,slots:slotIds});
+    if(slotIds.some(function(id){return id&&pmap[id];}))viewGroups.push({idx:gi+1,slots:slotIds});
   });
-
-  /* Trash marks */
   var trash=data.trash||[];
   var pullerP=pmap[data.puller]||null;
-
-  /* Boss data */
   var bd=data.bosses||{};
 
-  /* ── HTML ── */
-  var h='<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
-    +'<title>Raid View \u2014 Molten Core</title>'
-    +'<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:wght@400;500&display=swap" rel="stylesheet">'
-    +'<style>'
+  var css=''
     +'*{box-sizing:border-box;margin:0;padding:0;}'
-    +'body{background:#0a0704;color:#e8d5a3;font-family:"Crimson Pro",Georgia,serif;font-size:15px;padding:1rem 1.5rem;max-width:1200px;margin:0 auto;}'
-    +'h1{font-family:"Cinzel",serif;font-size:1.4rem;color:#ff9900;text-align:center;margin-bottom:.15rem;}'
-    +'.sub{text-align:center;color:#9a7a4a;font-size:.8rem;margin-bottom:1rem;font-family:"Cinzel",serif;}'
-    +'.section{background:#100c05;border:1px solid #3a2a08;border-radius:8px;padding:.8rem 1rem;margin-bottom:1rem;}'
-    +'.sh{font-family:"Cinzel",serif;font-size:.85rem;color:#ff9900;margin-bottom:.6rem;border-bottom:1px solid #2a1a08;padding-bottom:.4rem;}'
-    +'.ggrid{display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem;contain:layout style;}'
-    +'.gc{background:#100c05;border:1px solid #3a2a08;border-radius:6px;overflow:hidden;}'
-    +'.gh{background:#1a1005;padding:3px 8px;font-family:"Cinzel",serif;font-size:.7rem;color:#c87020;border-bottom:1px solid #2a1a08;}'
-    +'.gs{padding:4px 6px;}'
-    +'.sf{border-radius:3px;margin-bottom:2px;}'
-    +'.sb{padding:3px 6px;display:flex;align-items:center;gap:5px;}'
+    +'body{background:#0a0d18;color:#e0d8f8;font-family:"Crimson Pro",Georgia,serif;font-size:15px;padding:1.2rem 1.5rem;max-width:1200px;margin:0 auto;}'
+    +'h1{font-family:"Cinzel",serif;font-size:1.4rem;color:#7ab0ff;text-align:center;margin-bottom:.15rem;letter-spacing:.05em;}'
+    +'.sub{text-align:center;color:#4a6090;font-size:.8rem;margin-bottom:1.2rem;font-family:"Cinzel",serif;}'
+    +'.section{background:#131726;border:1px solid #2a3050;border-radius:8px;padding:.85rem 1.1rem;margin-bottom:1rem;}'
+    +'.sh{font-family:"Cinzel",serif;font-size:.88rem;color:#7ab0ff;margin-bottom:.65rem;border-bottom:1px solid #2a3050;padding-bottom:.4rem;letter-spacing:.06em;}'
+    +'.ggrid{display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem;}'
+    +'.gc{background:#0f1322;border:1px solid #2a3050;border-radius:6px;overflow:hidden;}'
+    +'.gh{background:#0d1020;padding:4px 9px;font-family:"Cinzel",serif;font-size:.72rem;color:#7ab0ff;border-bottom:1px solid #2a3050;}'
+    +'.gs{padding:5px 7px;}'
+    +'.sf{border-radius:5px;margin-bottom:4px;overflow:hidden;}'
+    +'.sb{padding:4px 8px;display:flex;align-items:center;gap:6px;}'
     +'.asgrid{display:grid;gap:.4rem;margin-bottom:.5rem;}'
     +'.asgrid-1{grid-template-columns:1fr;}'
     +'.asgrid-2{grid-template-columns:repeat(2,1fr);}'
@@ -1264,16 +1257,25 @@ function renderViewMode(data){
     +'.asgrid-4{grid-template-columns:repeat(4,1fr);}'
     +'.asgrid-5{grid-template-columns:repeat(5,1fr);}'
     +'.asgrid-6{grid-template-columns:repeat(6,1fr);}'
-    +'.mc{background:#141008;border:1px solid #3a2a10;border-radius:5px;overflow:hidden;}'
-    +'.mh{padding:3px 7px;font-family:"Cinzel",serif;font-size:.66rem;font-weight:600;border-bottom:1px solid #241a08;display:flex;align-items:center;gap:3px;}'
-    +'.mv{padding:4px 6px;}'
+    +'.mc{background:#0f1322;border:1px solid #2a3050;border-radius:6px;overflow:hidden;}'
+    +'.mh{padding:5px 9px;font-family:"Cinzel",serif;font-size:.7rem;font-weight:600;border-bottom:1px solid #2a3050;display:flex;align-items:center;gap:4px;}'
+    +'.mv{padding:5px 7px;}'
     +'.mark-row{display:grid;grid-template-columns:repeat(5,1fr);gap:.4rem;margin-bottom:.5rem;}'
-    +'.prow{display:flex;align-items:center;gap:.5rem;padding:.35rem .6rem;background:#141008;border:1px solid #3a2a10;border-radius:5px;margin-bottom:.4rem;}'
-    +'.plbl{font-family:"Cinzel",serif;font-size:.7rem;color:#c87020;white-space:nowrap;}'
-    +'.blbl{font-family:"Cinzel",serif;font-size:.7rem;font-weight:600;color:#c87020;margin:.4rem 0 .25rem;text-transform:uppercase;letter-spacing:.06em;}'
-    +'.note-box{font-size:.7rem;color:#8acc6a;background:#0a1a08;border:1px solid #2a4a1a;border-radius:5px;padding:.4rem .6rem;margin:.35rem 0;line-height:1.6;}'
-    +'.empty{color:#4a3a18;font-style:italic;font-size:.8rem;}'
-    +'</style></head><body>';
+    +'.prow{display:flex;align-items:center;gap:.6rem;padding:.45rem .65rem;background:#0f1322;border:1px solid #2a3050;border-radius:6px;margin-bottom:.45rem;}'
+    +'.plbl{font-family:"Cinzel",serif;font-size:.72rem;color:#7ab0ff;white-space:nowrap;}'
+    +'.blbl{font-family:"Cinzel",serif;font-size:.72rem;font-weight:600;color:#7ab0ff;margin:.4rem 0 .3rem;text-transform:uppercase;letter-spacing:.06em;}'
+    +'.rlbl{font-size:.62rem;color:#4a6090;text-transform:uppercase;font-family:"Cinzel",serif;letter-spacing:.05em;margin:.3rem 0 .2rem;}'
+    +'.note-box{font-size:.72rem;color:#60cc80;background:#0a1a12;border:1px solid #1a5a3a;border-radius:5px;padding:.4rem .65rem;margin:.35rem 0;line-height:1.6;}'
+    +'.empty{color:#3a5080;font-style:italic;font-size:.82rem;}'
+    +'.boss-sec{margin-bottom:1rem;padding-bottom:.85rem;border-bottom:1px solid #2a3050;}'
+    +'.boss-sec:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0;}';
+
+  var h='<!DOCTYPE html><html lang="en"><head>'
+    +'<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
+    +'<title>Raid View \u2014 Molten Core</title>'
+    +'<link rel="preconnect" href="https://fonts.googleapis.com">'
+    +'<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:wght@400;500&display=swap" rel="stylesheet">'
+    +'<style>'+css+'</style></head><body>';
 
   h+='<h1>Molten Core Raid</h1><div class="sub">Read-only raid view</div>';
 
@@ -1284,41 +1286,48 @@ function renderViewMode(data){
     g.slots.forEach(function(pid){
       if(!pid||!pmap[pid])return;
       var p=pmap[pid],c=cd(p.cls);
-      h+='<div class="sf" style="border:1px solid '+c.bd+'"><div class="sb" style="background:'+c.bg+'">'+ihtml(p.cls,14,p.role)
-        +'<span style="font-size:.82rem;font-weight:700;color:'+c.c+';flex:1">'+he(p.name)+'</span>'
-        +'<span style="font-size:.5rem;color:'+c.c+';opacity:.65">'+he(p.spec||'')+'</span>'
+      h+='<div class="sf" style="border:2px solid '+c.bd+'"><div class="sb" style="background:'+c.bg+'">'
+        +ihtml(p.cls,15,p.role)
+        +'<span style="font-size:1rem;font-weight:700;color:#f8f8f8;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+he(p.name)+'</span>'
+        +'<span style="font-size:.58rem;color:rgba(248,248,248,0.5)">'+he(p.spec||'')+'</span>'
         +'</div></div>';
     });
     h+='</div></div>';
   });
   h+='</div></div>';
 
-  /* Benched / Late / Absent */
+  /* Benched */
   var benchedV=data.benched||[];
   if(benchedV.length){
     h+='<div class="section"><div class="sh">Roster Status</div>';
-    h+='<div class="blbl" style="color:#50a050">&#128196; Benched ('+benchedV.length+')</div>';
-    h+='<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:.5rem">';
-    benchedV.forEach(function(p){var c=p.cls?cd(p.cls):{c:'#f8f8f8',bg:'#0a1a12',bd:'#1a5a3a'};h+='<span style="display:inline-flex;align-items:center;gap:3px;background:'+c.bg+';border:1px solid '+c.bd+';border-radius:3px;padding:2px 6px;font-size:.82rem;color:'+c.c+'">'+(p.cls?ihtml(p.cls,13,p.role):'')+he(p.name)+'</span>';});
-    h+='</div>';
-    h+='</div>';
+    h+='<div class="blbl" style="color:#60cc80">&#128196; Benched ('+benchedV.length+')</div>';
+    h+='<div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:.5rem">';
+    benchedV.forEach(function(p){
+      var c=p.cls?cd(p.cls):{c:'#f8f8f8',bg:'#0a1a12',bd:'#1a5a3a'};
+      h+='<div style="display:inline-flex;align-items:center;gap:5px;background:'+c.bg+';border:2px solid '+c.bd+';border-radius:5px;padding:4px 8px">'
+        +(p.cls?ihtml(p.cls,14,p.role):'')
+        +'<span style="font-size:.95rem;font-weight:700;color:#f8f8f8">'+he(p.name)+'</span>'
+        +(p.spec?'<span style="font-size:.58rem;color:rgba(248,248,248,0.5)">'+he(p.spec)+'</span>':'')
+        +'</div>';
+    });
+    h+='</div></div>';
   }
+
+  /* Trash marks */
   h+='<div class="section"><div class="sh">Trash \u2014 Tank Marks &amp; Healing</div>';
   h+='<div class="mark-row">';
   TRASH_MARKS.forEach(function(m,i){
     var tankId=trash[i]?trash[i].tank:null;
     var healId=trash[i]?trash[i].healer:null;
     h+='<div class="mc"><div class="mh" style="background:'+m.col+'33;color:'+m.col+'">'+MARK_SYMS[i]+' '+m.name+'</div><div class="mv">';
-    h+='<div style="font-size:.6rem;color:#9a8050;text-transform:uppercase;font-family:Cinzel,serif;margin-bottom:2px">Tank</div>';
-    h+=tankId?prow(tankId,false):'<span class="empty">Unassigned</span>';
-    h+='<div style="font-size:.6rem;color:#9a8050;text-transform:uppercase;font-family:Cinzel,serif;margin:.3rem 0 2px">Healer</div>';
-    h+=healId?prow(healId,false):'<span class="empty">Unassigned</span>';
+    h+='<div class="rlbl">Tank</div>';
+    h+=tankId?vprow(tankId):'<span class="empty">Unassigned</span>';
+    h+='<div class="rlbl" style="margin-top:.3rem">Healer</div>';
+    h+=healId?vprow(healId):'<span class="empty">Unassigned</span>';
     h+='</div></div>';
   });
   h+='</div>';
-  if(pullerP){
-    h+='<div class="prow"><span class="plbl">Puller</span>'+prow(data.puller,true)+'</div>';
-  }
+  if(pullerP){h+='<div class="prow"><span class="plbl">Puller</span>'+vprow(data.puller)+'</div>';}
   h+='</div>';
 
   /* Boss assignments */
@@ -1326,35 +1335,29 @@ function renderViewMode(data){
   BOSSES.forEach(function(boss){
     if(boss.isTrash)return;
     var bdata=bd[boss.id]||{};
-    var hasAny=boss.segments.some(function(seg){return seg.slots.some(function(sl){return bdata[sl.key]&&(typeof bdata[sl.key]==='string'?bdata[sl.key]:false);});});
-    /* always show, even if empty */
-    h+='<div style="margin-bottom:.8rem">';
+    h+='<div class="boss-sec">';
     h+='<div class="blbl">'+he(boss.name)+'</div>';
     boss.segments.forEach(function(seg){
       var cols=Math.min(seg.cols||seg.slots.length,6);
-      var rowColor=seg.isHealRow?'#60c060':seg.isSheepRow?'#8080e8':'#9a8050';
-      h+='<div style="font-size:.58rem;color:'+rowColor+';text-transform:uppercase;font-family:Cinzel,serif;letter-spacing:.05em;margin:.25rem 0 .2rem">'+he(seg.title)+'</div>';
+      var rowColor=seg.isHealRow?'#60cc80':seg.isSheepRow?'#8080e8':'#4a6090';
+      h+='<div class="rlbl" style="color:'+rowColor+'">'+he(seg.title)+'</div>';
       h+='<div class="asgrid asgrid-'+cols+'">';
       seg.slots.forEach(function(sl){
         var pid=bdata[sl.key];
         var markHtml=sl.markIdx!==null&&sl.markIdx!==undefined?'<span style="font-size:.9rem">'+MARK_SYMS[sl.markIdx]+'</span> ':'';
         var headerBg=seg.isSheepRow?'#181830':sl.isHealer?'#0a1a12':'#1e3858';
-        var headerCol=seg.isSheepRow?'#8080e8':sl.isHealer?'#60c060':MARK_COLS[sl.markIdx]||'#c8d8f8';
-        if(sl.markIdx===null||sl.markIdx===undefined) headerCol='#7ab0ff';
+        var headerCol=seg.isSheepRow?'#8080e8':sl.isHealer?'#60cc80':MARK_COLS[sl.markIdx]||'#c8d8f8';
+        if(sl.markIdx===null||sl.markIdx===undefined)headerCol='#7ab0ff';
         h+='<div class="mc"><div class="mh" style="background:'+headerBg+'88;color:'+headerCol+'">'+markHtml+he(sl.label)+'</div>';
-        h+='<div class="mv">';
-        if(pid&&pmap[pid]){h+=prow(pid,false);}
-        else{h+='<span class="empty">Unassigned</span>';}
-        h+='</div></div>';
+        h+='<div class="mv">'+(pid&&pmap[pid]?vprow(pid):'<span class="empty">Unassigned</span>')+'</div></div>';
       });
       h+='</div>';
     });
-    if(bdata.notes){h+='<div class="note-box">'+he(bdata.notes)+'</div>';}
+    if(bdata.notes)h+='<div class="note-box">'+he(bdata.notes)+'</div>';
     h+='</div>';
   });
   h+='</div>';
 
-  h+='<div style="text-align:center;font-size:.65rem;color:#3a2a10;margin-top:1rem;font-family:Cinzel,serif">Generated by Molten Core Raid Organizer</div>';
   h+='</body></html>';
   return h;
 }
