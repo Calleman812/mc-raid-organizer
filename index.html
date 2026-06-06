@@ -134,12 +134,21 @@ textarea{width:100%;background:#0d0802;border:1px solid #4a2e08;color:#e8d5a3;pa
   <div class="mbtns"><button class="btn bsm" id="bJsonCancel">Cancel</button><button class="btn bfire" id="bJsonImport">Import JSON</button></div>
 </div>
 
-<div class="card">
-  <div class="stitle">Import Raid</div>
+<div class="modal-wrap" id="shareModal" style="max-width:520px">
+  <div class="modal-title">&#128279; Share Raid View</div>
+  <div style="font-size:.75rem;color:#9a7030;margin-bottom:.5rem">Copy this link and send it to your raid members. They will see a read-only overview of the raid composition and all boss assignments.</div>
+  <div style="display:flex;gap:6px;align-items:center">
+    <input type="text" id="shareUrl" readonly style="flex:1;font-size:.72rem;background:#0a0602;color:#c0a060;cursor:text" placeholder="Generate link...">
+    <button class="btn bfire" id="bCopyShareUrl">Copy</button>
+  </div>
+  <div style="font-size:.65rem;color:#5a4020;margin-top:.4rem;font-style:italic">Note: the link encodes the current state. Re-generate after making changes.</div>
+  <div class="mbtns"><button class="btn bsm" id="bShareClose">Close</button></div>
+</div>
   <div class="row">
     <button class="btn bgold" id="bJsonOpen">Import JSON</button>
     <button class="btn bgold" id="bDemo">Load Demo</button>
     <button class="btn bgold" id="bAdd">+ Add Player</button>
+    <button class="btn bfire" id="bShare">&#128279; Share View</button>
   </div>
   <div class="tip" id="tip"></div>
 </div>
@@ -614,7 +623,7 @@ function renderTrashTab(){
   h+='</div>';
   var dp2=trashDups(),lines=['Trash tank and healing assignments'];
   trashMarks.forEach(function(m,i){
-    lines.push(MARK_SYMS[i]+' {'+m.name+'} '+(m.tank?m.tank.name:'--')+(m.tank&&dp2[m.tank.id]?' !':'')+' - '+(m.healer?m.healer.name:'--')+(m.healer&&dp2[m.healer.id]?' !':''));
+    lines.push('{'+m.name+'} '+(m.tank?m.tank.name:'--')+(m.tank&&dp2[m.tank.id]?' !':'')+' - '+(m.healer?m.healer.name:'--')+(m.healer&&dp2[m.healer.id]?' !':''));
   });
   lines.push('Puller: '+(puller?puller.name:'--'));
   h+='<div class="prev-row"><span class="prev-lbl">Preview</span><button class="btn bsm" data-a="copyTrash">Copy</button></div>';
@@ -852,6 +861,199 @@ document.getElementById('bMadd').addEventListener('click',function(){
   showUI();rAll();tip('Added '+name+' ('+role+')');
 });
 document.getElementById('mName').addEventListener('keydown',function(e){if(e.key==='Enter')document.getElementById('bMadd').click();});
+
+/* ── SHARE / VIEW MODE ── */
+function buildSharePayload(){
+  /* Encode minimal state: groups, trashMarks, bossData, puller */
+  var payload={
+    players: players.map(function(p){return{id:p.id,name:p.name,cls:p.cls,spec:p.spec,role:p.role};}),
+    groups: groups.map(function(g){return g.slots.map(function(s){return s.p?s.p.id:null;});}),
+    trash: trashMarks.map(function(m){return{tank:m.tank?m.tank.id:null,healer:m.healer?m.healer.id:null};}),
+    puller: puller?puller.id:null,
+    bosses: (function(){var o={};for(var bid in bossData){o[bid]={};for(var k in bossData[bid]){var v=bossData[bid][k];if(v&&typeof v==='object'&&v.id)o[bid][k]=v.id;else if(k==='notes')o[bid][k]=v||'';}}return o;})()
+  };
+  return payload;
+}
+
+function encodePayload(obj){
+  try{return btoa(unescape(encodeURIComponent(JSON.stringify(obj))));}catch(e){return '';}
+}
+function decodePayload(str){
+  try{return JSON.parse(decodeURIComponent(escape(atob(str))));}catch(e){return null;}
+}
+
+document.getElementById('bShare').addEventListener('click',function(){
+  if(!players.length){tip('Load a raid first before sharing.',true);return;}
+  var payload=buildSharePayload();
+  var encoded=encodePayload(payload);
+  var url=window.location.href.split('?')[0].split('#')[0]+'?view='+encoded;
+  document.getElementById('shareUrl').value=url;
+  document.getElementById('shareModal').className='modal-wrap on';
+});
+document.getElementById('bShareClose').addEventListener('click',function(){document.getElementById('shareModal').className='modal-wrap';});
+document.getElementById('bCopyShareUrl').addEventListener('click',function(){
+  var inp=document.getElementById('shareUrl');
+  inp.select();
+  navigator.clipboard.writeText(inp.value).catch(function(){});
+  document.getElementById('bCopyShareUrl').textContent='Copied!';
+  setTimeout(function(){document.getElementById('bCopyShareUrl').textContent='Copy';},1500);
+});
+
+/* ── READ-ONLY VIEW MODE ── */
+function renderViewMode(data){
+  /* Rebuild player map */
+  var pmap={};
+  (data.players||[]).forEach(function(p){pmap[p.id]=p;});
+
+  function pname(id){return id&&pmap[id]?pmap[id].name:'—';}
+  function prow(id,showSpec){
+    var p=pmap[id];if(!p)return '<span style="color:#4a3a18;font-style:italic">Unassigned</span>';
+    var c=cd(p.cls);
+    return '<span style="display:inline-flex;align-items:center;gap:4px;background:'+c.bg+';border:1px solid '+c.bd+';border-radius:3px;padding:2px 6px">'
+      +ihtml(p.cls,14,p.role)
+      +'<span style="color:'+c.c+';font-weight:600;font-size:.85rem">'+he(p.name)+'</span>'
+      +(showSpec?'<span style="color:'+c.c+';opacity:.6;font-size:.6rem">'+he(p.spec||'')+'</span>':'')
+      +'</span>';
+  }
+
+  /* Build groups */
+  var viewGroups=[];
+  (data.groups||[]).forEach(function(slotIds,gi){
+    var filled=slotIds.filter(function(id){return id&&pmap[id];});
+    if(filled.length)viewGroups.push({idx:gi+1,slots:slotIds});
+  });
+
+  /* Trash marks */
+  var trash=data.trash||[];
+  var pullerP=pmap[data.puller]||null;
+
+  /* Boss data */
+  var bd=data.bosses||{};
+
+  /* ── HTML ── */
+  var h='<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
+    +'<title>Raid View \u2014 Molten Core</title>'
+    +'<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:wght@400;500&display=swap" rel="stylesheet">'
+    +'<style>'
+    +'*{box-sizing:border-box;margin:0;padding:0;}'
+    +'body{background:#0a0704;color:#e8d5a3;font-family:"Crimson Pro",Georgia,serif;font-size:15px;padding:1rem 1.5rem;max-width:1200px;margin:0 auto;}'
+    +'h1{font-family:"Cinzel",serif;font-size:1.4rem;color:#ff9900;text-align:center;margin-bottom:.15rem;}'
+    +'.sub{text-align:center;color:#9a7a4a;font-size:.8rem;margin-bottom:1rem;font-family:"Cinzel",serif;}'
+    +'.section{background:#100c05;border:1px solid #3a2a08;border-radius:8px;padding:.8rem 1rem;margin-bottom:1rem;}'
+    +'.sh{font-family:"Cinzel",serif;font-size:.85rem;color:#ff9900;margin-bottom:.6rem;border-bottom:1px solid #2a1a08;padding-bottom:.4rem;}'
+    +'.ggrid{display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem;}'
+    +'.gc{background:#100c05;border:1px solid #3a2a08;border-radius:6px;overflow:hidden;}'
+    +'.gh{background:#1a1005;padding:3px 8px;font-family:"Cinzel",serif;font-size:.7rem;color:#c87020;border-bottom:1px solid #2a1a08;}'
+    +'.gs{padding:4px 6px;}'
+    +'.sf{border-radius:3px;margin-bottom:2px;}'
+    +'.sb{padding:3px 6px;display:flex;align-items:center;gap:5px;}'
+    +'.asgrid{display:grid;gap:.4rem;margin-bottom:.5rem;}'
+    +'.asgrid-1{grid-template-columns:1fr;}'
+    +'.asgrid-2{grid-template-columns:repeat(2,1fr);}'
+    +'.asgrid-3{grid-template-columns:repeat(3,1fr);}'
+    +'.asgrid-4{grid-template-columns:repeat(4,1fr);}'
+    +'.asgrid-5{grid-template-columns:repeat(5,1fr);}'
+    +'.asgrid-6{grid-template-columns:repeat(6,1fr);}'
+    +'.mc{background:#141008;border:1px solid #3a2a10;border-radius:5px;overflow:hidden;}'
+    +'.mh{padding:3px 7px;font-family:"Cinzel",serif;font-size:.66rem;font-weight:600;border-bottom:1px solid #241a08;display:flex;align-items:center;gap:3px;}'
+    +'.mv{padding:4px 6px;}'
+    +'.mark-row{display:grid;grid-template-columns:repeat(5,1fr);gap:.4rem;margin-bottom:.5rem;}'
+    +'.prow{display:flex;align-items:center;gap:.5rem;padding:.35rem .6rem;background:#141008;border:1px solid #3a2a10;border-radius:5px;margin-bottom:.4rem;}'
+    +'.plbl{font-family:"Cinzel",serif;font-size:.7rem;color:#c87020;white-space:nowrap;}'
+    +'.blbl{font-family:"Cinzel",serif;font-size:.7rem;font-weight:600;color:#c87020;margin:.4rem 0 .25rem;text-transform:uppercase;letter-spacing:.06em;}'
+    +'.note-box{font-size:.7rem;color:#8acc6a;background:#0a1a08;border:1px solid #2a4a1a;border-radius:5px;padding:.4rem .6rem;margin:.35rem 0;line-height:1.6;}'
+    +'.empty{color:#4a3a18;font-style:italic;font-size:.8rem;}'
+    +'</style></head><body>';
+
+  h+='<h1>Molten Core Raid</h1><div class="sub">Read-only raid view</div>';
+
+  /* Groups */
+  h+='<div class="section"><div class="sh">Raid Groups</div><div class="ggrid">';
+  viewGroups.forEach(function(g){
+    h+='<div class="gc"><div class="gh">Group '+g.idx+'</div><div class="gs">';
+    g.slots.forEach(function(pid){
+      if(!pid||!pmap[pid])return;
+      var p=pmap[pid],c=cd(p.cls);
+      h+='<div class="sf" style="border:1px solid '+c.bd+'"><div class="sb" style="background:'+c.bg+'">'+ihtml(p.cls,14,p.role)
+        +'<span style="font-size:.82rem;font-weight:700;color:'+c.c+';flex:1">'+he(p.name)+'</span>'
+        +'<span style="font-size:.5rem;color:'+c.c+';opacity:.65">'+he(p.spec||'')+'</span>'
+        +'</div></div>';
+    });
+    h+='</div></div>';
+  });
+  h+='</div></div>';
+
+  /* Trash marks */
+  h+='<div class="section"><div class="sh">Trash \u2014 Tank Marks &amp; Healing</div>';
+  h+='<div class="mark-row">';
+  TRASH_MARKS.forEach(function(m,i){
+    var tankId=trash[i]?trash[i].tank:null;
+    var healId=trash[i]?trash[i].healer:null;
+    h+='<div class="mc"><div class="mh" style="background:'+m.col+'33;color:'+m.col+'">'+MARK_SYMS[i]+' '+m.name+'</div><div class="mv">';
+    h+='<div style="font-size:.6rem;color:#9a8050;text-transform:uppercase;font-family:Cinzel,serif;margin-bottom:2px">Tank</div>';
+    h+=tankId?prow(tankId,false):'<span class="empty">Unassigned</span>';
+    h+='<div style="font-size:.6rem;color:#9a8050;text-transform:uppercase;font-family:Cinzel,serif;margin:.3rem 0 2px">Healer</div>';
+    h+=healId?prow(healId,false):'<span class="empty">Unassigned</span>';
+    h+='</div></div>';
+  });
+  h+='</div>';
+  if(pullerP){
+    h+='<div class="prow"><span class="plbl">Puller</span>'+prow(data.puller,true)+'</div>';
+  }
+  h+='</div>';
+
+  /* Boss assignments */
+  h+='<div class="section"><div class="sh">Boss Assignments</div>';
+  BOSSES.forEach(function(boss){
+    if(boss.isTrash)return;
+    var bdata=bd[boss.id]||{};
+    var hasAny=boss.segments.some(function(seg){return seg.slots.some(function(sl){return bdata[sl.key]&&(typeof bdata[sl.key]==='string'?bdata[sl.key]:false);});});
+    /* always show, even if empty */
+    h+='<div style="margin-bottom:.8rem">';
+    h+='<div class="blbl">'+he(boss.name)+'</div>';
+    boss.segments.forEach(function(seg){
+      var cols=Math.min(seg.cols||seg.slots.length,6);
+      var rowColor=seg.isHealRow?'#60c060':seg.isSheepRow?'#8080e8':'#9a8050';
+      h+='<div style="font-size:.58rem;color:'+rowColor+';text-transform:uppercase;font-family:Cinzel,serif;letter-spacing:.05em;margin:.25rem 0 .2rem">'+he(seg.title)+'</div>';
+      h+='<div class="asgrid asgrid-'+cols+'">';
+      seg.slots.forEach(function(sl){
+        var pid=bdata[sl.key];
+        var markHtml=sl.markIdx!==null&&sl.markIdx!==undefined?'<span style="font-size:.9rem">'+MARK_SYMS[sl.markIdx]+'</span> ':'';
+        var headerBg=seg.isSheepRow?'#181830':sl.isHealer?'#0a1a0a':'#1a2535';
+        var headerCol=seg.isSheepRow?'#8080e8':sl.isHealer?'#60c060':MARK_COLS[sl.markIdx]||'#c8d8f8';
+        if(sl.markIdx===null||sl.markIdx===undefined) headerCol='#c87020';
+        h+='<div class="mc"><div class="mh" style="background:'+headerBg+'88;color:'+headerCol+'">'+markHtml+he(sl.label)+'</div>';
+        h+='<div class="mv">';
+        if(pid&&pmap[pid]){h+=prow(pid,false);}
+        else{h+='<span class="empty">Unassigned</span>';}
+        h+='</div></div>';
+      });
+      h+='</div>';
+    });
+    if(bdata.notes){h+='<div class="note-box">'+he(bdata.notes)+'</div>';}
+    h+='</div>';
+  });
+  h+='</div>';
+
+  h+='<div style="text-align:center;font-size:.65rem;color:#3a2a10;margin-top:1rem;font-family:Cinzel,serif">Generated by Molten Core Raid Organizer</div>';
+  h+='</body></html>';
+  return h;
+}
+
+/* Check for ?view= param on load and show read-only view */
+(function(){
+  var params=new URLSearchParams(window.location.search);
+  var viewData=params.get('view');
+  if(!viewData)return;
+
+  var data=decodePayload(viewData);
+  if(!data){document.body.innerHTML='<div style="color:#c04030;padding:2rem;font-family:sans-serif">Invalid view link.</div>';return;}
+
+  /* Inject ISVG/TANK_ICON/CLS/MARK_SYMS/MARK_COLS/TRASH_MARKS/BOSSES/ihtml/cd/he into the rendered page directly */
+  var html=renderViewMode(data);
+  document.open();document.write(html);document.close();
+})();
+
 mkG();mkMarks();
 </script>
 </body>
