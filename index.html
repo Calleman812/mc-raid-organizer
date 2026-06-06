@@ -4,10 +4,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Molten Core Raid Organizer</title>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:wght@400;500&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:wght@400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:wght@400;500&display=swap" rel="stylesheet"></noscript>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:#0a0704;color:#e8d5a3;font-family:'Crimson Pro',Georgia,serif;font-size:15px;}
+/* Prevent font flash on re-renders */
+@font-face{font-family:'Cinzel';font-display:swap;}
+@font-face{font-family:'Crimson Pro';font-display:swap;}
 .app{max-width:1400px;margin:0 auto;padding:1rem 1.5rem;}
 h1{font-family:'Cinzel',serif;font-size:1.6rem;font-weight:700;color:#ff9900;text-align:center;letter-spacing:.05em;margin-bottom:.15rem;}
 .sub{text-align:center;color:#9a7a4a;font-size:.85rem;margin-bottom:.9rem;font-family:'Cinzel',serif;}
@@ -34,7 +40,7 @@ select option{background:#1a0f07;}
 .sl{font-size:.65rem;color:#7a6030;text-transform:uppercase;letter-spacing:.07em;text-align:center;}
 .vsep{width:1px;background:#3a2a10;height:28px;}
 .layout{display:grid;grid-template-columns:210px 1fr;gap:.85rem;align-items:start;}
-.pool{background:#100c05;border:1px solid #3a2a08;border-radius:8px;padding:.7rem;max-height:84vh;overflow-y:auto;position:sticky;top:0;}
+.pool{background:#100c05;border:1px solid #3a2a08;border-radius:8px;padding:.7rem;max-height:84vh;overflow-y:auto;position:sticky;top:0;will-change:transform;transform:translateZ(0);contain:layout style;}
 .pool::-webkit-scrollbar{width:3px;}
 .pool::-webkit-scrollbar-thumb{background:#4a3a18;}
 .ptitle{font-family:'Cinzel',serif;font-size:.72rem;color:#c87020;text-transform:uppercase;margin-bottom:.4rem;display:flex;justify-content:space-between;align-items:center;}
@@ -48,7 +54,7 @@ select option{background:#1a0f07;}
 .pc-inner{padding:4px 6px;display:flex;align-items:center;gap:6px;}
 .rcol{display:flex;flex-direction:column;gap:.85rem;}
 .sectitle{font-family:'Cinzel',serif;font-size:.76rem;color:#c87020;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.5rem;display:flex;justify-content:space-between;align-items:center;}
-.ggrid{display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem;}
+.ggrid{display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem;contain:layout style;}
 .gc{background:#100c05;border:1px solid #3a2a08;border-radius:7px;overflow:hidden;}
 .gh{background:#1a1005;padding:4px 9px;font-family:'Cinzel',serif;font-size:.72rem;color:#c87020;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #2a1a08;}
 .ghint{font-size:.58rem;color:#7a5a28;font-style:italic;font-family:'Crimson Pro',serif;}
@@ -63,7 +69,7 @@ select option{background:#1a0f07;}
 .smeta{font-size:.55rem;opacity:.7;white-space:nowrap;font-style:italic;}
 .banner{background:#0a1f0a;border:1px solid #3a6a2a;border-radius:6px;padding:6px 10px;margin-bottom:.65rem;font-size:.8rem;color:#8acc6a;display:none;align-items:center;gap:8px;}
 .banner.on{display:flex;}
-.assign-section{background:#100c05;border:1px solid #3a2a08;border-radius:8px;overflow:hidden;}
+.assign-section{background:#100c05;border:1px solid #3a2a08;border-radius:8px;overflow:hidden;contain:layout style;}
 /* Tabs: bigger text, no scrollbar */
 .tabs{display:flex;border-bottom:2px solid #2a1a08;background:#120e06;overflow:hidden;flex-wrap:wrap;}
 .tab{font-family:'Cinzel',serif;font-size:.78rem;color:#7a6030;padding:8px 14px;cursor:pointer;border-right:1px solid #2a1a08;white-space:nowrap;letter-spacing:.06em;transition:all .15s;}
@@ -547,7 +553,16 @@ function buildBossPreview(boss,bd){
   return lines.join('\n');
 }
 
-function rAll(){rPool();rGroups();rBossTabs();rStats();}
+var _rafPending=false;
+function rAll(){
+  if(_rafPending)return;
+  _rafPending=true;
+  requestAnimationFrame(function(){
+    _rafPending=false;
+    rPool();rGroups();rBossTabs();rStats();
+  });
+}
+function rAllNow(){rPool();rGroups();rBossTabs();rStats();}
 
 function rStats(){
   var as=aset(),ac=0;for(var k in as)ac++;
@@ -1238,7 +1253,7 @@ function renderViewMode(data){
     +'.sub{text-align:center;color:#9a7a4a;font-size:.8rem;margin-bottom:1rem;font-family:"Cinzel",serif;}'
     +'.section{background:#100c05;border:1px solid #3a2a08;border-radius:8px;padding:.8rem 1rem;margin-bottom:1rem;}'
     +'.sh{font-family:"Cinzel",serif;font-size:.85rem;color:#ff9900;margin-bottom:.6rem;border-bottom:1px solid #2a1a08;padding-bottom:.4rem;}'
-    +'.ggrid{display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem;}'
+    +'.ggrid{display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem;contain:layout style;}'
     +'.gc{background:#100c05;border:1px solid #3a2a08;border-radius:6px;overflow:hidden;}'
     +'.gh{background:#1a1005;padding:3px 8px;font-family:"Cinzel",serif;font-size:.7rem;color:#c87020;border-bottom:1px solid #2a1a08;}'
     +'.gs{padding:4px 6px;}'
