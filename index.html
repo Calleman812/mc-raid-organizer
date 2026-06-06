@@ -64,24 +64,26 @@ select option{background:#1a0f07;}
 .banner{background:#0a1f0a;border:1px solid #3a6a2a;border-radius:6px;padding:6px 10px;margin-bottom:.65rem;font-size:.8rem;color:#8acc6a;display:none;align-items:center;gap:8px;}
 .banner.on{display:flex;}
 .assign-section{background:#100c05;border:1px solid #3a2a08;border-radius:8px;overflow:hidden;}
-.tabs{display:flex;gap:0;border-bottom:2px solid #2a1a08;overflow-x:auto;background:#120e06;}
-.tab{font-family:'Cinzel',serif;font-size:.66rem;color:#7a6030;padding:6px 11px;cursor:pointer;border-right:1px solid #2a1a08;white-space:nowrap;letter-spacing:.05em;transition:all .15s;}
+/* Tabs: bigger text, no scrollbar */
+.tabs{display:flex;border-bottom:2px solid #2a1a08;background:#120e06;overflow:hidden;flex-wrap:wrap;}
+.tab{font-family:'Cinzel',serif;font-size:.78rem;color:#7a6030;padding:8px 14px;cursor:pointer;border-right:1px solid #2a1a08;white-space:nowrap;letter-spacing:.06em;transition:all .15s;}
 .tab:hover{background:#1a1208;color:#c89040;}
-.tab.active{background:#1e1408;color:#ffb040;border-bottom:2px solid #ff9900;margin-bottom:-2px;}
+.tab.active{background:#1e1408;color:#ffb040;border-bottom:2px solid #ff9900;margin-bottom:-2px;font-weight:600;}
 .tab-content{padding:.75rem;}
-.boss-header{font-family:'Cinzel',serif;font-size:.82rem;color:#ff9900;margin-bottom:.2rem;}
-.boss-hint{font-size:.7rem;color:#7a6030;font-style:italic;font-family:'Crimson Pro',serif;margin-bottom:.55rem;}
+.boss-header{font-family:'Cinzel',serif;font-size:.9rem;color:#ff9900;margin-bottom:.2rem;font-weight:600;}
+.boss-hint{font-size:.72rem;color:#7a6030;font-style:italic;font-family:'Crimson Pro',serif;margin-bottom:.6rem;}
 .asgrid{display:grid;gap:.4rem;margin-bottom:.45rem;}
 .asgrid-1{grid-template-columns:repeat(1,1fr);}
 .asgrid-2{grid-template-columns:repeat(2,1fr);}
 .asgrid-3{grid-template-columns:repeat(3,1fr);}
 .asgrid-4{grid-template-columns:repeat(4,1fr);}
 .asgrid-5{grid-template-columns:repeat(5,1fr);}
+.asgrid-6{grid-template-columns:repeat(6,1fr);}
 .mc{background:#141008;border:1px solid #3a2a10;border-radius:6px;overflow:hidden;}
-.mh{padding:4px 8px;font-family:'Cinzel',serif;font-size:.68rem;font-weight:600;border-bottom:1px solid #241a08;}
+.mh{padding:4px 8px;font-family:'Cinzel',serif;font-size:.7rem;font-weight:600;border-bottom:1px solid #241a08;display:flex;align-items:center;gap:4px;}
 .mlbl{font-size:.6rem;color:#9a8050;font-family:'Cinzel',serif;text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px;margin-top:4px;}
 .mas{padding:4px 6px;}
-.abtn{cursor:pointer;padding:4px 8px;font-size:.7rem;border:1px dashed #6a5020;border-radius:3px;color:#aa8840;display:block;background:#1a1208;margin-bottom:3px;}
+.abtn{cursor:pointer;padding:4px 8px;font-size:.72rem;border:1px dashed #6a5020;border-radius:3px;color:#aa8840;display:block;background:#1a1208;margin-bottom:3px;}
 .abtn:hover{border-color:#aa8030;color:#ccaa50;background:#221a0a;}
 .abtn.picking{border-color:#5a9a3a;color:#8acc6a;background:#0a1a08;border-style:solid;}
 .abar{display:flex;align-items:center;gap:3px;margin-bottom:3px;}
@@ -90,7 +92,7 @@ select option{background:#1a0f07;}
 .prow-empty{cursor:pointer;padding:4px 8px;font-size:.72rem;border:1px dashed #6a5020;border-radius:3px;color:#aa8840;background:#1a1208;display:inline-block;}
 .prow-empty:hover{border-color:#aa8030;color:#ccaa50;}
 .prow-empty.picking{border-color:#5a9a3a;color:#8acc6a;background:#0a1a08;border-style:solid;}
-.expbox{background:#0a0602;border:1px solid #3a2a10;border-radius:6px;padding:.55rem .75rem;font-size:.78rem;color:#b09060;white-space:pre;line-height:1.6;font-family:monospace;overflow-x:auto;max-height:150px;overflow-y:auto;}
+.expbox{background:#0a0602;border:1px solid #3a2a10;border-radius:6px;padding:.55rem .75rem;font-size:.78rem;color:#b09060;white-space:pre;line-height:1.6;font-family:monospace;overflow-x:auto;max-height:140px;overflow-y:auto;}
 .dup{font-size:.6rem;background:#3a1a00;color:#ff8020;border:1px solid #7a3a00;border-radius:3px;padding:1px 4px;white-space:nowrap;}
 .logbox{background:#0a0f05;border:1px solid #2a3a10;border-radius:5px;padding:.45rem .7rem;font-size:.72rem;color:#6a8a40;line-height:1.55;margin-top:.45rem;font-family:monospace;white-space:pre-wrap;}
 .modal-wrap{display:none;background:#1a0f07;border:1px solid #7a3a10;border-radius:10px;padding:1.2rem;max-width:380px;margin:.5rem 0 .9rem;}
@@ -103,6 +105,10 @@ textarea{width:100%;background:#0d0802;border:1px solid #4a2e08;color:#e8d5a3;pa
 .div-sep{border:none;border-top:1px solid #2a1a08;margin:.45rem 0;}
 .note-box{font-size:.7rem;color:#8acc6a;background:#0a1a08;border:1px solid #2a4a1a;border-radius:5px;padding:.45rem .65rem;margin-bottom:.4rem;line-height:1.6;}
 .auto-tag{font-size:.58rem;background:#0a2a1a;color:#60c090;border:1px solid #1a5a30;border-radius:3px;padding:1px 5px;white-space:nowrap;margin-left:3px;}
+.prev-row{margin-top:.5rem;display:flex;justify-content:space-between;align-items:center;margin-bottom:.35rem;}
+.prev-lbl{font-family:'Cinzel',serif;font-size:.65rem;color:#7a6030;text-transform:uppercase;letter-spacing:.08em;}
+.mark-sym{font-size:.9rem;margin-right:2px;}
+.sheep-label{font-size:.58rem;background:#181830;color:#8080e8;border:1px solid #3030a0;border-radius:3px;padding:1px 5px;white-space:nowrap;margin-left:3px;}
 </style>
 </head>
 <body>
@@ -191,23 +197,30 @@ textarea{width:100%;background:#0d0802;border:1px solid #4a2e08;color:#e8d5a3;pa
 </div>
 
 <script>
-/* ── Icons ── */
-var TANK_ICON = '<svg viewBox="0 0 20 20"><rect width="20" height="20" rx="3" fill="#1a2535"/><path d="M10 2L17 5V10C17 14 13.5 17.5 10 18.5C6.5 17.5 3 14 3 10V5Z" fill="#4a7ab0" stroke="#c8d8f8" stroke-width="1"/><path d="M7 10L9 12L13 8" stroke="#c8d8f8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>';
-var ISVG = {
-  /* Warrior DPS: axe */
-  Warrior: '<svg viewBox="0 0 20 20"><rect width="20" height="20" rx="3" fill="#1a2535"/><line x1="5" y1="15" x2="14" y2="4" stroke="#c8d8f8" stroke-width="2" stroke-linecap="round"/><path d="M14 4 L17 7 L12 8 Z" fill="#c8d8f8"/><path d="M5 15 L3 17 L5 17 L7 15 Z" fill="#c8d8f8"/></svg>',
-  Druid:   '<svg viewBox="0 0 20 20"><rect width="20" height="20" rx="3" fill="#2a1505"/><path d="M10 2C6 2 3 5 4 9C5 13 7 14 8 17L10 19L12 17C13 14 15 13 16 9C17 5 14 2 10 2Z" fill="#f8a040"/></svg>',
-  Paladin: '<svg viewBox="0 0 20 20"><rect width="20" height="20" rx="3" fill="#2a1530"/><rect x="7" y="2" width="6" height="5" rx="1" fill="#f8b0d8"/><line x1="10" y1="7" x2="10" y2="18" stroke="#f8b0d8" stroke-width="2.5" stroke-linecap="round"/></svg>',
-  Rogue:   '<svg viewBox="0 0 20 20"><rect width="20" height="20" rx="3" fill="#201e00"/><path d="M4 17L15 4L17 6L10 14L13 14L11 18L5 19Z" fill="#e8d040"/></svg>',
-  Hunter:  '<svg viewBox="0 0 20 20"><rect width="20" height="20" rx="3" fill="#082008"/><path d="M3 10A7 7 0 0 1 17 10" stroke="#70d870" stroke-width="2" fill="none"/><path d="M10 3L10 17M6 7L14 13M14 7L6 13" stroke="#70d870" stroke-width="1.5" stroke-linecap="round"/></svg>',
-  Priest:  '<svg viewBox="0 0 20 20"><rect width="20" height="20" rx="3" fill="#2a2a2a"/><path d="M10 2L10 18M4 8L16 8" stroke="#e8e8e8" stroke-width="2.5" stroke-linecap="round"/></svg>',
+/* ── ICONS ── */
+var TANK_ICON='<svg viewBox="0 0 20 20"><rect width="20" height="20" rx="3" fill="#1a2535"/><path d="M10 2L17 5V10C17 14 13.5 17.5 10 18.5C6.5 17.5 3 14 3 10V5Z" fill="#4a7ab0" stroke="#c8d8f8" stroke-width="1"/><path d="M7 10L9 12L13 8" stroke="#c8d8f8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>';
+var ISVG={
+  /* Warrior DPS: two crossed swords */
+  Warrior:'<svg viewBox="0 0 20 20"><rect width="20" height="20" rx="3" fill="#1a2535"/><line x1="3" y1="17" x2="17" y2="3" stroke="#c8d8f8" stroke-width="2" stroke-linecap="round"/><line x1="17" y1="17" x2="3" y2="3" stroke="#c8d8f8" stroke-width="2" stroke-linecap="round"/><rect x="8.5" y="8.5" width="3" height="3" rx="0.5" fill="#c8d8f8"/></svg>',
+  /* Druid: Triquetra */
+  Druid:'<svg viewBox="0 0 20 20"><rect width="20" height="20" rx="3" fill="#2a1505"/><path d="M10 4 C10 4 7 4 5.5 6.5 C4 9 5.5 11.5 7.5 12.5 C5.5 12.5 3.5 13.5 3.5 15.5 L16.5 15.5 C16.5 13.5 14.5 12.5 12.5 12.5 C14.5 11.5 16 9 14.5 6.5 C13 4 10 4 10 4 Z" fill="none" stroke="#f8a040" stroke-width="1.4" stroke-linejoin="round"/><circle cx="10" cy="15.5" r="1" fill="#f8a040"/></svg>',
+  /* Paladin: plate helmet */
+  Paladin:'<svg viewBox="0 0 20 20"><rect width="20" height="20" rx="3" fill="#2a1530"/><path d="M5 9 C5 5 7.5 3 10 3 C12.5 3 15 5 15 9 L15 14 C15 15.5 13.5 17 10 17 C6.5 17 5 15.5 5 14 Z" fill="none" stroke="#f8b0d8" stroke-width="1.4"/><rect x="7" y="10" width="6" height="2.5" rx="0.5" fill="#f8b0d8"/><line x1="5" y1="9" x2="15" y2="9" stroke="#f8b0d8" stroke-width="1.2"/></svg>',
+  Rogue:'<svg viewBox="0 0 20 20"><rect width="20" height="20" rx="3" fill="#201e00"/><path d="M4 17L15 4L17 6L10 14L13 14L11 18L5 19Z" fill="#e8d040"/></svg>',
+  Hunter:'<svg viewBox="0 0 20 20"><rect width="20" height="20" rx="3" fill="#082008"/><path d="M3 10A7 7 0 0 1 17 10" stroke="#70d870" stroke-width="2" fill="none"/><path d="M10 3L10 17M6 7L14 13M14 7L6 13" stroke="#70d870" stroke-width="1.5" stroke-linecap="round"/></svg>',
+  Priest:'<svg viewBox="0 0 20 20"><rect width="20" height="20" rx="3" fill="#2a2a2a"/><path d="M10 2L10 18M4 8L16 8" stroke="#e8e8e8" stroke-width="2.5" stroke-linecap="round"/></svg>',
   /* Mage: flame */
-  Mage:    '<svg viewBox="0 0 20 20"><rect width="20" height="20" rx="3" fill="#081828"/><path d="M10 18C10 18 4 14 4 9C4 6 6 3 10 3C10 3 8 6 9 8C10 10 13 9 13 9C13 9 16 12 13 15C12 16 10 18 10 18Z" fill="#90d0ff"/><path d="M10 18C10 18 7 15 8 12C8.5 10.5 10 10 10 10C10 10 9 12 10 13C11 14 12 12 12 12C12 12 13 14 11 16C10.5 17 10 18 10 18Z" fill="#c0e8ff"/></svg>',
-  Warlock: '<svg viewBox="0 0 20 20"><rect width="20" height="20" rx="3" fill="#180828"/><circle cx="10" cy="8" r="4" stroke="#b070e8" stroke-width="1.8" fill="none"/><path d="M6 12L4 18L10 15L16 18L14 12" fill="#b070e8"/></svg>',
-  Shaman:  '<svg viewBox="0 0 20 20"><rect width="20" height="20" rx="3" fill="#08182a"/><path d="M10 3L10 17M5 7L15 7M4 10L16 10M5 13L15 13" stroke="#60b0f0" stroke-width="2" stroke-linecap="round"/></svg>'
+  Mage:'<svg viewBox="0 0 20 20"><rect width="20" height="20" rx="3" fill="#081828"/><path d="M10 18C10 18 4 14 4 9C4 6 6 3 10 3C10 3 8 6 9 8C10 10 13 9 13 9C13 9 16 12 13 15C12 16 10 18 10 18Z" fill="#90d0ff"/><path d="M10 18C10 18 7 15 8 12C8.5 10.5 10 10 10 10C10 10 9 12 10 13C11 14 12 12 12 12C12 12 13 14 11 16C10.5 17 10 18 10 18Z" fill="#c0e8ff"/></svg>',
+  Warlock:'<svg viewBox="0 0 20 20"><rect width="20" height="20" rx="3" fill="#180828"/><circle cx="10" cy="8" r="4" stroke="#b070e8" stroke-width="1.8" fill="none"/><path d="M6 12L4 18L10 15L16 18L14 12" fill="#b070e8"/></svg>',
+  Shaman:'<svg viewBox="0 0 20 20"><rect width="20" height="20" rx="3" fill="#08182a"/><path d="M10 3L10 17M5 7L15 7M4 10L16 10M5 13L15 13" stroke="#60b0f0" stroke-width="2" stroke-linecap="round"/></svg>'
 };
 
-var CLS = {
+/* Mark symbols in kill order (Skull=first to die) */
+var MARK_SYMS=['💀','✚','■','☽','▲','◆','●','★'];
+var MARK_NAMES=['Skull','Cross','Square','Moon','Triangle','Diamond','Circle','Star'];
+var MARK_COLS=['#e03030','#e05020','#4080e0','#a070e0','#30b050','#e090e0','#30c0c0','#f0d030'];
+
+var CLS={
   Warrior:{c:'#c8d8f8',bg:'#1a2535',bd:'#3a5070',sp:['Arms','Fury','Protection']},
   Druid:  {c:'#f8a040',bg:'#2a1505',bd:'#8a4a00',sp:['Balance','Feral','Restoration']},
   Paladin:{c:'#f8b0d8',bg:'#2a1530',bd:'#7a3070',sp:['Holy','Protection','Retribution']},
@@ -218,155 +231,193 @@ var CLS = {
   Warlock:{c:'#b070e8',bg:'#180828',bd:'#501880',sp:['Affliction','Demonology','Destruction']},
   Shaman: {c:'#60b0f0',bg:'#08182a',bd:'#1a4070',sp:['Elemental','Enhancement','Restoration']}
 };
-var CO = ['Warrior','Druid','Paladin','Rogue','Hunter','Priest','Mage','Warlock','Shaman'];
-var GHINTS = ['4 tanks + pala heal','1 tank + pala heal + melee','melee + priest + hunter','melee + priest + hunter','buffer','buffer','warlocks + mages + druid heal','mages + warlocks + heal'];
+var CO=['Warrior','Druid','Paladin','Rogue','Hunter','Priest','Mage','Warlock','Shaman'];
+var GHINTS=['4 tanks + pala heal','1 tank + pala heal + melee','melee + priest + hunter','melee + priest + hunter','buffer','buffer','warlocks + mages + druid heal','mages + warlocks + heal'];
 
 /*
-  Boss schema.
-  Each boss has 'slots': array of {key, label, hcol, tcol, healerKey?}
-  healerKey: if set, assigning this tank slot auto-fills the healer slot from trash mark healer.
-  Healer slots have isHealer:true.
-  Alliance-only: no Shaman.
+  BOSS SCHEMA
+  Each non-trash boss has 'segments': array of segment groups.
+  Each segment: {title, cols, slots:[]}
+  Each slot: {key, label, markIdx (0-7), isHealer, healerKey, isSheep}
+  markIdx: index into MARK_SYMS/MARK_NAMES — labels targets in kill order.
+  healerKey: when tank assigned, auto-fill from trash mark healer.
+  isSheep: slot is for a Mage sheep assignment.
 */
-var BOSSES = [
+var BOSSES=[
   {id:'trash', name:'Trash', isTrash:true},
   {
     id:'lucifron', name:'Lucifron',
-    hint:'MT on Lucifron + OT on each add, each with dedicated healer',
+    hint:'MT on Lucifron + OT on each add, 1 healer each',
     note:'Kill adds first. Dispel Dominate Mind and Shadow Shock curse off tanks.',
-    slots:[
-      {key:'mt',   label:'MT \u2014 Lucifron', hcol:'#2a1a08', tcol:'#e07020', healerKey:'mth'},
-      {key:'ot1',  label:'OT1 \u2014 Add',     hcol:'#1a2535', tcol:'#c8d8f8', healerKey:'ot1h'},
-      {key:'ot2',  label:'OT2 \u2014 Add',     hcol:'#1a2535', tcol:'#c8d8f8', healerKey:'ot2h'},
-      {key:'mth',  label:'Heal \u2014 MT',      hcol:'#0a1a0a', tcol:'#60c060', isHealer:true},
-      {key:'ot1h', label:'Heal \u2014 OT1',     hcol:'#0a1a0a', tcol:'#60c060', isHealer:true},
-      {key:'ot2h', label:'Heal \u2014 OT2',     hcol:'#0a1a0a', tcol:'#60c060', isHealer:true}
-    ],
-    tankCols:3, healCols:3
+    segments:[
+      {title:'Tanks', cols:3, slots:[
+        {key:'mt',  label:'Lucifron', markIdx:2, healerKey:'mth'},
+        {key:'ot1', label:'Add 1',    markIdx:0, healerKey:'ot1h'},
+        {key:'ot2', label:'Add 2',    markIdx:1, healerKey:'ot2h'}
+      ]},
+      {title:'Healers', cols:3, isHealRow:true, slots:[
+        {key:'mth',  label:'Healer \u2014 Lucifron', isHealer:true},
+        {key:'ot1h', label:'Healer \u2014 Add 1',    isHealer:true},
+        {key:'ot2h', label:'Healer \u2014 Add 2',    isHealer:true}
+      ]}
+    ]
   },
   {
     id:'magmadar', name:'Magmadar',
     hint:'1 MT with 1 dedicated healer',
     note:'Hunters Tranquilizing Shot on Frenzy. Face boss away from raid. Fear Ward on MT.',
-    slots:[
-      {key:'mt',  label:'MT \u2014 Magmadar', hcol:'#2a1a08', tcol:'#e07020', healerKey:'mth'},
-      {key:'mth', label:'Heal \u2014 MT',     hcol:'#0a1a0a', tcol:'#60c060', isHealer:true}
-    ],
-    tankCols:1, healCols:1
+    segments:[
+      {title:'Tank', cols:1, slots:[{key:'mt', label:'Magmadar', markIdx:0, healerKey:'mth'}]},
+      {title:'Healer', cols:1, isHealRow:true, slots:[{key:'mth', label:'Healer \u2014 MT', isHealer:true}]}
+    ]
   },
   {
     id:'gehennas', name:'Gehennas',
     hint:'3 tanks (boss + 2 adds), 1 healer each',
-    note:'Mages decurse Gehennas Curse constantly. Focus adds first. Spread to avoid Rain of Fire.',
-    slots:[
-      {key:'mt',   label:'MT \u2014 Gehennas', hcol:'#2a1a08', tcol:'#e07020', healerKey:'mth'},
-      {key:'ot1',  label:'OT1 \u2014 Add',     hcol:'#1a2535', tcol:'#c8d8f8', healerKey:'ot1h'},
-      {key:'ot2',  label:'OT2 \u2014 Add',     hcol:'#1a2535', tcol:'#c8d8f8', healerKey:'ot2h'},
-      {key:'mth',  label:'Heal \u2014 MT',      hcol:'#0a1a0a', tcol:'#60c060', isHealer:true},
-      {key:'ot1h', label:'Heal \u2014 OT1',     hcol:'#0a1a0a', tcol:'#60c060', isHealer:true},
-      {key:'ot2h', label:'Heal \u2014 OT2',     hcol:'#0a1a0a', tcol:'#60c060', isHealer:true}
-    ],
-    tankCols:3, healCols:3
+    note:'Mages decurse Gehennas Curse constantly. Kill adds first. Spread to avoid Rain of Fire.',
+    segments:[
+      {title:'Tanks', cols:3, slots:[
+        {key:'mt',  label:'Gehennas', markIdx:2, healerKey:'mth'},
+        {key:'ot1', label:'Add 1',   markIdx:0, healerKey:'ot1h'},
+        {key:'ot2', label:'Add 2',   markIdx:1, healerKey:'ot2h'}
+      ]},
+      {title:'Healers', cols:3, isHealRow:true, slots:[
+        {key:'mth',  label:'Healer \u2014 Gehennas', isHealer:true},
+        {key:'ot1h', label:'Healer \u2014 Add 1',     isHealer:true},
+        {key:'ot2h', label:'Healer \u2014 Add 2',     isHealer:true}
+      ]}
+    ]
   },
   {
     id:'garr', name:'Garr',
-    hint:'MT on Garr + 4 OTs on Firesworn adds (rest Banished)',
+    hint:'MT on Garr + 4 OTs on Firesworn adds, 1 healer each (rest Banished)',
     note:'Warlocks Banish remaining adds. Stay within 15 yards of Garr. Kill Garr first \u2014 adds die with him.',
-    slots:[
-      {key:'mt',  label:'MT \u2014 Garr',  hcol:'#2a1a08', tcol:'#e07020', healerKey:'mth'},
-      {key:'ot1', label:'OT1 \u2014 Add', hcol:'#1a2535', tcol:'#c8d8f8'},
-      {key:'ot2', label:'OT2 \u2014 Add', hcol:'#1a2535', tcol:'#c8d8f8'},
-      {key:'ot3', label:'OT3 \u2014 Add', hcol:'#1a2535', tcol:'#c8d8f8'},
-      {key:'ot4', label:'OT4 \u2014 Add', hcol:'#1a2535', tcol:'#c8d8f8'},
-      {key:'mth', label:'Heal \u2014 MT', hcol:'#0a1a0a', tcol:'#60c060', isHealer:true}
-    ],
-    tankCols:5, healCols:1
+    segments:[
+      {title:'Tanks', cols:5, slots:[
+        {key:'mt',  label:'Garr',  markIdx:4, healerKey:'mth'},
+        {key:'ot1', label:'Add 1', markIdx:0, healerKey:'ot1h'},
+        {key:'ot2', label:'Add 2', markIdx:1, healerKey:'ot2h'},
+        {key:'ot3', label:'Add 3', markIdx:2, healerKey:'ot3h'},
+        {key:'ot4', label:'Add 4', markIdx:3, healerKey:'ot4h'}
+      ]},
+      {title:'Healers', cols:5, isHealRow:true, slots:[
+        {key:'mth',  label:'Heal \u2014 Garr',  isHealer:true},
+        {key:'ot1h', label:'Heal \u2014 Add 1', isHealer:true},
+        {key:'ot2h', label:'Heal \u2014 Add 2', isHealer:true},
+        {key:'ot3h', label:'Heal \u2014 Add 3', isHealer:true},
+        {key:'ot4h', label:'Heal \u2014 Add 4', isHealer:true}
+      ]}
+    ]
   },
   {
     id:'geddon', name:'Baron Geddon',
     hint:'Single MT with 2 healers',
-    note:'Dispel Ignite Mana constantly. Kite to Garr room at low HP. AoE heal at 10% Armageddon.',
-    slots:[
-      {key:'mt', label:'MT \u2014 Geddon',  hcol:'#2a1a08', tcol:'#e07020', healerKey:'h1'},
-      {key:'h1', label:'Healer 1 \u2014 MT', hcol:'#0a1a0a', tcol:'#60c060', isHealer:true},
-      {key:'h2', label:'Healer 2 \u2014 MT', hcol:'#0a1a0a', tcol:'#60c060', isHealer:true}
-    ],
-    tankCols:1, healCols:2
+    note:'Dispel Ignite Mana constantly. Kite at low HP. AoE heal at 10% Armageddon.',
+    segments:[
+      {title:'Tank', cols:1, slots:[{key:'mt', label:'Baron Geddon', markIdx:0, healerKey:'h1'}]},
+      {title:'Healers', cols:2, isHealRow:true, slots:[
+        {key:'h1', label:'Healer 1 \u2014 MT', isHealer:true},
+        {key:'h2', label:'Healer 2 \u2014 MT', isHealer:true}
+      ]}
+    ]
   },
   {
     id:'shazzrah', name:'Shazzrah',
-    hint:'1 MT only \u2014 rely on melee DPS',
-    note:'Shazzrah Counterspells casters \u2014 melee DPS only. Mages decurse. He blinks randomly; MT must reposition quickly.',
-    slots:[
-      {key:'mt',  label:'MT \u2014 Shazzrah', hcol:'#2a1a08', tcol:'#e07020', healerKey:'mth'},
-      {key:'mth', label:'Heal \u2014 MT',      hcol:'#0a1a0a', tcol:'#60c060', isHealer:true}
-    ],
-    tankCols:1, healCols:1
+    hint:'1 MT only \u2014 melee DPS preferred',
+    note:'Shazzrah Counterspells casters \u2014 use melee. Mages decurse. He blinks; MT must reposition quickly.',
+    segments:[
+      {title:'Tank', cols:1, slots:[{key:'mt', label:'Shazzrah', markIdx:0, healerKey:'mth'}]},
+      {title:'Healer', cols:1, isHealRow:true, slots:[{key:'mth', label:'Healer \u2014 MT', isHealer:true}]}
+    ]
   },
   {
     id:'sulfuron', name:'Sulfuron',
-    hint:'MT on boss + 4 OTs on Flamewaker Priests, 1 healer per tank',
+    hint:'MT on boss + 5 OTs on Flamewaker Priests, 1 healer each',
     note:'Interrupt Dark Mending (top priority!). Drag priests apart. Kill priests one by one, Sulfuron last.',
-    slots:[
-      {key:'mt',  label:'MT \u2014 Sulfuron', hcol:'#2a1a08', tcol:'#e07020', healerKey:'mth'},
-      {key:'ot1', label:'OT1 \u2014 Priest',  hcol:'#1a2535', tcol:'#c8d8f8', healerKey:'ot1h'},
-      {key:'ot2', label:'OT2 \u2014 Priest',  hcol:'#1a2535', tcol:'#c8d8f8', healerKey:'ot2h'},
-      {key:'ot3', label:'OT3 \u2014 Priest',  hcol:'#1a2535', tcol:'#c8d8f8', healerKey:'ot3h'},
-      {key:'ot4', label:'OT4 \u2014 Priest',  hcol:'#1a2535', tcol:'#c8d8f8', healerKey:'ot4h'},
-      {key:'mth',  label:'Heal \u2014 MT',    hcol:'#0a1a0a', tcol:'#60c060', isHealer:true},
-      {key:'ot1h', label:'Heal \u2014 OT1',   hcol:'#0a1a0a', tcol:'#60c060', isHealer:true},
-      {key:'ot2h', label:'Heal \u2014 OT2',   hcol:'#0a1a0a', tcol:'#60c060', isHealer:true},
-      {key:'ot3h', label:'Heal \u2014 OT3',   hcol:'#0a1a0a', tcol:'#60c060', isHealer:true},
-      {key:'ot4h', label:'Heal \u2014 OT4',   hcol:'#0a1a0a', tcol:'#60c060', isHealer:true}
-    ],
-    tankCols:5, healCols:5
+    segments:[
+      {title:'Tanks', cols:6, slots:[
+        {key:'mt',  label:'Sulfuron',  markIdx:5, healerKey:'mth'},
+        {key:'ot1', label:'Priest 1',  markIdx:0, healerKey:'ot1h'},
+        {key:'ot2', label:'Priest 2',  markIdx:1, healerKey:'ot2h'},
+        {key:'ot3', label:'Priest 3',  markIdx:2, healerKey:'ot3h'},
+        {key:'ot4', label:'Priest 4',  markIdx:3, healerKey:'ot4h'},
+        {key:'ot5', label:'Priest 5',  markIdx:4, healerKey:'ot5h'}
+      ]},
+      {title:'Healers', cols:6, isHealRow:true, slots:[
+        {key:'mth',  label:'Heal \u2014 Sulfuron',  isHealer:true},
+        {key:'ot1h', label:'Heal \u2014 Priest 1',  isHealer:true},
+        {key:'ot2h', label:'Heal \u2014 Priest 2',  isHealer:true},
+        {key:'ot3h', label:'Heal \u2014 Priest 3',  isHealer:true},
+        {key:'ot4h', label:'Heal \u2014 Priest 4',  isHealer:true},
+        {key:'ot5h', label:'Heal \u2014 Priest 5',  isHealer:true}
+      ]}
+    ]
   },
   {
     id:'golemagg', name:'Golemagg',
     hint:'1 MT on Golemagg + 2 OTs on Core Hounds, 1 healer each',
-    note:'MT and OTs swap threat regularly. Stack boss and hounds for cleave. Hounds must NOT reach 50% \u2014 they heal each other.',
-    slots:[
-      {key:'mt',  label:'MT \u2014 Golemagg',  hcol:'#2a1a08', tcol:'#e07020', healerKey:'mth'},
-      {key:'ot1', label:'OT1 \u2014 Hound',    hcol:'#2a1015', tcol:'#e05050', healerKey:'ot1h'},
-      {key:'ot2', label:'OT2 \u2014 Hound',    hcol:'#2a1015', tcol:'#e05050', healerKey:'ot2h'},
-      {key:'mth',  label:'Heal \u2014 MT',     hcol:'#0a1a0a', tcol:'#60c060', isHealer:true},
-      {key:'ot1h', label:'Heal \u2014 OT1',    hcol:'#0a1a0a', tcol:'#60c060', isHealer:true},
-      {key:'ot2h', label:'Heal \u2014 OT2',    hcol:'#0a1a0a', tcol:'#60c060', isHealer:true}
-    ],
-    tankCols:3, healCols:3
+    note:'Stack boss and hounds for cleave. Hounds must NOT reach 50% \u2014 they heal each other.',
+    segments:[
+      {title:'Tanks', cols:3, slots:[
+        {key:'mt',  label:'Golemagg',   markIdx:2, healerKey:'mth'},
+        {key:'ot1', label:'Core Hound 1', markIdx:0, healerKey:'ot1h'},
+        {key:'ot2', label:'Core Hound 2', markIdx:1, healerKey:'ot2h'}
+      ]},
+      {title:'Healers', cols:3, isHealRow:true, slots:[
+        {key:'mth',  label:'Heal \u2014 MT',     isHealer:true},
+        {key:'ot1h', label:'Heal \u2014 Hound 1', isHealer:true},
+        {key:'ot2h', label:'Heal \u2014 Hound 2', isHealer:true}
+      ]}
+    ]
   },
   {
     id:'domo', name:'Domo',
-    hint:'MT on Domo + 4 OTs on Elite Firelord guards',
-    note:'Kill all 8 Elite Firelords and 20 Flamewaker Handlers before engaging Domo. He surrenders at low HP \u2014 Ragnaros spawns.',
-    slots:[
-      {key:'mt',  label:'MT \u2014 Domo',    hcol:'#2a1a08', tcol:'#e07020', healerKey:'mth'},
-      {key:'ot1', label:'OT1 \u2014 Guard', hcol:'#1a2535', tcol:'#c8d8f8'},
-      {key:'ot2', label:'OT2 \u2014 Guard', hcol:'#1a2535', tcol:'#c8d8f8'},
-      {key:'ot3', label:'OT3 \u2014 Guard', hcol:'#1a2535', tcol:'#c8d8f8'},
-      {key:'ot4', label:'OT4 \u2014 Guard', hcol:'#1a2535', tcol:'#c8d8f8'},
-      {key:'mth', label:'Heal \u2014 MT',   hcol:'#0a1a0a', tcol:'#60c060', isHealer:true}
-    ],
-    tankCols:5, healCols:1
+    hint:'MT on Domo (unmarked) + 4 OTs on guards + 4 Mages sheep targets',
+    note:'Kill all 8 Elite Firelords and 20 Flamewaker Handlers first. Sheep 4 targets. He surrenders at low HP \u2014 Ragnaros spawns.',
+    segments:[
+      {title:'Tanks', cols:5, slots:[
+        {key:'mt',  label:'Domo (boss)',  markIdx:null, healerKey:'mth'},
+        {key:'ot1', label:'Guard 1',      markIdx:0,    healerKey:'ot1h'},
+        {key:'ot2', label:'Guard 2',      markIdx:1,    healerKey:'ot2h'},
+        {key:'ot3', label:'Guard 3',      markIdx:2,    healerKey:'ot3h'},
+        {key:'ot4', label:'Guard 4',      markIdx:3,    healerKey:'ot4h'}
+      ]},
+      {title:'Healers', cols:5, isHealRow:true, slots:[
+        {key:'mth',  label:'Heal \u2014 Domo',    isHealer:true},
+        {key:'ot1h', label:'Heal \u2014 Guard 1', isHealer:true},
+        {key:'ot2h', label:'Heal \u2014 Guard 2', isHealer:true},
+        {key:'ot3h', label:'Heal \u2014 Guard 3', isHealer:true},
+        {key:'ot4h', label:'Heal \u2014 Guard 4', isHealer:true}
+      ]},
+      {title:'Sheep Targets', cols:4, isSheepRow:true, slots:[
+        {key:'sh1', label:'Sheep 1', markIdx:4, isSheep:true},
+        {key:'sh2', label:'Sheep 2', markIdx:5, isSheep:true},
+        {key:'sh3', label:'Sheep 3', markIdx:6, isSheep:true},
+        {key:'sh4', label:'Sheep 4', markIdx:7, isSheep:true}
+      ]}
+    ]
   },
   {
     id:'ragnaros', name:'Ragnaros',
-    hint:'2 MTs sharing aggro, 3 healers on tanks',
-    note:'Maximize Fire Resistance (MT 305 FR, melee 200 FR, ranged 150 FR). MTs taunt-swap. Melee run out during Wrath of Ragnaros. AoE heal aggressively.',
-    slots:[
-      {key:'mt1', label:'MT1 \u2014 Ragnaros', hcol:'#2a1a08', tcol:'#e07020'},
-      {key:'mt2', label:'MT2 \u2014 Ragnaros', hcol:'#2a1a08', tcol:'#e07020'},
-      {key:'h1',  label:'Healer 1',            hcol:'#0a1a0a', tcol:'#60c060', isHealer:true},
-      {key:'h2',  label:'Healer 2',            hcol:'#0a1a0a', tcol:'#60c060', isHealer:true},
-      {key:'h3',  label:'Healer 3',            hcol:'#0a1a0a', tcol:'#60c060', isHealer:true}
-    ],
-    tankCols:2, healCols:3
+    hint:'2 MTs taunt-swapping + 3 healers on tanks',
+    note:'Maximize Fire Resistance (MT 305 FR, melee 200 FR, ranged 150 FR). Melee run out during Wrath of Ragnaros. AoE heal aggressively.',
+    segments:[
+      {title:'Tanks', cols:2, slots:[
+        {key:'mt1', label:'MT 1', markIdx:0},
+        {key:'mt2', label:'MT 2', markIdx:1}
+      ]},
+      {title:'Healers', cols:3, isHealRow:true, slots:[
+        {key:'h1', label:'Healer 1', isHealer:true},
+        {key:'h2', label:'Healer 2', isHealer:true},
+        {key:'h3', label:'Healer 3', isHealer:true}
+      ]}
+    ]
   }
 ];
 
-var TRASH_MARKS = [{name:'Skull',col:'#e03030'},{name:'Cross',col:'#e05020'},{name:'Square',col:'#4080e0'},{name:'Moon',col:'#a070e0'},{name:'Triangle',col:'#30b050'}];
+var TRASH_MARKS=[{name:'Skull',col:'#e03030'},{name:'Cross',col:'#e05020'},{name:'Square',col:'#4080e0'},{name:'Moon',col:'#a070e0'},{name:'Triangle',col:'#30b050'}];
 
-var DEMO = [
+var DEMO=[
   {id:'t1',name:'Ubi',cls:'Warrior',spec:'Protection',role:'tank'},{id:'t2',name:'Willheim',cls:'Warrior',spec:'Protection',role:'tank'},
   {id:'t3',name:'Dehuel',cls:'Warrior',spec:'Protection',role:'tank'},{id:'t4',name:'Methax',cls:'Warrior',spec:'Protection',role:'tank'},
   {id:'t5',name:'Skallrock',cls:'Warrior',spec:'Protection',role:'tank'},
@@ -419,7 +470,7 @@ function mkMarks(){
   BOSSES.forEach(function(b){
     if(b.isTrash)return;
     var d={notes:''};
-    b.slots.forEach(function(s){d[s.key]=null;});
+    b.segments.forEach(function(seg){seg.slots.forEach(function(sl){d[sl.key]=null;});});
     bossData[b.id]=d;
   });
 }
@@ -439,9 +490,9 @@ function hideBan(){document.getElementById('banner').className='banner';}
 function ihtml(cls,sz,role){sz=sz||18;var svg=(role==='tank')?TANK_ICON:(ISVG[cls]||ISVG.Warrior);return '<span style="display:inline-block;width:'+sz+'px;height:'+sz+'px;flex-shrink:0;vertical-align:middle">'+svg+'</span>';}
 function buildMRT(){var n=[];for(var gi=0;gi<groups.length;gi++){var g=groups[gi];for(var j=0;j<g.slots.length;j++)if(g.slots[j].p)n.push(expandRealm(g.slots[j].p.name));}if(!n.length)return '';return '"'+n.join('\n')+'"';}
 
-function pbar(p,isDup,removeAction,removeExtra){
+function pbar(p,isDup,rmAction,rmExtra){
   var c=cd(p.cls);
-  var rm=(removeAction)?'<button class="bx" data-a="'+removeAction+'" '+(removeExtra||'')+'>x</button>':'';
+  var rm=rmAction?'<button class="bx" data-a="'+rmAction+'" '+(rmExtra||'')+'>x</button>':'';
   return '<div style="background:'+c.bg+';border:2px solid '+c.bd+';border-radius:4px;padding:3px 7px;display:flex;align-items:center;gap:5px;flex:1;min-width:0">'
     +ihtml(p.cls,16,p.role)
     +'<span style="font-size:.88rem;font-weight:700;color:'+c.c+';flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+he(p.name)+'</span>'
@@ -450,15 +501,34 @@ function pbar(p,isDup,removeAction,removeExtra){
     +rm+'</div>';
 }
 
-/* Lookup healer from trash marks to auto-fill boss healer slot */
 function getTrashHealerForTank(tankPlayer){
-  if(!tankPlayer) return null;
-  for(var i=0;i<trashMarks.length;i++){
-    if(trashMarks[i].tank&&trashMarks[i].tank.id===tankPlayer.id){
-      return trashMarks[i].healer||null;
-    }
-  }
+  if(!tankPlayer)return null;
+  for(var i=0;i<trashMarks.length;i++)if(trashMarks[i].tank&&trashMarks[i].tank.id===tankPlayer.id)return trashMarks[i].healer||null;
   return null;
+}
+
+/* Build preview text for a boss */
+function buildBossPreview(boss,bd){
+  var lines=[boss.name+' assignments'];
+  boss.segments.forEach(function(seg){
+    if(seg.isHealRow)return; /* healers shown inline with tanks */
+    seg.slots.forEach(function(sl){
+      if(sl.isHealer)return;
+      var p=bd[sl.key];
+      var mark=sl.markIdx!==null&&sl.markIdx!==undefined?'{'+MARK_NAMES[sl.markIdx]+'} ':'';
+      if(sl.isSheep){
+        var mage=bd[sl.key];
+        lines.push(mark+sl.label+': '+(mage?'[Sheep] '+mage.name:'--'));
+      } else {
+        var tankName=p?p.name:'--';
+        /* find healer for this tank */
+        var healerName='--';
+        if(sl.healerKey&&bd[sl.healerKey])healerName=bd[sl.healerKey].name;
+        lines.push(mark+he(sl.label)+': '+tankName+' / '+healerName);
+      }
+    });
+  });
+  return lines.join('\n');
 }
 
 function rAll(){rPool();rGroups();rBossTabs();rStats();}
@@ -502,12 +572,8 @@ function rGroups(){
     h+='<div class="gc"><div class="gh"><span>Group '+g.id+'</span><span class="ghint">'+(GHINTS[gi]||'')+'</span><span class="gcnt">'+filled+'/5</span></div><div class="gs">';
     for(var si=0;si<g.slots.length;si++){
       var s=g.slots[si],pick=sel&&sel.t==='g'&&sel.gi===gi&&sel.si===si;
-      if(s.p){
-        var c=cd(s.p.cls);
-        h+='<div class="sf" style="border:2px solid '+c.bd+'"><div class="sb" style="background:'+c.bg+'">'+ihtml(s.p.cls,16,s.p.role)+'<span class="sname" style="color:'+c.c+'">'+he(s.p.name)+'</span><span class="smeta" style="color:'+c.c+'">'+he(s.p.spec||'')+'</span><button class="bx" data-a="rmg" data-gi="'+gi+'" data-si="'+si+'">x</button></div></div>';
-      } else {
-        h+='<div class="se'+(pick?' picking':'')+'" data-a="sg" data-gi="'+gi+'" data-si="'+si+'">+ click to assign</div>';
-      }
+      if(s.p){var c=cd(s.p.cls);h+='<div class="sf" style="border:2px solid '+c.bd+'"><div class="sb" style="background:'+c.bg+'">'+ihtml(s.p.cls,16,s.p.role)+'<span class="sname" style="color:'+c.c+'">'+he(s.p.name)+'</span><span class="smeta" style="color:'+c.c+'">'+he(s.p.spec||'')+'</span><button class="bx" data-a="rmg" data-gi="'+gi+'" data-si="'+si+'">x</button></div></div>';}
+      else h+='<div class="se'+(pick?' picking':'')+'" data-a="sg" data-gi="'+gi+'" data-si="'+si+'">+ click to assign</div>';
     }
     h+='</div></div>';
   }
@@ -527,11 +593,11 @@ function rBossTabs(){
 function renderTrashTab(){
   var dp=trashDups();
   var h='<div class="boss-header">Trash \u2014 Tank Marks &amp; Healing</div>';
-  h+='<div class="boss-hint">Assign the 5 kill marks and puller. Healer assignments here auto-fill boss assignments.</div>';
+  h+='<div class="boss-hint">Assign the 5 kill marks and puller. Healer assignments here auto-fill boss healers.</div>';
   h+='<div class="asgrid asgrid-5">';
   trashMarks.forEach(function(m,mi){
     var tp=sel&&sel.t==='tm'&&sel.mi===mi, hp=sel&&sel.t==='th'&&sel.mi===mi;
-    h+='<div class="mc"><div class="mh" style="background:'+m.col+'33;color:'+m.col+'">'+m.name+'</div><div class="mas">';
+    h+='<div class="mc"><div class="mh" style="background:'+m.col+'33;color:'+m.col+'">'+MARK_SYMS[mi]+' '+m.name+'</div><div class="mas">';
     h+='<div class="mlbl">Tank</div>';
     if(m.tank)h+='<div class="abar">'+pbar(m.tank,!!dp[m.tank.id],'rmt','data-mi="'+mi+'"')+'</div>';
     else h+='<div class="abtn'+(tp?' picking':'')+'" data-a="st" data-mi="'+mi+'">+ Assign tank</div>';
@@ -547,13 +613,11 @@ function renderTrashTab(){
   else h+='<div class="prow-empty'+(pp?' picking':'')+'" data-a="spu">+ Assign puller</div>';
   h+='</div>';
   var dp2=trashDups(),lines=['Trash tank and healing assignments'];
-  trashMarks.forEach(function(m){
-    lines.push('{'+m.name+'} '+(m.tank?m.tank.name:'--')+(m.tank&&dp2[m.tank.id]?' !':'')+' - '+(m.healer?m.healer.name:'--')+(m.healer&&dp2[m.healer.id]?' !':''));
+  trashMarks.forEach(function(m,i){
+    lines.push(MARK_SYMS[i]+' {'+m.name+'} '+(m.tank?m.tank.name:'--')+(m.tank&&dp2[m.tank.id]?' !':'')+' - '+(m.healer?m.healer.name:'--')+(m.healer&&dp2[m.healer.id]?' !':''));
   });
   lines.push('Puller: '+(puller?puller.name:'--'));
-  h+='<div style="margin-top:.5rem;display:flex;justify-content:space-between;align-items:center;margin-bottom:.35rem">';
-  h+='<span style="font-family:Cinzel,serif;font-size:.65rem;color:#7a6030;text-transform:uppercase;letter-spacing:.08em">Preview</span>';
-  h+='<button class="btn bsm" data-a="copyTrash">Copy</button></div>';
+  h+='<div class="prev-row"><span class="prev-lbl">Preview</span><button class="btn bsm" data-a="copyTrash">Copy</button></div>';
   h+='<div class="expbox" id="trashExpBox">'+he(lines.join('\n'))+'</div>';
   return h;
 }
@@ -563,50 +627,50 @@ function renderBossTab(boss){
   var h='<div class="boss-header">'+he(boss.name)+'</div>';
   h+='<div class="boss-hint">'+he(boss.hint)+'</div>';
 
-  /* Tank slots */
-  var tankSlots=boss.slots.filter(function(s){return !s.isHealer;});
-  var healSlots=boss.slots.filter(function(s){return s.isHealer;});
-  var tc=Math.min(boss.tankCols||tankSlots.length,5);
-  var hc=Math.min(boss.healCols||healSlots.length,5);
+  boss.segments.forEach(function(seg){
+    var cols=Math.min(seg.cols||seg.slots.length,6);
+    var colClass='asgrid-'+cols;
+    var rowBg=seg.isHealRow?'#0a1a0a':seg.isSheepRow?'#0a0a1a':'#1a1208';
+    var rowLblColor=seg.isHealRow?'#60c060':seg.isSheepRow?'#8080e8':'#9a8050';
+    var titleSuffix=seg.isHealRow?'<span class="auto-tag">auto-filled from Trash</span>':seg.isSheepRow?'<span class="sheep-label">Polymorph</span>':'';
 
-  if(tankSlots.length){
-    h+='<div style="font-family:Cinzel,serif;font-size:.62rem;color:#9a8050;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.3rem">Tanks</div>';
-    h+='<div class="asgrid asgrid-'+tc+'">';
-    tankSlots.forEach(function(sl){
+    h+='<div style="font-family:Cinzel,serif;font-size:.62rem;color:'+rowLblColor+';text-transform:uppercase;letter-spacing:.06em;margin:.35rem 0 .3rem">'+he(seg.title)+titleSuffix+'</div>';
+    h+='<div class="asgrid '+colClass+'">';
+
+    seg.slots.forEach(function(sl){
       var p=bd[sl.key]||null;
       var isSel=sel&&sel.t==='bs'&&sel.bid===boss.id&&sel.key===sl.key;
-      h+='<div class="mc"><div class="mh" style="background:'+sl.hcol+'88;color:'+sl.tcol+'">'+he(sl.label)+'</div><div class="mas">';
+      /* mark label */
+      var markHtml='';
+      if(sl.markIdx!==null&&sl.markIdx!==undefined){
+        markHtml='<span style="font-size:1rem;margin-right:2px">'+MARK_SYMS[sl.markIdx]+'</span>';
+      }
+      var headerBg=seg.isSheepRow?'#181830':sl.isHealer?'#0a1a0a':'#1a2535';
+      var headerCol=seg.isSheepRow?'#8080e8':sl.isHealer?'#60c060':MARK_COLS[sl.markIdx]||'#c8d8f8';
+      if(sl.markIdx===null||sl.markIdx===undefined) headerCol='#c87020';
+
+      h+='<div class="mc"><div class="mh" style="background:'+headerBg+'88;color:'+headerCol+'">'+markHtml+he(sl.label)+'</div><div class="mas">';
       if(p){
         h+='<div class="abar">'+pbar(p,false,'rbs','data-bid="'+boss.id+'" data-key="'+sl.key+'"')+'</div>';
       } else {
-        h+='<div class="abtn'+(isSel?' picking':'')+'" data-a="sbs" data-bid="'+boss.id+'" data-key="'+sl.key+'">+ Assign</div>';
+        var btnLabel=sl.isSheep?'+ Assign Mage':sl.isHealer?'+ Assign healer':'+ Assign';
+        h+='<div class="abtn'+(isSel?' picking':'')+'" data-a="sbs" data-bid="'+boss.id+'" data-key="'+sl.key+'">'+btnLabel+'</div>';
       }
       h+='</div></div>';
     });
     h+='</div>';
-  }
-
-  if(healSlots.length){
-    h+='<div style="font-family:Cinzel,serif;font-size:.62rem;color:#9a8050;text-transform:uppercase;letter-spacing:.06em;margin:.4rem 0 .3rem">Healers <span class="auto-tag">auto-filled from Trash</span></div>';
-    h+='<div class="asgrid asgrid-'+hc+'">';
-    healSlots.forEach(function(sl){
-      var p=bd[sl.key]||null;
-      var isSel=sel&&sel.t==='bs'&&sel.bid===boss.id&&sel.key===sl.key;
-      h+='<div class="mc"><div class="mh" style="background:'+sl.hcol+'88;color:'+sl.tcol+'">'+he(sl.label)+'</div><div class="mas">';
-      if(p){
-        h+='<div class="abar">'+pbar(p,false,'rbs','data-bid="'+boss.id+'" data-key="'+sl.key+'"')+'</div>';
-      } else {
-        h+='<div class="abtn'+(isSel?' picking':'')+'" data-a="sbs" data-bid="'+boss.id+'" data-key="'+sl.key+'">+ Assign</div>';
-      }
-      h+='</div></div>';
-    });
-    h+='</div>';
-  }
+  });
 
   h+='<hr class="div-sep">';
   h+='<div class="note-box">'+he(boss.note||'')+'</div>';
-  h+='<div style="font-family:Cinzel,serif;font-size:.62rem;color:#7a6030;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.3rem">Extra notes</div>';
-  h+='<textarea style="height:55px;border-color:#3a2a10" data-a="bossnote" data-bid="'+boss.id+'" placeholder="Add raid-specific notes...">'+he(bd.notes||'')+'</textarea>';
+
+  /* Preview */
+  var prevText=buildBossPreview(boss,bd);
+  h+='<div class="prev-row"><span class="prev-lbl">Preview</span><button class="btn bsm" data-a="copyBoss" data-bid="'+boss.id+'">Copy</button></div>';
+  h+='<div class="expbox" id="bossExpBox_'+boss.id+'">'+he(prevText)+'</div>';
+
+  h+='<div style="font-family:Cinzel,serif;font-size:.62rem;color:#7a6030;text-transform:uppercase;letter-spacing:.06em;margin:.4rem 0 .3rem">Extra notes</div>';
+  h+='<textarea style="height:50px;border-color:#3a2a10" data-a="bossnote" data-bid="'+boss.id+'" placeholder="Add raid-specific notes...">'+he(bd.notes||'')+'</textarea>';
   return h;
 }
 
@@ -619,33 +683,25 @@ function doAssign(pid){
   var as=aset(),s=sel;
   sel=null;hideBan();
 
-  if(s.t==='g'){
-    if(as[pid])return;
-    groups[s.gi].slots[s.si].p=p;
-  } else if(s.t==='tm'){
-    trashMarks[s.mi].tank=p;
-  } else if(s.t==='th'){
-    trashMarks[s.mi].healer=p;
-  } else if(s.t==='pu'){
-    puller=p;
-  } else if(s.t==='bs'){
+  if(s.t==='g'){if(as[pid])return;groups[s.gi].slots[s.si].p=p;}
+  else if(s.t==='tm'){trashMarks[s.mi].tank=p;}
+  else if(s.t==='th'){trashMarks[s.mi].healer=p;}
+  else if(s.t==='pu'){puller=p;}
+  else if(s.t==='bs'){
     if(!bossData[s.bid])bossData[s.bid]={notes:''};
     bossData[s.bid][s.key]=p;
-    /* Auto-fill healer from trash if tank slot has healerKey */
+    /* Auto-fill healer from trash assignments */
     var boss=null;
     for(var i=0;i<BOSSES.length;i++)if(BOSSES[i].id===s.bid){boss=BOSSES[i];break;}
     if(boss){
-      for(var i=0;i<boss.slots.length;i++){
-        if(boss.slots[i].key===s.key&&boss.slots[i].healerKey){
-          var hKey=boss.slots[i].healerKey;
-          /* Only auto-fill if healer slot is empty */
-          if(!bossData[s.bid][hKey]){
-            var autoHealer=getTrashHealerForTank(p);
-            if(autoHealer)bossData[s.bid][hKey]=autoHealer;
+      boss.segments.forEach(function(seg){
+        seg.slots.forEach(function(sl){
+          if(sl.key===s.key&&sl.healerKey&&!bossData[s.bid][sl.healerKey]){
+            var autoH=getTrashHealerForTank(p);
+            if(autoH)bossData[s.bid][sl.healerKey]=autoH;
           }
-          break;
-        }
-      }
+        });
+      });
     }
   }
   rAll();
@@ -656,7 +712,7 @@ function removeFromPool(pid){
   for(var i=0;i<groups.length;i++)for(var j=0;j<groups[i].slots.length;j++)if(groups[i].slots[j].p&&groups[i].slots[j].p.id===pid)groups[i].slots[j].p=null;
   trashMarks.forEach(function(m){if(m.tank&&m.tank.id===pid)m.tank=null;if(m.healer&&m.healer.id===pid)m.healer=null;});
   if(puller&&puller.id===pid)puller=null;
-  for(var bid in bossData){for(var k in bossData[bid]){if(bossData[bid][k]&&typeof bossData[bid][k]==='object'&&bossData[bid][k].id===pid)bossData[bid][k]=null;}}
+  for(var bid in bossData)for(var k in bossData[bid])if(bossData[bid][k]&&typeof bossData[bid][k]==='object'&&bossData[bid][k].id===pid)bossData[bid][k]=null;
   rAll();
 }
 
@@ -682,20 +738,13 @@ function parseRHJson(data){
 /* ── Unified click handler ── */
 document.addEventListener('click',function(e){
   var t=e.target;
-
-  /* Tab switch */
   var tabEl=t.closest?t.closest('.tab'):null;
   if(tabEl&&tabEl.dataset.boss){activeTab=tabEl.dataset.boss;sel=null;hideBan();rBossTabs();return;}
-
-  /* Pool card pick */
   var pc=t.closest?t.closest('.pc'):null;
   if(pc&&pc.classList.contains('pick')&&!(t.dataset&&t.dataset.a)){doAssign(pc.dataset.pid);return;}
-
-  /* data-a routing */
   var el=(t.dataset&&t.dataset.a)?t:(t.closest?t.closest('[data-a]'):null);
   if(!el)return;
   var a=el.dataset.a;
-
   if(a==='rmp'){removeFromPool(el.dataset.pid);return;}
   if(a==='sg'){sel={t:'g',gi:+el.dataset.gi,si:+el.dataset.si};setBan('Group '+(+el.dataset.gi+1)+' slot '+(+el.dataset.si+1));rAll();return;}
   if(a==='rmg'){groups[+el.dataset.gi].slots[+el.dataset.si].p=null;rAll();return;}
@@ -708,6 +757,7 @@ document.addEventListener('click',function(e){
   if(a==='sbs'){sel={t:'bs',bid:el.dataset.bid,key:el.dataset.key};setBan(el.dataset.bid+' \u2014 '+el.dataset.key);rAll();return;}
   if(a==='rbs'){if(bossData[el.dataset.bid])bossData[el.dataset.bid][el.dataset.key]=null;rAll();return;}
   if(a==='copyTrash'){var box=document.getElementById('trashExpBox');if(box)navigator.clipboard.writeText(box.textContent.replace(/ !/g,'')).catch(function(){});return;}
+  if(a==='copyBoss'){var box2=document.getElementById('bossExpBox_'+el.dataset.bid);if(box2)navigator.clipboard.writeText(box2.textContent).catch(function(){});return;}
 });
 
 document.addEventListener('input',function(e){
@@ -730,7 +780,6 @@ document.getElementById('bDemo').addEventListener('click',function(){
   document.getElementById('logbox').style.display='none';
   showUI();rAll();tip('Loaded '+players.length+' players');
 });
-
 document.getElementById('bJsonOpen').addEventListener('click',function(){document.getElementById('jsonModal').className='modal-wrap on';document.getElementById('jsonInput').value='';document.getElementById('jsonInput').focus();});
 document.getElementById('bJsonCancel').addEventListener('click',function(){document.getElementById('jsonModal').className='modal-wrap';});
 document.getElementById('bJsonImport').addEventListener('click',function(){
@@ -739,7 +788,6 @@ document.getElementById('bJsonImport').addEventListener('click',function(){
   var data;try{data=JSON.parse(raw);}catch(e){tip('Invalid JSON: '+e.message,true);return;}
   document.getElementById('jsonModal').className='modal-wrap';parseRHJson(data);
 });
-
 document.getElementById('bAuto').addEventListener('click',function(){
   mkG();var used={},log=[];
   function get(fn){var r=[];for(var i=0;i<players.length;i++)if(!used[players[i].id]&&fn(players[i]))r.push(players[i]);return r;}
@@ -781,10 +829,8 @@ document.getElementById('bAuto').addEventListener('click',function(){
   var lb=document.getElementById('logbox');lb.style.display='block';lb.textContent=log.join('\n');
   rAll();tip('Auto-assign complete');
 });
-
 document.getElementById('bClear').addEventListener('click',function(){mkG();mkMarks();sel=null;hideBan();document.getElementById('logbox').style.display='none';rAll();});
 document.getElementById('bCopyMRT').addEventListener('click',function(){navigator.clipboard.writeText(document.getElementById('mrtBox').textContent).catch(function(){});});
-
 document.getElementById('bAdd').addEventListener('click',function(){
   var c=document.getElementById('mCls').value,sp=(CLS[c]||{sp:[]}).sp,h='';
   for(var i=0;i<sp.length;i++)h+='<option>'+sp[i]+'</option>';
