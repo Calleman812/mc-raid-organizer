@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Molten Core Raid Organizer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#0a0704;color:#e8d5a3;font-family:'Crimson Pro',Georgia,serif;}
+.app{max-width:1400px;margin:0 auto;padding:1rem 1.5rem;}
+h1{font-family:'Cinzel',serif;font-size:1.5rem;font-weight:700;color:#ff9900;text-align:center;letter-spacing:.05em;margin-bottom:.15rem;}
+.sub{text-align:center;color:#9a7a4a;font-size:.8rem;margin-bottom:.9rem;font-family:'Cinzel',serif;}
+.card{background:#150f07;border:1px solid #5a3a10;border-radius:8px;padding:.7rem .9rem;margin-bottom:.75rem;}
+.stitle{font-family:'Cinzel',serif;font-size:.72rem;color:#c87020;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.45rem;display:flex;justify-content:space-between;align-items:center;}
+.row{display:flex;gap:7px;align-items:center;flex-wrap:wrap;}
+input[type=text]{flex:1;min-width:160px;background:#0d0802;border:1px solid #4a2e08;color:#e8d5a3;padding:5px 9px;border-radius:4px;font-family:'Crimson Pro',serif;font-size:.83rem;}
+input[type=text]::placeholder{color:#5a4020;}
+select{background:#0d0802;border:1px solid #4a2e08;color:#e8d5a3;padding:4px 6px;border-radius:4px;font-family:'Crimson Pro',serif;font-size:.81rem;}
+select option{background:#1a0f07;}
+.btn{font-family:'Cinzel',serif;cursor:pointer;border-radius:4px;letter-spacing:.04em;transition:background .15s;}
+.bfire{background:#8b2500;color:#ffd080;padding:5px 13px;font-size:.72rem;border:1px solid #e05000;}
+.bfire:hover{background:#a03000;}
+.bgold{background:#3a2500;color:#ffc040;padding:4px 11px;font-size:.7rem;border:1px solid #7a5010;}
+.bgold:hover{background:#4a3000;}
+.bsm{background:#1a0f05;color:#a07030;padding:2px 7px;font-size:.65rem;border:1px solid #3a2010;}
+.bsm:hover{background:#2a1a08;}
+.bx{background:transparent;color:#703020;padding:1px 4px;font-size:.62rem;border:1px solid #3a1010;border-radius:3px;cursor:pointer;flex-shrink:0;}
+.bx:hover{background:#2a0808;color:#c04030;}
+.tip{font-size:.7rem;color:#5a4020;margin-top:.3rem;font-style:italic;min-height:14px;}
+.tip.err{color:#c04030;}
+.statsbar{display:flex;gap:.6rem;background:#100c05;border:1px solid #3a2a08;border-radius:8px;padding:.5rem .8rem;flex-wrap:wrap;align-items:center;margin-bottom:.7rem;}
+.sv{font-family:'Cinzel',serif;font-size:1rem;color:#ff9900;text-align:center;}
+.sl{font-size:.6rem;color:#6a5030;text-transform:uppercase;letter-spacing:.07em;text-align:center;}
+.vsep{width:1px;background:#2a1a08;height:24px;}
+.layout{display:grid;grid-template-columns:185px 1fr 300px;gap:.75rem;align-items:start;}
+.pool{background:#100c05;border:1px solid #3a2a08;border-radius:8px;padding:.6rem;max-height:82vh;overflow-y:auto;position:sticky;top:0;}
+.pool::-webkit-scrollbar{width:3px;}
+.pool::-webkit-scrollbar-thumb{background:#3a2a08;}
+.ptitle{font-family:'Cinzel',serif;font-size:.68rem;color:#c87020;text-transform:uppercase;margin-bottom:.35rem;display:flex;justify-content:space-between;}
+.fbtnrow{display:flex;gap:3px;margin-bottom:.4rem;}
+.fbtn{background:#0d0802;color:#7a5020;padding:2px 7px;font-size:.63rem;border:1px solid #2a1a08;border-radius:3px;cursor:pointer;font-family:'Cinzel',serif;}
+.fbtn.on{background:#2a1a08;color:#e8a040;border-color:#5a3010;}
+.pc{border-radius:4px;margin-bottom:2px;border:1px solid transparent;overflow:hidden;user-select:none;}
+.pc.pick{cursor:pointer;outline:2px solid #6aaa3a;outline-offset:1px;}
+.pc.pick:hover{filter:brightness(1.15);}
+.pc.dim{opacity:.2;pointer-events:none;}
+.pc-inner{padding:2px 5px;display:flex;align-items:center;gap:4px;}
+.gmid{display:flex;flex-direction:column;gap:.6rem;}
+.sectitle{font-family:'Cinzel',serif;font-size:.72rem;color:#c87020;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.45rem;display:flex;justify-content:space-between;align-items:center;}
+.ggrid{display:grid;grid-template-columns:repeat(4,1fr);gap:.45rem;}
+.gc{background:#100c05;border:1px solid #3a2a08;border-radius:7px;overflow:hidden;}
+.gh{background:#1a1005;padding:3px 7px;font-family:'Cinzel',serif;font-size:.67rem;color:#c87020;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #2a1a08;}
+.ghint{font-size:.53rem;color:#5a3a18;font-style:italic;font-family:'Crimson Pro',serif;}
+.gcnt{font-size:.62rem;color:#5a4020;}
+.gs{padding:3px 5px;min-height:118px;}
+.se{background:#0d0802;border:1px dashed #2a1a08;border-radius:3px;margin-bottom:2px;padding:2px 5px;font-size:.63rem;color:#3a2a10;font-style:italic;cursor:pointer;min-height:22px;}
+.se:hover{border-color:#5a3a10;}
+.se.picking{border-color:#5a9a3a;border-style:solid;background:#081508;color:#7acc7a;}
+.sf{border-radius:3px;margin-bottom:2px;overflow:hidden;}
+.sb{padding:2px 5px;display:flex;align-items:center;gap:4px;}
+.sname{font-size:.82rem;font-weight:700;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.smeta{font-size:.48rem;opacity:.5;white-space:nowrap;font-style:italic;}
+.rcol{display:flex;flex-direction:column;gap:.65rem;}
+.asec{background:#100c05;border:1px solid #3a2a08;border-radius:8px;padding:.65rem;}
+.mmarks{display:grid;grid-template-columns:1fr;gap:.3rem;margin-bottom:.4rem;}
+.mc{background:#0d0802;border:1px solid #2a1a08;border-radius:5px;overflow:hidden;}
+.mh{padding:3px 6px;font-family:'Cinzel',serif;font-size:.65rem;font-weight:600;border-bottom:1px solid #1a1208;}
+.mlbl{font-size:.55rem;color:#4a3a20;font-family:'Cinzel',serif;text-transform:uppercase;letter-spacing:.04em;margin-bottom:1px;margin-top:2px;}
+.mas{padding:3px 4px;}
+.abtn{cursor:pointer;padding:2px 5px;font-size:.63rem;font-style:italic;border:1px dashed #2a1a08;border-radius:3px;color:#3a2a10;display:inline-block;}
+.abtn:hover{border-color:#5a3a10;color:#7a5020;}
+.abtn.picking{border-color:#5a9a3a;color:#7acc7a;background:#081508;}
+.prow{display:flex;align-items:center;gap:.45rem;padding:.35rem .5rem;background:#0d0802;border:1px solid #2a1a08;border-radius:5px;margin-bottom:.4rem;}
+.plbl{font-family:'Cinzel',serif;font-size:.67rem;color:#c87020;white-space:nowrap;}
+.expbox{background:#0a0602;border:1px solid #2a1a08;border-radius:5px;padding:.45rem .6rem;font-size:.72rem;color:#a08050;white-space:pre;line-height:1.5;font-family:monospace;overflow-x:auto;max-height:160px;overflow-y:auto;}
+.dup{font-size:.55rem;background:#3a1a00;color:#ff8020;border:1px solid #7a3a00;border-radius:3px;padding:1px 3px;white-space:nowrap;}
+.logbox{background:#0a0f05;border:1px solid #2a3a10;border-radius:5px;padding:.4rem .6rem;font-size:.67rem;color:#6a8a40;line-height:1.5;margin-top:.4rem;font-family:monospace;white-space:pre-wrap;}
+.abar{display:flex;align-items:center;gap:3px;margin-bottom:2px;}
+.banner{background:#0a1f0a;border:1px solid #2a5a2a;border-radius:6px;padding:5px 9px;margin-bottom:.55rem;font-size:.75rem;color:#7acc7a;display:none;align-items:center;gap:8px;}
+.banner.on{display:flex;}
+.modal-wrap{display:none;background:#1a0f07;border:1px solid #7a3a10;border-radius:10px;padding:1.1rem;max-width:420px;margin:.4rem 0 .8rem;}
+.modal-wrap.on{display:block;}
+.modal-title{font-family:'Cinzel',serif;color:#c87020;font-size:.87rem;margin-bottom:.7rem;}
+.mrow{display:flex;gap:6px;margin-bottom:.4rem;flex-wrap:wrap;}
+.mrow input,.mrow select{flex:1;}
+.mbtns{display:flex;gap:8px;justify-content:flex-end;margin-top:.6rem;}
+textarea{width:100%;background:#0d0802;border:1px solid #4a2e08;color:#e8d5a3;padding:5px 7px;border-radius:4px;font-family:monospace;font-size:.72rem;resize:vertical;}
+</style>
+</head>
+<body>
+<div class="app">
+<h1>Molten Core Raid Organizer</h1>
+<div class="sub">Ragnaros awaits &mdash; organize your 40-man raid</div>
+
+<!-- Add player modal (inline - no position:fixed) -->
+<div class="modal-wrap" id="modal">
+  <div class="modal-title">Add Player Manually</div>
+  <div class="mrow"><input type="text" id="mName" placeholder="Player name"></div>
+  <div class="mrow">
+    <select id="mCls">
+      <option>Warrior</option><option>Paladin</option><option>Druid</option><option>Priest</option>
+      <option>Shaman</option><option>Mage</option><option>Warlock</option><option>Rogue</option><option>Hunter</option>
+    </select>
+    <select id="mSpec"></select>
+  </div>
+  <div class="mrow"><select id="mRole"><option value="tank">Tank</option><option value="healer">Healer</option><option value="dps">DPS</option></select></div>
+  <div class="mbtns"><button class="btn bsm" id="bMcancel">Cancel</button><button class="btn bfire" id="bMadd">Add Player</button></div>
+</div>
+
+<!-- JSON import modal (inline) -->
+<div class="modal-wrap" id="jsonModal">
+  <div class="modal-title">Import from Raid-Helper JSON</div>
+  <div style="font-size:.7rem;color:#7a5020;margin-bottom:.45rem">Paste the contents of your exported .json file below:</div>
+  <textarea id="jsonInput" rows="7" placeholder='{"slots":[...],...}'></textarea>
+  <div class="mbtns"><button class="btn bsm" id="bJsonCancel">Cancel</button><button class="btn bfire" id="bJsonImport">Import JSON</button></div>
+</div>
+
+<div class="card">
+  <div class="stitle">Import Raid</div>
+  <div class="row">
+    <input type="text" id="urlIn" placeholder="https://raid-helper.xyz/event/..." value="https://raid-helper.xyz/event/1510613865807741028">
+    <button class="btn bfire" id="bImport">Import URL</button>
+    <button class="btn bgold" id="bJsonOpen">Import JSON</button>
+    <button class="btn bgold" id="bDemo">Load Demo</button>
+    <button class="btn bgold" id="bAdd">+ Add Player</button>
+  </div>
+  <div class="tip" id="tip"></div>
+</div>
+
+<div class="banner" id="banner">
+  Assigning: <strong id="banLbl"></strong> &mdash; click a player from the pool
+  <button class="btn bsm" id="bCancel">Cancel</button>
+</div>
+
+<div id="statsWrap" style="display:none">
+  <div class="statsbar">
+    <div><div class="sv" id="stT">0</div><div class="sl">Pool</div></div><div class="vsep"></div>
+    <div><div class="sv" id="stA">0</div><div class="sl">Assigned</div></div><div class="vsep"></div>
+    <div><div class="sv" id="stTk">0</div><div class="sl">Tanks</div></div><div class="vsep"></div>
+    <div><div class="sv" id="stH">0</div><div class="sl">Healers</div></div><div class="vsep"></div>
+    <div><div class="sv" id="stD">0</div><div class="sl">DPS</div></div><div class="vsep"></div>
+    <div><div class="sv" id="stG">0/8</div><div class="sl">Groups</div></div>
+  </div>
+
+  <div class="layout">
+    <div>
+      <div class="pool">
+        <div class="ptitle">Raid Pool <span id="pcnt" style="color:#7a5020;font-size:.65rem"></span></div>
+        <div class="fbtnrow">
+          <button class="fbtn on" id="fAll">All</button>
+          <button class="fbtn" id="fTank">Tank</button>
+          <button class="fbtn" id="fHeal">Heal</button>
+          <button class="fbtn" id="fDps">DPS</button>
+        </div>
+        <div id="poolList"></div>
+      </div>
+    </div>
+
+    <div class="gmid">
+      <div>
+        <div class="sectitle">Groups
+          <div class="row" style="gap:5px">
+            <button class="btn bgold" id="bAuto">Auto-Assign</button>
+            <button class="btn bsm" id="bClear">Clear All</button>
+          </div>
+        </div>
+        <div class="ggrid" id="ggrid"></div>
+        <div class="logbox" id="logbox" style="display:none"></div>
+      </div>
+    </div>
+
+    <div class="rcol">
+      <div class="asec">
+        <div class="sectitle" style="margin-bottom:.5rem">
+          Tank &amp; Heal Assignments
+          <button class="btn bsm" id="bCopyAssign">Copy</button>
+        </div>
+        <div class="mmarks" id="mgrid"></div>
+        <div class="prow"><span class="plbl">Puller</span><div id="pulDiv" style="flex:1"></div></div>
+        <div class="expbox" id="assignBox"></div>
+      </div>
+      <div class="asec">
+        <div class="sectitle" style="margin-bottom:.35rem">
+          MRT Group Export
+          <button class="btn bsm" id="bCopyMRT">Copy for MRT</button>
+        </div>
+        <div style="font-size:.63rem;color:#5a4020;margin-bottom:.35rem;font-style:italic">Paste into MRT addon import field</div>
+        <div class="expbox" id="mrtBox"></div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+var CLS = {
+  Warrior:{c:'#c8d8f8',bg:'#1a2535',bd:'#3a5070',sp:['Arms','Fury','Protection']},
+  Paladin:{c:'#f8b0d8',bg:'#2a1530',bd:'#7a3070',sp:['Holy','Protection','Retribution']},
+  Druid:  {c:'#f8a040',bg:'#2a1505',bd:'#8a4a00',sp:['Balance','Feral','Restoration']},
+  Priest: {c:'#e8e8e8',bg:'#2a2a2a',bd:'#585858',sp:['Discipline','Holy','Shadow']},
+  Shaman: {c:'#60b0f0',bg:'#08182a',bd:'#1a4070',sp:['Elemental','Enhancement','Restoration']},
+  Mage:   {c:'#90d0ff',bg:'#081828',bd:'#1050b0',sp:['Arcane','Fire','Frost']},
+  Warlock:{c:'#b070e8',bg:'#180828',bd:'#501880',sp:['Affliction','Demonology','Destruction']},
+  Rogue:  {c:'#e8d040',bg:'#201e00',bd:'#605800',sp:['Assassination','Combat','Subtlety']},
+  Hunter: {c:'#70d870',bg:'#082008',bd:'#286028',sp:['Beast Mastery','Marksmanship','Survival']}
+};
+var CLASS_ORDER = ['Druid','Hunter','Mage','Paladin','Priest','Rogue','Shaman','Warlock','Warrior'];
+var MARKS = [{name:'Skull',col:'#e03030'},{name:'Cross',col:'#e05020'},{name:'Square',col:'#4080e0'},{name:'Moon',col:'#a070e0'},{name:'Triangle',col:'#30b050'}];
+var GHINTS = ['4 tanks + pala heal','1 tank + pala heal + melee','melee + priest + hunter','melee + priest + hunter','buffer','buffer','warlocks + mages + druid heal','mages + warlocks + heal'];
+var DEMO = [
+  {id:'t1',name:'Ubi',cls:'Warrior',spec:'Protection',role:'tank'},
+  {id:'t2',name:'Willheim',cls:'Warrior',spec:'Protection',role:'tank'},
+  {id:'t3',name:'Dehuel',cls:'Warrior',spec:'Protection',role:'tank'},
+  {id:'t4',name:'Methax',cls:'Warrior',spec:'Protection',role:'tank'},
+  {id:'t5',name:'Skallrock',cls:'Warrior',spec:'Protection',role:'tank'},
+  {id:'f1',name:'Thorvik',cls:'Warrior',spec:'Fury',role:'dps'},
+  {id:'f2',name:'Pyraxis',cls:'Warrior',spec:'Fury',role:'dps'},
+  {id:'f3',name:'Ravenmoor',cls:'Warrior',spec:'Fury',role:'dps'},
+  {id:'f4',name:'Bloodthorn',cls:'Warrior',spec:'Fury',role:'dps'},
+  {id:'f5',name:'Lavaborn',cls:'Warrior',spec:'Fury',role:'dps'},
+  {id:'f6',name:'Ironpelt',cls:'Warrior',spec:'Fury',role:'dps'},
+  {id:'f7',name:'Forgefist',cls:'Warrior',spec:'Fury',role:'dps'},
+  {id:'f8',name:'Grimaxe',cls:'Warrior',spec:'Fury',role:'dps'},
+  {id:'f9',name:'Stonecleave',cls:'Warrior',spec:'Fury',role:'dps'},
+  {id:'f10',name:'Emberstrike',cls:'Warrior',spec:'Fury',role:'dps'},
+  {id:'f11',name:'Coldrage',cls:'Warrior',spec:'Fury',role:'dps'},
+  {id:'f12',name:'Duskblade',cls:'Warrior',spec:'Fury',role:'dps'},
+  {id:'d1',name:'Moonshadow',cls:'Druid',spec:'Restoration',role:'healer'},
+  {id:'d2',name:'Mistwalker',cls:'Druid',spec:'Restoration',role:'healer'},
+  {id:'p1',name:'Seta',cls:'Paladin',spec:'Holy',role:'healer'},
+  {id:'p2',name:'Voldus',cls:'Paladin',spec:'Holy',role:'healer'},
+  {id:'p3',name:'Quadi',cls:'Paladin',spec:'Holy',role:'healer'},
+  {id:'r1',name:'Swiftmark',cls:'Rogue',spec:'Combat',role:'dps'},
+  {id:'r2',name:'Skullreaper',cls:'Rogue',spec:'Combat',role:'dps'},
+  {id:'r3',name:'Nightshroud',cls:'Rogue',spec:'Combat',role:'dps'},
+  {id:'r4',name:'Shadowcut',cls:'Rogue',spec:'Combat',role:'dps'},
+  {id:'h1',name:'Wildmane',cls:'Hunter',spec:'Marksmanship',role:'dps'},
+  {id:'h2',name:'Dustwind',cls:'Hunter',spec:'Marksmanship',role:'dps'},
+  {id:'pr1',name:'Horion',cls:'Priest',spec:'Holy',role:'healer'},
+  {id:'pr2',name:'Pansies',cls:'Priest',spec:'Holy',role:'healer'},
+  {id:'pr3',name:'Granada',cls:'Priest',spec:'Holy',role:'healer'},
+  {id:'pr4',name:'Ashwick',cls:'Priest',spec:'Holy',role:'healer'},
+  {id:'pr5',name:'Lightweave',cls:'Priest',spec:'Holy',role:'healer'},
+  {id:'m1',name:'Frostbolt',cls:'Mage',spec:'Fire',role:'dps'},
+  {id:'m2',name:'Coldsnap',cls:'Mage',spec:'Fire',role:'dps'},
+  {id:'m3',name:'Arcwarden',cls:'Mage',spec:'Fire',role:'dps'},
+  {id:'m4',name:'Blazemantle',cls:'Mage',spec:'Fire',role:'dps'},
+  {id:'wl1',name:'Voidcaller',cls:'Warlock',spec:'Destruction',role:'dps'},
+  {id:'wl2',name:'Demonchain',cls:'Warlock',spec:'Destruction',role:'dps'},
+  {id:'wl3',name:'Grimshaw',cls:'Warlock',spec:'Destruction',role:'dps'}
+];
+
+var players=[],groups=[],mdata=[],puller=null,filt='all',sel=null;
+
+function deriveRole(cls,spec){
+  var s=(spec||'').toLowerCase().replace(/\d+$/,'');
+  var c=(cls||'').toLowerCase();
+  if(c==='tank') return 'tank';
+  if((c==='warrior'||c==='paladin')&&s==='protection') return 'tank';
+  if(c==='druid'&&s==='guardian') return 'tank';
+  if(s==='protection'||s==='guardian') return 'tank';
+  if(s==='holy'||s==='restoration'||s==='discipline'||s==='dreamstate') return 'healer';
+  if(c==='priest'&&s!=='shadow') return 'healer';
+  return 'dps';
+}
+
+function sortPlayers(){
+  players.sort(function(a,b){
+    var ci=CLASS_ORDER.indexOf(a.cls)-CLASS_ORDER.indexOf(b.cls);
+    if(ci!==0) return ci;
+    return a.name.toLowerCase()<b.name.toLowerCase()?-1:a.name.toLowerCase()>b.name.toLowerCase()?1:0;
+  });
+}
+
+function expandRealm(name){
+  name=name.replace(/-PV$/,'-PyrewoodVillage');
+  name=name.replace(/-MR$/,'-MirageRaceway');
+  name=name.replace(/-NK$/,'-NethergardeKeep');
+  return name;
+}
+
+function mkG(){groups=[];for(var i=0;i<8;i++){var s=[];for(var j=0;j<5;j++)s.push({p:null});groups.push({id:i+1,slots:s});}}
+function mkM(){mdata=[];for(var i=0;i<MARKS.length;i++)mdata.push({name:MARKS[i].name,col:MARKS[i].col,tank:null,healer:null});}
+function aset(){var s={};for(var i=0;i<groups.length;i++)for(var j=0;j<groups[i].slots.length;j++)if(groups[i].slots[j].p)s[groups[i].slots[j].p.id]=1;return s;}
+function dups(){var a=[puller];for(var i=0;i<mdata.length;i++){a.push(mdata[i].tank);a.push(mdata[i].healer);}var c={};for(var i=0;i<a.length;i++)if(a[i])c[a[i].id]=(c[a[i].id]||0)+1;var d={};for(var k in c)if(c[k]>1)d[k]=1;return d;}
+function isMelee(p){return p.cls==='Warrior'||p.cls==='Rogue'||(p.cls==='Paladin'&&p.role==='dps')||(p.cls==='Druid'&&p.spec==='Feral'&&p.role==='dps')||(p.cls==='Shaman'&&p.spec==='Enhancement');}
+function cd(c){return CLS[c]||CLS.Warrior;}
+function he(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function tip(m,e){var el=document.getElementById('tip');el.textContent=m;el.className=e?'tip err':'tip';}
+function showUI(){document.getElementById('statsWrap').style.display='block';}
+function setBan(l){document.getElementById('banLbl').textContent=l;document.getElementById('banner').className='banner on';}
+function hideBan(){document.getElementById('banner').className='banner';}
+
+function buildMRT(){
+  var names=[];
+  for(var gi=0;gi<groups.length;gi++){
+    var g=groups[gi];
+    for(var j=0;j<g.slots.length;j++){
+      if(g.slots[j].p) names.push(expandRealm(g.slots[j].p.name));
+    }
+  }
+  if(!names.length) return '';
+  return '"'+names.join('\n')+'"';
+}
+
+function pbar(p,isDup){
+  var c=cd(p.cls);
+  return '<div style="background:'+c.bg+';border:1px solid '+(isDup?'#c06010':c.bd)+';border-radius:3px;padding:2px 5px;display:flex;align-items:center;gap:3px;flex:1;min-width:0">'
+    +'<span style="font-size:.8rem;font-weight:700;color:'+c.c+';flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+he(p.name)+'</span>'
+    +(isDup?'<span class="dup">!dup</span>':'')
+    +'<span style="font-size:.5rem;font-family:Cinzel,serif;color:'+c.c+';opacity:.6">'+he(p.cls.substring(0,3).toUpperCase())+'</span>'
+    +'<span style="font-size:.48rem;font-style:italic;color:'+c.c+';opacity:.5;white-space:nowrap">'+he(p.spec||'')+'</span>'
+    +'</div>';
+}
+
+function rAll(){rPool();rGroups();rMarks();rStats();}
+
+function rStats(){
+  var as=aset(),ac=0;for(var k in as)ac++;
+  document.getElementById('stT').textContent=players.length;
+  document.getElementById('stA').textContent=ac;
+  document.getElementById('stTk').textContent=players.filter(function(p){return p.role==='tank';}).length;
+  document.getElementById('stH').textContent=players.filter(function(p){return p.role==='healer';}).length;
+  document.getElementById('stD').textContent=players.filter(function(p){return p.role==='dps';}).length;
+  var gf=0;for(var i=0;i<groups.length;i++)for(var j=0;j<groups[i].slots.length;j++)if(groups[i].slots[j].p){gf++;break;}
+  document.getElementById('stG').textContent=gf+'/8';
+}
+
+function rPool(){
+  var as=aset();
+  var list=players.filter(function(p){return filt==='all'||p.role===filt;});
+  document.getElementById('pcnt').textContent=list.length;
+  var h='';
+  for(var i=0;i<list.length;i++){
+    var p=list[i],c=cd(p.cls);
+    var dim=sel&&sel.t==='g'&&as[p.id];
+    var pick=!!sel&&!dim;
+    h+='<div class="pc'+(dim?' dim':pick?' pick':'')+'" data-pid="'+he(p.id)+'" style="background:'+c.bg+';border-color:'+c.bd+'">'
+      +'<div class="pc-inner">'
+      +'<span style="font-size:.8rem;font-weight:600;color:'+c.c+';flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+he(p.name)+'</span>'
+      +'<span style="font-size:.52rem;opacity:.55;white-space:nowrap;color:'+c.c+'">'+he(p.cls.substring(0,3).toUpperCase())+(p.spec?' '+he(p.spec):'')+'</span>'
+      +'<button class="bx" data-a="rmp" data-pid="'+he(p.id)+'" title="Remove">x</button>'
+      +'</div></div>';
+  }
+  if(!h) h='<div style="color:#3a2a10;font-size:.72rem;text-align:center;padding:.7rem">No players</div>';
+  document.getElementById('poolList').innerHTML=h;
+}
+
+function rGroups(){
+  var h='';
+  for(var gi=0;gi<groups.length;gi++){
+    var g=groups[gi],filled=0;
+    for(var j=0;j<g.slots.length;j++) if(g.slots[j].p) filled++;
+    h+='<div class="gc"><div class="gh"><span>Group '+g.id+'</span><span class="ghint">'+(GHINTS[gi]||'')+'</span><span class="gcnt">'+filled+'/5</span></div><div class="gs">';
+    for(var si=0;si<g.slots.length;si++){
+      var s=g.slots[si],pick=sel&&sel.t==='g'&&sel.gi===gi&&sel.si===si;
+      if(s.p){
+        var c=cd(s.p.cls);
+        h+='<div class="sf" style="border:1px solid '+c.bd+'"><div class="sb" style="background:'+c.bg+'">'
+          +'<span class="sname" style="color:'+c.c+'">'+he(s.p.name)+'</span>'
+          +'<span class="smeta" style="color:'+c.c+'">'+he(s.p.cls.substring(0,3).toUpperCase())+(s.p.spec?' '+he(s.p.spec):'')+'</span>'
+          +'<button class="bx" data-a="rmg" data-gi="'+gi+'" data-si="'+si+'">x</button>'
+          +'</div></div>';
+      } else {
+        h+='<div class="se'+(pick?' picking':'')+'" data-a="sg" data-gi="'+gi+'" data-si="'+si+'">click to assign</div>';
+      }
+    }
+    h+='</div></div>';
+  }
+  document.getElementById('ggrid').innerHTML=h;
+  document.getElementById('mrtBox').textContent=buildMRT();
+}
+
+function rMarks(){
+  var dp=dups(),h='';
+  for(var mi=0;mi<mdata.length;mi++){
+    var m=mdata[mi],tp=sel&&sel.t==='mt'&&sel.mi===mi,hp=sel&&sel.t==='mh'&&sel.mi===mi;
+    h+='<div class="mc"><div class="mh" style="background:'+m.col+'22;color:'+m.col+'">'+m.name+'</div><div class="mas">';
+    h+='<div class="mlbl">Tank</div>';
+    if(m.tank){ h+='<div class="abar">'+pbar(m.tank,!!dp[m.tank.id])+'<button class="bx" data-a="rmt" data-mi="'+mi+'">x</button></div>'; }
+    else { h+='<div class="abtn'+(tp?' picking':'')+'" data-a="st" data-mi="'+mi+'">+ Tank</div>'; }
+    h+='<div class="mlbl">Healer</div>';
+    if(m.healer){ h+='<div class="abar">'+pbar(m.healer,!!dp[m.healer.id])+'<button class="bx" data-a="rmh" data-mi="'+mi+'">x</button></div>'; }
+    else { h+='<div class="abtn'+(hp?' picking':'')+'" data-a="sh" data-mi="'+mi+'">+ Healer</div>'; }
+    h+='</div></div>';
+  }
+  document.getElementById('mgrid').innerHTML=h;
+  var dp2=dups(),pp=sel&&sel.t==='pu';
+  document.getElementById('pulDiv').innerHTML=puller
+    ?'<div class="abar">'+pbar(puller,!!dp2[puller.id])+'<button class="bx" data-a="rpu">x</button></div>'
+    :'<div class="abtn'+(pp?' picking':'')+'" data-a="spu">+ Assign Puller</div>';
+  var lines=['Trash tank and healing assignments'];
+  for(var i=0;i<mdata.length;i++){
+    var m=mdata[i];
+    lines.push('{'+m.name+'} '+(m.tank?m.tank.name:'--')+(m.tank&&dp2[m.tank.id]?' !':'')+' - '+(m.healer?m.healer.name:'--')+(m.healer&&dp2[m.healer.id]?' !':''));
+  }
+  lines.push('Puller: '+(puller?puller.name:'--'));
+  document.getElementById('assignBox').textContent=lines.join('\n');
+}
+
+function doAssign(pid){
+  if(!sel) return;
+  var p=null;
+  for(var i=0;i<players.length;i++) if(players[i].id===pid){p=players[i];break;}
+  if(!p) return;
+  var as=aset(),s=sel;sel=null;hideBan();
+  if(s.t==='g'){if(as[pid])return;groups[s.gi].slots[s.si].p=p;}
+  else if(s.t==='mt') mdata[s.mi].tank=p;
+  else if(s.t==='mh') mdata[s.mi].healer=p;
+  else if(s.t==='pu') puller=p;
+  rAll();
+}
+
+function removeFromPool(pid){
+  players=players.filter(function(p){return p.id!==pid;});
+  for(var i=0;i<groups.length;i++) for(var j=0;j<groups[i].slots.length;j++) if(groups[i].slots[j].p&&groups[i].slots[j].p.id===pid) groups[i].slots[j].p=null;
+  for(var i=0;i<mdata.length;i++){if(mdata[i].tank&&mdata[i].tank.id===pid)mdata[i].tank=null;if(mdata[i].healer&&mdata[i].healer.id===pid)mdata[i].healer=null;}
+  if(puller&&puller.id===pid) puller=null;
+  rAll();
+}
+
+function parseRHJson(data){
+  var slots=data.slots||[];
+  if(!slots.length){tip('No slots found in JSON',true);return;}
+  var cm={hunter:'Hunter',druid:'Druid',warrior:'Warrior',priest:'Priest',mage:'Mage',shaman:'Shaman',paladin:'Paladin',rogue:'Rogue',warlock:'Warlock',tank:'Warrior',bench:'Priest'};
+  mkG();mkM();puller=null;sel=null;hideBan();players=[];
+  slots.sort(function(a,b){return (a.groupNumber-b.groupNumber)||((a.slotNumber||0)-(b.slotNumber||0));});
+  for(var i=0;i<slots.length;i++){
+    var s=slots[i];
+    var rawCls=s.className||'Warrior';
+    var cls=cm[rawCls.toLowerCase()]||'Warrior';
+    var spec=(s.specName||'').replace(/\d+$/,'');
+    var role=deriveRole(rawCls,s.specName||'');
+    var pid='rh'+i;
+    var p={id:pid,name:s.name||'Unknown',cls:cls,spec:spec,role:role};
+    players.push(p);
+    var gn=(s.groupNumber||1)-1,sn=(s.slotNumber||1)-1;
+    if(gn>=0&&gn<8&&sn>=0&&sn<5) groups[gn].slots[sn].p=p;
+  }
+  sortPlayers();
+  showUI();rAll();
+  tip('Imported '+players.length+' players from JSON (groups pre-filled)');
+}
+
+document.addEventListener('click',function(e){
+  var t=e.target;
+  var pc=t.closest?t.closest('.pc'):null;
+  if(pc&&pc.classList.contains('pick')&&!(t.dataset&&t.dataset.a)){doAssign(pc.dataset.pid);return;}
+  var el=t.dataset&&t.dataset.a?t:(t.closest?t.closest('[data-a]'):null);
+  if(!el) return;
+  var a=el.dataset.a;
+  if(a==='rmp'){removeFromPool(el.dataset.pid);return;}
+  if(a==='sg'){sel={t:'g',gi:+el.dataset.gi,si:+el.dataset.si};setBan('Group '+(+el.dataset.gi+1)+' slot '+(+el.dataset.si+1));rAll();return;}
+  if(a==='rmg'){groups[+el.dataset.gi].slots[+el.dataset.si].p=null;rAll();return;}
+  if(a==='st'){sel={t:'mt',mi:+el.dataset.mi};setBan(mdata[+el.dataset.mi].name+' - Tank');rAll();return;}
+  if(a==='sh'){sel={t:'mh',mi:+el.dataset.mi};setBan(mdata[+el.dataset.mi].name+' - Healer');rAll();return;}
+  if(a==='spu'){sel={t:'pu'};setBan('Puller');rAll();return;}
+  if(a==='rmt'){mdata[+el.dataset.mi].tank=null;rAll();return;}
+  if(a==='rmh'){mdata[+el.dataset.mi].healer=null;rAll();return;}
+  if(a==='rpu'){puller=null;rAll();return;}
+});
+
+document.getElementById('fAll').addEventListener('click',function(){filt='all';document.getElementById('fAll').className='fbtn on';document.getElementById('fTank').className='fbtn';document.getElementById('fHeal').className='fbtn';document.getElementById('fDps').className='fbtn';rPool();});
+document.getElementById('fTank').addEventListener('click',function(){filt='tank';document.getElementById('fAll').className='fbtn';document.getElementById('fTank').className='fbtn on';document.getElementById('fHeal').className='fbtn';document.getElementById('fDps').className='fbtn';rPool();});
+document.getElementById('fHeal').addEventListener('click',function(){filt='healer';document.getElementById('fAll').className='fbtn';document.getElementById('fTank').className='fbtn';document.getElementById('fHeal').className='fbtn on';document.getElementById('fDps').className='fbtn';rPool();});
+document.getElementById('fDps').addEventListener('click',function(){filt='dps';document.getElementById('fAll').className='fbtn';document.getElementById('fTank').className='fbtn';document.getElementById('fHeal').className='fbtn';document.getElementById('fDps').className='fbtn on';rPool();});
+document.getElementById('bCancel').addEventListener('click',function(){sel=null;hideBan();rAll();});
+
+document.getElementById('bDemo').addEventListener('click',function(){
+  players=[];
+  for(var i=0;i<DEMO.length;i++) players.push({id:DEMO[i].id,name:DEMO[i].name,cls:DEMO[i].cls,spec:DEMO[i].spec,role:DEMO[i].role});
+  sortPlayers();mkG();mkM();puller=null;sel=null;hideBan();
+  document.getElementById('logbox').style.display='none';
+  showUI();rAll();tip('Loaded '+players.length+' players');
+});
+
+document.getElementById('bImport').addEventListener('click',function(){
+  var url=document.getElementById('urlIn').value.trim();
+  if(!url){tip('Please enter a URL',true);return;}
+  var m=url.match(/\/event\/(\d+)/);
+  if(!m){tip('Invalid Raid-Helper URL',true);return;}
+  tip('Fetching...');
+  fetch('https://raid-helper.xyz/api/v2/events/'+m[1])
+    .then(function(r){if(!r.ok)throw 0;return r.json();})
+    .then(function(data){
+      if(data.slots&&data.slots.length){parseRHJson(data);return;}
+      var s=data.signUps||data.signups||[],id=1;
+      var cm2={warrior:'Warrior',paladin:'Paladin',druid:'Druid',priest:'Priest',shaman:'Shaman',mage:'Mage',warlock:'Warlock',rogue:'Rogue',hunter:'Hunter'};
+      players=[];mkG();mkM();puller=null;sel=null;hideBan();
+      for(var i=0;i<s.length;i++){
+        var x=s[i];if(x.status!=='accepted'&&x.entryType==='Absence')continue;
+        var cls=cm2[(x.className||x.class||'').toLowerCase()]||'Warrior';
+        var role=deriveRole(cls,x.specName||x.roleName||x.role||'');
+        players.push({id:'p'+(id++),name:x.name||x.playerName||'Unknown',cls:cls,role:role,spec:x.specName||''});
+      }
+      if(!players.length){tip('No signups found',true);return;}
+      sortPlayers();showUI();rAll();tip('Imported '+players.length+' players');
+    })
+    .catch(function(){tip('CORS blocked - use Import JSON instead',true);});
+});
+
+document.getElementById('bJsonOpen').addEventListener('click',function(){
+  document.getElementById('jsonModal').className='modal-wrap on';
+  document.getElementById('jsonInput').value='';
+  document.getElementById('jsonInput').focus();
+});
+document.getElementById('bJsonCancel').addEventListener('click',function(){document.getElementById('jsonModal').className='modal-wrap';});
+document.getElementById('bJsonImport').addEventListener('click',function(){
+  var raw=document.getElementById('jsonInput').value.trim();
+  if(!raw){tip('Please paste JSON content',true);return;}
+  var data;
+  try{data=JSON.parse(raw);}catch(e){tip('Invalid JSON: '+e.message,true);return;}
+  document.getElementById('jsonModal').className='modal-wrap';
+  parseRHJson(data);
+});
+
+document.getElementById('bAuto').addEventListener('click',function(){
+  mkG();
+  var used={},log=[];
+  function get(fn){var r=[];for(var i=0;i<players.length;i++)if(!used[players[i].id]&&fn(players[i]))r.push(players[i]);return r;}
+  function take(arr,n){var r=arr.slice(0,n);for(var i=0;i<r.length;i++)used[r[i].id]=1;return r;}
+  function fill(gi,ms){for(var i=0;i<ms.length&&i<5;i++)groups[gi].slots[i].p=ms[i];}
+  var g1t=take(get(function(p){return p.role==='tank';}),4);
+  var g1h=take(get(function(p){return p.role==='healer'&&p.cls==='Paladin';}),1);
+  if(!g1h.length)g1h=take(get(function(p){return p.role==='healer';}),1);
+  fill(0,g1t.concat(g1h));log.push('Group 1: '+g1t.concat(g1h).map(function(p){return p.name;}).join(', '));
+  var g2t=take(get(function(p){return p.role==='tank';}),1);
+  var g2h=take(get(function(p){return p.role==='healer'&&p.cls==='Paladin';}),1);
+  if(!g2h.length)g2h=take(get(function(p){return p.role==='healer';}),1);
+  var g2m=take(get(function(p){return p.role==='dps'&&isMelee(p);}),3);
+  fill(1,g2t.concat(g2h,g2m));log.push('Group 2: '+g2t.concat(g2h,g2m).map(function(p){return p.name;}).join(', '));
+  for(var gi=2;gi<=3;gi++){
+    var h=take(get(function(p){return p.role==='healer'&&p.cls==='Priest';}),1);
+    if(!h.length)h=take(get(function(p){return p.role==='healer';}),1);
+    var hu=take(get(function(p){return p.role==='dps'&&p.cls==='Hunter';}),1);
+    var mm=take(get(function(p){return p.role==='dps'&&isMelee(p);}),5-h.length-hu.length);
+    var mb=h.concat(hu,mm);
+    while(mb.length<5){var x=take(get(function(p){return p.role==='dps';}),1);if(!x.length)break;mb=mb.concat(x);}
+    fill(gi,mb);log.push('Group '+(gi+1)+': '+mb.map(function(p){return p.name;}).join(', '));
+  }
+  var g7h=take(get(function(p){return p.role==='healer'&&p.cls==='Druid';}),1);
+  if(!g7h.length)g7h=take(get(function(p){return p.role==='healer';}),1);
+  var g7w=take(get(function(p){return p.role==='dps'&&p.cls==='Warlock';}),3);
+  var g7m=take(get(function(p){return p.role==='dps'&&p.cls==='Mage';}),Math.max(0,4-g7w.length));
+  var g7r=take(get(function(p){return p.role==='dps';}),Math.max(0,4-g7w.length-g7m.length));
+  var g7=g7h.concat(g7w,g7m,g7r).slice(0,5);fill(6,g7);log.push('Group 7: '+g7.map(function(p){return p.name;}).join(', '));
+  var g8h=take(get(function(p){return p.role==='healer';}),1);
+  var g8m=take(get(function(p){return p.role==='dps'&&p.cls==='Mage';}),3);
+  var g8w=take(get(function(p){return p.role==='dps'&&p.cls==='Warlock';}),Math.max(0,4-g8m.length));
+  var g8r=take(get(function(p){return p.role==='dps';}),Math.max(0,4-g8m.length-g8w.length));
+  var g8=g8h.concat(g8m,g8w,g8r).slice(0,5);fill(7,g8);log.push('Group 8: '+g8.map(function(p){return p.name;}).join(', '));
+  var rem=get(function(p){return true;}),ri=0;
+  for(var bi=4;bi<=5;bi++){var mb2=[];while(mb2.length<5&&ri<rem.length){mb2.push(rem[ri]);used[rem[ri].id]=1;ri++;}fill(bi,mb2);if(mb2.length)log.push('Group '+(bi+1)+' (buffer): '+mb2.map(function(p){return p.name;}).join(', '));}
+  var f2=[],e2=[];
+  for(var i=0;i<groups.length;i++){var has=false;for(var j=0;j<groups[i].slots.length;j++)if(groups[i].slots[j].p){has=true;break;}if(has)f2.push(groups[i]);else e2.push(groups[i]);}
+  groups=f2.concat(e2);for(var i=0;i<groups.length;i++)groups[i].id=i+1;
+  var lb=document.getElementById('logbox');lb.style.display='block';lb.textContent=log.join('\n');
+  rAll();tip('Auto-assign complete');
+});
+
+document.getElementById('bClear').addEventListener('click',function(){mkG();mkM();puller=null;sel=null;hideBan();document.getElementById('logbox').style.display='none';rAll();});
+document.getElementById('bCopyAssign').addEventListener('click',function(){navigator.clipboard.writeText(document.getElementById('assignBox').textContent.replace(/ !/g,'')).catch(function(){});});
+document.getElementById('bCopyMRT').addEventListener('click',function(){navigator.clipboard.writeText(document.getElementById('mrtBox').textContent).catch(function(){});});
+
+document.getElementById('bAdd').addEventListener('click',function(){
+  var c=document.getElementById('mCls').value,sp=(CLS[c]||{sp:[]}).sp,h='';
+  for(var i=0;i<sp.length;i++)h+='<option>'+sp[i]+'</option>';
+  document.getElementById('mSpec').innerHTML=h;
+  document.getElementById('modal').className='modal-wrap on';
+  document.getElementById('mName').focus();
+});
+document.getElementById('mCls').addEventListener('change',function(){
+  var c=this.value,sp=(CLS[c]||{sp:[]}).sp,h='';
+  for(var i=0;i<sp.length;i++)h+='<option>'+sp[i]+'</option>';
+  document.getElementById('mSpec').innerHTML=h;
+});
+document.getElementById('bMcancel').addEventListener('click',function(){document.getElementById('modal').className='modal-wrap';});
+document.getElementById('bMadd').addEventListener('click',function(){
+  var name=document.getElementById('mName').value.trim();if(!name)return;
+  var cls=document.getElementById('mCls').value;
+  var spec=document.getElementById('mSpec').value;
+  var role=document.getElementById('mRole').value;
+  players.push({id:'m'+Date.now(),name:name,cls:cls,spec:spec,role:role});
+  sortPlayers();
+  document.getElementById('mName').value='';
+  document.getElementById('modal').className='modal-wrap';
+  showUI();rAll();tip('Added '+name);
+});
+document.getElementById('mName').addEventListener('keydown',function(e){if(e.key==='Enter')document.getElementById('bMadd').click();});
+mkG();mkM();
+</script>
+</body>
+</html>
