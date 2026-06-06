@@ -456,6 +456,7 @@ var DEMO=[
 
 var players=[],groups=[],trashMarks=[],bossData={},puller=null,filt='all',sel=null,activeTab='trash';
 var benched=[],lateList=[],absentList=[],tentativeList=[];
+var originalStatus={}; /* pid -> 'active'|'bench'|'late'|'absent'|'tentative' */
 
 function deriveRole(cls,spec){
   var s=(spec||'').toLowerCase().replace(/\d+$/,''),c=(cls||'').toLowerCase();
@@ -481,7 +482,7 @@ function mkG(){groups=[];for(var i=0;i<8;i++){var s=[];for(var j=0;j<5;j++)s.pus
 function mkMarks(){
   trashMarks=TRASH_MARKS.map(function(m){return{name:m.name,col:m.col,tank:null,healer:null};});
   puller=null; bossData={};
-  benched=[];lateList=[];absentList=[];tentativeList=[];
+  benched=[];lateList=[];absentList=[];tentativeList=[];originalStatus={};
   BOSSES.forEach(function(b){
     if(b.isTrash)return;
     var d={notes:''};
@@ -577,6 +578,7 @@ function rPool(){
     h+='<div class="pc'+(dim?' dim':canPick?' pick':'')+'" data-pid="'+he(p.id)+'" style="background:'+c.bg+';border-color:'+c.bd+'">'
       +'<div class="pc-inner">'+ihtml(p.cls,18,p.role)
       +'<span style="font-size:.82rem;font-weight:600;color:'+c.c+';flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+he(p.name)+'</span>'
+      +(p.cls==='Warrior'?'<button class="bx" data-a="totank" data-pid="'+he(p.id)+'" title="'+(p.role==='tank'?'Convert to DPS':'Convert to Tank')+'" style="font-size:.55rem;padding:1px 4px;color:'+(p.role==='tank'?'#6080e0':'#e07020')+';border-color:'+(p.role==='tank'?'#2040a0':'#804010')+'">'+(p.role==='tank'?'D':'T')+'</button>':'')
       +'<button class="bx" data-a="tobench" data-pid="'+he(p.id)+'" title="Move to bench" style="font-size:.55rem;padding:1px 4px">B</button>'
       +'<button class="bx" data-a="rmp" data-pid="'+he(p.id)+'" title="Remove">x</button>'
       +'</div></div>';
@@ -815,11 +817,39 @@ function doAssign(pid){
 }
 
 function removeFromPool(pid){
-  players=players.filter(function(p){return p.id!==pid;});
+  /* Remove from groups and assignments */
   for(var i=0;i<groups.length;i++)for(var j=0;j<groups[i].slots.length;j++)if(groups[i].slots[j].p&&groups[i].slots[j].p.id===pid)groups[i].slots[j].p=null;
   trashMarks.forEach(function(m){if(m.tank&&m.tank.id===pid)m.tank=null;if(m.healer&&m.healer.id===pid)m.healer=null;});
   if(puller&&puller.id===pid)puller=null;
   for(var bid in bossData)for(var k in bossData[bid])if(bossData[bid][k]&&typeof bossData[bid][k]==='object'&&bossData[bid][k].id===pid)bossData[bid][k]=null;
+
+  /* Restore player to their original pool section based on originalStatus */
+  var orig=originalStatus[pid]||'active';
+  var p=findInAll(pid);
+  if(!p){rAll();return;}
+
+  /* Remove from all active lists first */
+  players=players.filter(function(x){return x.id!==pid;});
+  benched=benched.filter(function(x){return x.id!==pid;});
+  lateList=lateList.filter(function(x){return x.id!==pid;});
+  absentList=absentList.filter(function(x){return x.id!==pid;});
+  tentativeList=tentativeList.filter(function(x){return x.id!==pid;});
+
+  /* Restore to original section */
+  if(orig==='active'){
+    players.push(p);sortPlayers();
+  } else if(orig==='bench'||orig==='overflow'){
+    p.isBench=true;benched.push(p);sortBenched();
+  } else if(orig==='late'){
+    lateList.push(p);sortBenched();
+  } else if(orig==='absent'){
+    absentList.push(p);sortBenched();
+  } else if(orig==='tentative'){
+    tentativeList.push(p);sortBenched();
+  } else {
+    /* fallback: put back in active pool */
+    players.push(p);sortPlayers();
+  }
   rAll();
 }
 
@@ -882,25 +912,29 @@ function parseRHJson(data){
 
     /* Absence */
     if(rawCls==='absence'){
-      absentList.push({id:pid,name:pname,cls:'',spec:'',role:'',pos:pos});
+      var ap={id:pid,name:pname,cls:'',spec:'',role:'',pos:pos};
+      absentList.push(ap);
+      originalStatus[pid]='absent';
       continue;
     }
 
     /* Tentative */
     if(rawCls==='tentative'){
-      tentativeList.push({id:pid,name:pname,cls:'',spec:'',role:'',pos:pos});
+      var tp={id:pid,name:pname,cls:'',spec:'',role:'',pos:pos};
+      tentativeList.push(tp);
+      originalStatus[pid]='tentative';
       continue;
     }
 
     /* Late — has a real class/spec */
     if(rawCls==='late'){
       var lateCls=CLSMAP[(s.cClassName||'').toLowerCase()]||'Warrior';
-      /* Try to get actual class from spec entry if present */
       var lateRealCls=CLSMAP[rawCls]||'Warrior';
-      /* roleName gives us category hint */
       var lateSpec=rawSpec;
       var lateRole=deriveRole(lateRealCls,lateSpec);
-      lateList.push({id:pid,name:pname,cls:lateRealCls,spec:lateSpec,role:lateRole,pos:pos});
+      var lp={id:pid,name:pname,cls:lateRealCls,spec:lateSpec,role:lateRole,pos:pos};
+      lateList.push(lp);
+      originalStatus[pid]='late';
       continue;
     }
 
@@ -915,6 +949,7 @@ function parseRHJson(data){
       var bSpec=rawSpec;
       var bRoleDerived=deriveRole(bCls,bSpec);
       benched.push({id:pid,name:pname,cls:bCls,spec:bSpec,role:bRoleDerived,isBench:true,pos:pos});
+      originalStatus[pid]='bench';
       continue;
     }
 
@@ -927,15 +962,17 @@ function parseRHJson(data){
     if(activeCount<40){
       players.push(p);
       activeCount++;
+      originalStatus[pid]='active';
       /* Old format group pre-fill */
       if(s.groupNumber!=null){
         var gn=s.groupNumber-1,sn=(s.slotNumber||1)-1;
         if(gn>=0&&gn<8&&sn>=0&&sn<5)groups[gn].slots[sn].p=p;
       }
     } else {
-      /* Overflow goes to bench */
+      /* Overflow goes to bench automatically */
       p.isBench=true;p.overflowBench=true;
       benched.push(p);
+      originalStatus[pid]='overflow'; /* overflow active -> auto-benched */
     }
   }
 
@@ -967,6 +1004,7 @@ document.addEventListener('click',function(e){
   if(a==='rmp'){removeFromPool(el.dataset.pid);return;}
   if(a==='topool'){moveToPool(el.dataset.pid);return;}
   if(a==='tobench'){moveToBench(el.dataset.pid);return;}
+  if(a==='totank'){convertToTank(el.dataset.pid);return;}
   if(a==='sg'){sel={t:'g',gi:+el.dataset.gi,si:+el.dataset.si};setBan('Group '+(+el.dataset.gi+1)+' slot '+(+el.dataset.si+1));rAll();return;}
   if(a==='rmg'){groups[+el.dataset.gi].slots[+el.dataset.si].p=null;rAll();return;}
   if(a==='st'){sel={t:'tm',mi:+el.dataset.mi};setBan(trashMarks[+el.dataset.mi].name+' \u2014 Tank');rAll();return;}
@@ -1009,10 +1047,44 @@ document.getElementById('bJsonImport').addEventListener('click',function(){
   var data;try{data=JSON.parse(raw);}catch(e){tip('Invalid JSON: '+e.message,true);return;}
   document.getElementById('jsonModal').className='modal-wrap';parseRHJson(data);
 });
+/* Convert a warrior between tank and DPS in the pool */
+function convertToTank(pid){
+  for(var i=0;i<players.length;i++){
+    if(players[i].id===pid){
+      var p=players[i];
+      if(p.role==='tank'){
+        p.role='dps';p.spec=p.spec==='Protection'?'Fury':p.spec;
+      } else {
+        p.role='tank';p.spec='Protection';
+      }
+      sortPlayers();rAll();return;
+    }
+  }
+}
+
 document.getElementById('bAuto').addEventListener('click',function(){
-  /* Auto-assign only uses the active players[] list — late/bench/tentative are excluded */
+  /* Auto-assign uses only the active players[] list, capped at 40 by sign-up order (pos).
+     Late, benched, tentative and absent are never included. */
   mkG();var used={},log=[];
-  function get(fn){var r=[];for(var i=0;i<players.length;i++)if(!used[players[i].id]&&fn(players[i]))r.push(players[i]);return r;}
+
+  /* Build the assignable pool: active players[] only, sorted by sign-up position,
+     capped at 40. Late/tentative/benched/absent are in separate lists and never here. */
+  var pool=players.slice().sort(function(a,b){return (a.pos||9999)-(b.pos||9999);}).slice(0,40);
+
+  /* Auto-bench anyone in players[] who didn't make the 40-cut */
+  var poolIds={};pool.forEach(function(p){poolIds[p.id]=1;});
+  var overflow=players.filter(function(p){return !poolIds[p.id];});
+  if(overflow.length){
+    overflow.forEach(function(p){
+      p.isBench=true;p.overflowBench=true;
+      benched.push(p);
+      if(!originalStatus[p.id])originalStatus[p.id]='overflow';
+    });
+    players=players.filter(function(p){return poolIds[p.id];});
+    sortBenched();
+  }
+
+  function get(fn){var r=[];for(var i=0;i<pool.length;i++)if(!used[pool[i].id]&&fn(pool[i]))r.push(pool[i]);return r;}
   function take(arr,n){var r=arr.slice(0,n);for(var i=0;i<r.length;i++)used[r[i].id]=1;return r;}
   function fill(gi,ms){for(var i=0;i<ms.length&&i<5;i++)groups[gi].slots[i].p=ms[i];}
   var g1t=take(get(function(p){return p.role==='tank';}),4);
@@ -1048,10 +1120,18 @@ document.getElementById('bAuto').addEventListener('click',function(){
   for(var bi=4;bi<=5;bi++){var mb2=[];while(mb2.length<5&&ri<rem.length){mb2.push(rem[ri]);used[rem[ri].id]=1;ri++;}fill(bi,mb2);if(mb2.length)log.push('Group '+(bi+1)+' (buffer): '+mb2.map(function(p){return p.name;}).join(', '));}
   var f2=[],e2=[];for(var i=0;i<groups.length;i++){var has=false;for(var j=0;j<groups[i].slots.length;j++)if(groups[i].slots[j].p){has=true;break;}if(has)f2.push(groups[i]);else e2.push(groups[i]);}
   groups=f2.concat(e2);for(var i=0;i<groups.length;i++)groups[i].id=i+1;
-  var lb=document.getElementById('logbox');lb.style.display='block';lb.textContent=log.join('\n');
-  rAll();tip('Auto-assign complete');
+  var excluded=overflow.length;
+  var lb=document.getElementById('logbox');lb.style.display='block';
+  lb.textContent=log.join('\n')+(excluded>0?'\n\nMoved to bench (signed up too late — '+excluded+' player'+(excluded>1?'s':'')+'):\n'+overflow.map(function(p){return '  '+p.name+' (pos '+p.pos+')';}).join('\n'):'');
+  rAll();tip('Auto-assign complete'+(excluded>0?' — '+excluded+' player'+(excluded>1?'s':'')+' auto-benched (40-cap)':''));
 });
-document.getElementById('bClear').addEventListener('click',function(){mkG();mkMarks();sel=null;hideBan();document.getElementById('logbox').style.display='none';rAll();});
+document.getElementById('bClear').addEventListener('click',function(){
+  /* Only clear group assignments — pool, bench, late, absent, tentative are untouched */
+  mkG();
+  sel=null;hideBan();
+  document.getElementById('logbox').style.display='none';
+  rAll();
+});
 document.getElementById('bCopyMRT').addEventListener('click',function(){navigator.clipboard.writeText(document.getElementById('mrtBox').textContent).catch(function(){});});
 document.getElementById('bAdd').addEventListener('click',function(){
   var c=document.getElementById('mCls').value,sp=(CLS[c]||{sp:[]}).sp,h='';
