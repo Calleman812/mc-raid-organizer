@@ -375,11 +375,25 @@ var DEMO=[
 var players=[],groups=[],trashMarks=[],bossData={},puller=null,filt='all',sel=null,activeTab='trash';
 var benched=[],lateList=[],absentList=[],tentativeList=[];
 var originalStatus={}; /* pid -> 'active'|'bench'|'late'|'absent'|'tentative' */
-var groupOrderData={}; /* bossId -> array of 8 group indices (0-based) into groups[] */
+var bossGroups={}; /* bossId -> array of 8 groups, each {slots:[{p:player|null}x5]} */
 
-function getGroupOrder(bossId){
-  /* Returns array of group indices. Default is natural order 0..7. */
-  return groupOrderData[bossId]||[0,1,2,3,4,5,6,7];
+function initBossGroups(bossId){
+  /* Seed from current main groups — copy players across */
+  var bg=[];
+  for(var i=0;i<8;i++){
+    var slots=[];
+    for(var j=0;j<5;j++){
+      var mp=(groups[i]&&groups[i].slots[j])?groups[i].slots[j].p:null;
+      slots.push({p:mp?{id:mp.id,name:mp.name,cls:mp.cls,spec:mp.spec,role:mp.role}:null});
+    }
+    bg.push({slots:slots});
+  }
+  bossGroups[bossId]=bg;
+}
+
+function getBossGroups(bossId){
+  if(!bossGroups[bossId])initBossGroups(bossId);
+  return bossGroups[bossId];
 }
 
 function switchRaid(raidId){
@@ -388,15 +402,12 @@ function switchRaid(raidId){
   BOSSES=BOSSES_BY_RAID[raidId];
   /* Reset assignments but keep pool */
   trashMarks=TRASH_MARKS.map(function(m){return{name:m.name,col:m.col,tank:null,healer:null};});
-  puller=null;bossData={};groupOrderData={};
+  puller=null;bossData={};bossGroups={};
   BOSSES.forEach(function(b){
     if(b.isTrash)return;
     var d={notes:''};
     b.segments.forEach(function(seg){seg.slots.forEach(function(sl){d[sl.key]=null;});});
     bossData[b.id]=d;
-    if(b.hasGroupOrder){
-      groupOrderData[b.id]=[0,1,2,3,4,5,6,7];
-    }
   });
   activeTab='trash';
   /* Update raid selector button styles */
@@ -502,16 +513,14 @@ function buildMRT(homeRealm){
 }
 
 function buildMRTForBoss(bossId,homeRealm){
-  /* Build MRT string using the boss-specific group order */
-  var go=getGroupOrder(bossId);
+  /* Build MRT string from the boss-specific group layout */
+  var bg=getBossGroups(bossId);
   var n=[];
-  for(var i=0;i<go.length;i++){
-    var grpIdx=go[i];
-    if(grpIdx<0||grpIdx>=groups.length)continue;
-    var g=groups[grpIdx];
-    for(var j=0;j<g.slots.length;j++){
-      if(g.slots[j].p){
-        var expanded=expandRealm(g.slots[j].p.name);
+  for(var i=0;i<bg.length;i++){
+    for(var j=0;j<bg[i].slots.length;j++){
+      var p=bg[i].slots[j].p;
+      if(p){
+        var expanded=expandRealm(p.name);
         if(homeRealm){
           var suffix='-'+homeRealm;
           if(expanded.endsWith(suffix))expanded=expanded.slice(0,expanded.length-suffix.length);
@@ -817,52 +826,58 @@ function renderBossTab(boss){
   h+='<hr class="div-sep">';
   h+='<div class="note-box">'+he(boss.note||'')+'</div>';
 
-  /* Group order UI for special bosses */
+  /* Per-boss group editor for special bosses */
   if(boss.hasGroupOrder){
-    var go=getGroupOrder(boss.id);
-    h+='<div style="margin:.6rem 0">';
-    h+='<div style="font-family:Cinzel,serif;font-size:.72rem;color:#7ab0ff;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.5rem;display:flex;justify-content:space-between;align-items:center">';
-    h+='<span>Group Order for '+he(boss.name)+'</span>';
-    h+='<button class="btn bsm" data-a="resetGroupOrder" data-bid="'+boss.id+'" style="font-size:.6rem">Reset to default</button>';
-    h+='</div>';
-    h+='<div style="font-size:.68rem;color:#4a6090;margin-bottom:.5rem">Click a slot below to change which group goes there. This order is used for the MRT export when you copy for this boss.</div>';
-    /* 8 slots showing current assignment */
-    h+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:5px">';
-    for(var goi=0;goi<8;goi++){
-      var grpIdx=go[goi];
-      var grp=groups[grpIdx]||null;
-      var filled=grp?grp.slots.filter(function(s){return s.p;}).length:0;
-      var grpLabel=grp?'Group '+grp.id:'—';
-      h+='<div style="background:#0d1020;border:1.5px solid #2a3a60;border-radius:5px;overflow:hidden;cursor:pointer" data-a="goSlotClick" data-bid="'+boss.id+'" data-goi="'+goi+'">';
-      h+='<div style="background:#131726;padding:2px 7px;font-size:.6rem;font-family:Cinzel,serif;color:#4a6090;display:flex;justify-content:space-between"><span>Slot '+(goi+1)+'</span><span style="color:#7ab0ff">'+he(grpLabel)+'</span></div>';
-      h+='<div style="padding:3px 6px;min-height:22px">';
-      if(grp){
-        var names=grp.slots.filter(function(s){return s.p;}).map(function(s){return s.p.name;});
-        if(names.length){
-          h+='<div style="font-size:.65rem;color:#e0d8f8;line-height:1.4">'+names.slice(0,3).map(function(n){return he(n);}).join(', ')+(names.length>3?' +&hellip;':'')+'</div>';
-        } else {
-          h+='<div style="font-size:.62rem;color:#3a5080;font-style:italic">empty</div>';
-        }
-      } else {
-        h+='<div style="font-size:.62rem;color:#3a5080;font-style:italic">—</div>';
+    var bg=getBossGroups(boss.id);
+    /* All players across all groups — for the picker */
+    var allPlayers=[];
+    for(var gi3=0;gi3<groups.length;gi3++){
+      for(var si3=0;si3<groups[gi3].slots.length;si3++){
+        if(groups[gi3].slots[si3].p)allPlayers.push(groups[gi3].slots[si3].p);
       }
-      h+='</div></div>';
+    }
+    h+='<div style="margin:.6rem 0">';
+    h+='<div style="font-family:Cinzel,serif;font-size:.72rem;color:#7ab0ff;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.4rem;display:flex;justify-content:space-between;align-items:center">';
+    h+='<span>Group Setup \u2014 '+he(boss.name)+'</span>';
+    h+='<button class="btn bsm" data-a="bgReset" data-bid="'+boss.id+'" style="font-size:.6rem">Reset from main groups</button>';
+    h+='</div>';
+    h+='<div style="font-size:.68rem;color:#4a6090;margin-bottom:.5rem">Click any player slot to reassign. This layout is used for the boss MRT export below.</div>';
+    /* 8 group cards */
+    h+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:5px">';
+    for(var gi4=0;gi4<8;gi4++){
+      var grp4=bg[gi4];
+      h+='<div style="background:#0d1020;border:1px solid #2a3050;border-radius:5px;overflow:hidden">';
+      h+='<div style="background:#131726;padding:3px 7px;font-family:Cinzel,serif;font-size:.65rem;color:#7ab0ff;border-bottom:1px solid #2a3050">Group '+(gi4+1)+'</div>';
+      for(var si4=0;si4<5;si4++){
+        var sp=grp4.slots[si4].p;
+        if(sp){
+          var sc=cd(sp.cls);
+          h+='<div style="display:flex;align-items:center;gap:4px;padding:3px 6px;background:'+sc.bg+';border-bottom:1px solid #1a2040;cursor:pointer" data-a="bgSlotClick" data-bid="'+boss.id+'" data-gi="'+gi4+'" data-si="'+si4+'">';
+          h+=ihtml(sp.cls,14,sp.role);
+          h+='<span style="font-size:.82rem;font-weight:700;color:#f8f8f8;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+he(sp.name)+'</span>';
+          h+='<span style="font-size:.55rem;color:rgba(248,248,248,0.5)">'+he(sp.spec||'')+'</span>';
+          h+='</div>';
+        } else {
+          h+='<div style="padding:3px 6px;font-size:.65rem;color:#3a5080;font-style:italic;border-bottom:1px solid #1a2040;cursor:pointer;min-height:24px" data-a="bgSlotClick" data-bid="'+boss.id+'" data-gi="'+gi4+'" data-si="'+si4+'">+ empty</div>';
+        }
+      }
+      h+='</div>';
     }
     h+='</div>';
-    /* Group picker dropdown (hidden, shown on slot click) */
-    h+='<div id="goPickerWrap_'+boss.id+'" style="display:none;margin-top:6px;background:#131726;border:1px solid #3a5090;border-radius:6px;padding:7px">';
-    h+='<div style="font-size:.68rem;color:#7ab0ff;font-family:Cinzel,serif;margin-bottom:5px">Choose group for slot <span id="goPickerSlotLbl_'+boss.id+'"></span>:</div>';
-    h+='<div style="display:flex;gap:5px;flex-wrap:wrap">';
-    for(var gi2=0;gi2<groups.length;gi2++){
-      var g2=groups[gi2];
-      var f2=g2.slots.filter(function(s){return s.p;}).length;
-      h+='<button class="btn bsm" data-a="goPickGroup" data-bid="'+boss.id+'" data-grpidx="'+gi2+'" style="font-size:.68rem;padding:3px 10px">Group '+g2.id+' ('+f2+')</button>';
+    /* Player picker (hidden) */
+    h+='<div id="bgPicker_'+boss.id+'" style="display:none;margin-top:6px;background:#131726;border:1px solid #3a5090;border-radius:6px;padding:8px">';
+    h+='<div style="font-size:.68rem;color:#7ab0ff;font-family:Cinzel,serif;margin-bottom:5px">Assign player to <span id="bgPickerLbl_'+boss.id+'">slot</span> — or clear:</div>';
+    h+='<div style="display:flex;flex-wrap:wrap;gap:4px">';
+    /* Clear button */
+    h+='<button class="btn bsm" data-a="bgPickPlayer" data-bid="'+boss.id+'" data-pid="" style="font-size:.65rem;color:#e06060;border-color:#4a1020">Clear slot</button>';
+    for(var pi=0;pi<allPlayers.length;pi++){
+      var pp=allPlayers[pi];var pc2=cd(pp.cls);
+      h+='<button class="btn" data-a="bgPickPlayer" data-bid="'+boss.id+'" data-pid="'+he(pp.id)+'" style="font-size:.72rem;font-weight:700;padding:3px 9px;border-radius:4px;cursor:pointer;background:'+pc2.bg+';border:2px solid '+pc2.bd+';color:#f8f8f8">'+he(pp.name)+'</button>';
     }
-    h+='<button class="btn bsm" data-a="goPickGroup" data-bid="'+boss.id+'" data-grpidx="-1" style="font-size:.68rem;padding:3px 10px;color:#e06060;border-color:#4a1020">Clear</button>';
     h+='</div></div>';
-    /* Boss-specific MRT export */
+    /* Boss MRT export */
     h+='<div style="margin-top:.6rem">';
-    h+='<div style="font-size:.68rem;color:#4a6090;margin-bottom:.4rem">MRT export using this group order:</div>';
+    h+='<div style="font-size:.68rem;color:#4a6090;margin-bottom:.4rem">MRT export using this group setup:</div>';
     h+='<div style="display:flex;gap:5px;flex-wrap:wrap">';
     h+='<button class="btn bsm mrt-boss-btn" data-bid="'+boss.id+'" data-realm="PyrewoodVillage" style="font-size:.68rem;padding:3px 10px">Copy \u2014 Pyrewood</button>';
     h+='<button class="btn bsm mrt-boss-btn" data-bid="'+boss.id+'" data-realm="NethergardeKeep" style="font-size:.68rem;padding:3px 10px">Copy \u2014 Nethergarde</button>';
@@ -1094,7 +1109,7 @@ function sortBenched(){
 }
 
 /* ── Unified click handler ── */
-var _goActiveBid=null,_goActiveSlot=-1;
+var _goActiveBid=null,_goActiveGi=-1,_goActiveSi=-1;
 document.addEventListener('click',function(e){
   var t=e.target;
   var tabEl=t.closest?t.closest('.tab'):null;
@@ -1120,29 +1135,40 @@ document.addEventListener('click',function(e){
   if(a==='rbs'){if(bossData[el.dataset.bid])bossData[el.dataset.bid][el.dataset.key]=null;rAll();return;}
   if(a==='copyTrash'){var box=document.getElementById('trashExpBox');if(box)navigator.clipboard.writeText(box.textContent.replace(/ !/g,'')).catch(function(){});return;}
   if(a==='copyBoss'){var box2=document.getElementById('bossExpBox_'+el.dataset.bid);if(box2)navigator.clipboard.writeText(box2.textContent).catch(function(){});return;}
-  if(a==='goSlotClick'){
-    var bid=el.dataset.bid,goi=+el.dataset.goi;
-    _goActiveBid=bid;_goActiveSlot=goi;
-    var wrap=document.getElementById('goPickerWrap_'+bid);
-    var lbl=document.getElementById('goPickerSlotLbl_'+bid);
-    if(wrap){wrap.style.display='block';if(lbl)lbl.textContent=goi+1;}
+  if(a==='bgSlotClick'){
+    /* User clicked a player slot in the boss group editor — open player picker */
+    var bid=el.dataset.bid,gi=+el.dataset.gi,si=+el.dataset.si;
+    _goActiveBid=bid;_goActiveGi=gi;_goActiveSi=si;
+    var picker=document.getElementById('bgPicker_'+bid);
+    var lbl=document.getElementById('bgPickerLbl_'+bid);
+    if(picker){picker.style.display='block';}
+    if(lbl)lbl.textContent='Group '+(gi+1)+' Slot '+(si+1);
     return;
   }
-  if(a==='goPickGroup'){
-    var bid2=el.dataset.bid,grpIdx=+el.dataset.grpidx;
-    if(!groupOrderData[bid2])groupOrderData[bid2]=[0,1,2,3,4,5,6,7];
-    if(_goActiveSlot>=0)groupOrderData[bid2][_goActiveSlot]=grpIdx;
-    var wrap2=document.getElementById('goPickerWrap_'+bid2);
-    if(wrap2)wrap2.style.display='none';
-    _goActiveBid=null;_goActiveSlot=-1;
-    rAll();return;
+  if(a==='bgPickPlayer'){
+    /* Assign chosen player to the active slot */
+    var bid2=el.dataset.bid,pid=el.dataset.pid;
+    var bg=getBossGroups(bid2);
+    var newPlayer=null;
+    if(pid){
+      /* Find player in all players */
+      var allp=[];
+      for(var i=0;i<groups.length;i++)for(var j=0;j<groups[i].slots.length;j++)if(groups[i].slots[j].p)allp.push(groups[i].slots[j].p);
+      for(var k=0;k<allp.length;k++)if(allp[k].id===pid){newPlayer={id:allp[k].id,name:allp[k].name,cls:allp[k].cls,spec:allp[k].spec,role:allp[k].role};break;}
+    }
+    if(_goActiveBid===bid2&&_goActiveGi>=0&&_goActiveSi>=0){
+      bg[_goActiveGi].slots[_goActiveSi].p=newPlayer;
+    }
+    var picker2=document.getElementById('bgPicker_'+bid2);
+    if(picker2)picker2.style.display='none';
+    _goActiveBid=null;_goActiveGi=-1;_goActiveSi=-1;
+    rBossTabs();return;
   }
-  if(a==='resetGroupOrder'){
+  if(a==='bgReset'){
+    /* Re-seed boss groups from current main groups */
     var bid3=el.dataset.bid;
-    groupOrderData[bid3]=[0,1,2,3,4,5,6,7];
-    var wrap3=document.getElementById('goPickerWrap_'+bid3);
-    if(wrap3)wrap3.style.display='none';
-    rAll();return;
+    initBossGroups(bid3);
+    rBossTabs();return;
   }
 });
 
@@ -1332,7 +1358,7 @@ function buildSharePayload(){
     trash: trashMarks.map(function(m){return{tank:m.tank?m.tank.id:null,healer:m.healer?m.healer.id:null};}),
     puller: puller?puller.id:null,
     bosses: (function(){var o={};for(var bid in bossData){o[bid]={};for(var k in bossData[bid]){var v=bossData[bid][k];if(v&&typeof v==='object'&&v.id)o[bid][k]=v.id;else if(k==='notes')o[bid][k]=v||'';}}return o;})(),
-    groupOrders: groupOrderData
+    groupOrders: bossGroups
   };
   return payload;
 }
