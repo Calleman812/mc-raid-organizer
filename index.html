@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Molten Core Raid Organizer</title>
+<title>WoW Classic Raid Organizer</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:wght@400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
@@ -119,8 +119,14 @@ textarea{width:100%;background:#0d1020;border:1px solid #2a3050;color:#e0d8f8;pa
 </head>
 <body>
 <div class="app">
-<h1>Molten Core Raid Organizer</h1>
-<div class="sub">Ragnaros awaits &mdash; organize your 40-man raid</div>
+<h1>WoW Classic Raid Organizer</h1>
+<div class="sub">Organize your 40-man raid &mdash; select a raid below</div>
+<div style="display:flex;gap:6px;justify-content:center;margin-bottom:.9rem;flex-wrap:wrap">
+  <button class="btn raid-sel-btn" data-raid="mc"   id="rsMC"   style="font-family:Cinzel,serif;font-size:.74rem;padding:5px 14px;border-radius:4px;cursor:pointer;border:1px solid #3a6ae0;background:#1a3a80;color:#c8d8ff">&#128293; Molten Core</button>
+  <button class="btn raid-sel-btn" data-raid="bwl"  id="rsBWL"  style="font-family:Cinzel,serif;font-size:.74rem;padding:5px 14px;border-radius:4px;cursor:pointer;border:1px solid #2a3050;background:#131726;color:#7ab0ff">&#128009; Blackwing Lair</button>
+  <button class="btn raid-sel-btn" data-raid="aq40" id="rsAQ40" style="font-family:Cinzel,serif;font-size:.74rem;padding:5px 14px;border-radius:4px;cursor:pointer;border:1px solid #2a3050;background:#131726;color:#7ab0ff">&#129412; Temple of Ahn'Qiraj</button>
+  <button class="btn raid-sel-btn" data-raid="naxx" id="rsNAXX" style="font-family:Cinzel,serif;font-size:.74rem;padding:5px 14px;border-radius:4px;cursor:pointer;border:1px solid #2a3050;background:#131726;color:#7ab0ff">&#128128; Naxxramas</button>
+</div>
 
 <div class="modal-wrap" id="modal">
   <div class="modal-title">Add Player Manually</div>
@@ -269,177 +275,76 @@ var GHINTS=['4 tanks + pala heal','1 tank + pala heal + melee','melee + priest +
   healerKey: when tank assigned, auto-fill from trash mark healer.
   isSheep: slot is for a Mage sheep assignment.
 */
-var BOSSES=[
-  {id:'trash', name:'Trash', isTrash:true},
-  {
-    id:'lucifron', name:'Lucifron',
-    hint:'MT on Lucifron + OT on each add, 1 healer each',
-    note:'Kill adds first. Dispel Dominate Mind and Shadow Shock curse off tanks.',
-    segments:[
-      {title:'Tanks', cols:3, slots:[
-        {key:'mt',  label:'Lucifron', markIdx:2, healerKey:'mth'},
-        {key:'ot1', label:'Add 1',    markIdx:0, healerKey:'ot1h'},
-        {key:'ot2', label:'Add 2',    markIdx:1, healerKey:'ot2h'}
-      ]},
-      {title:'Healers', cols:3, isHealRow:true, slots:[
-        {key:'mth',  label:'Healer \u2014 Lucifron', isHealer:true},
-        {key:'ot1h', label:'Healer \u2014 Add 1',    isHealer:true},
-        {key:'ot2h', label:'Healer \u2014 Add 2',    isHealer:true}
-      ]}
-    ]
-  },
-  {
-    id:'magmadar', name:'Magmadar',
-    hint:'1 MT with 1 dedicated healer',
-    note:'Hunters Tranquilizing Shot on Frenzy. Face boss away from raid. Fear Ward on MT.',
-    segments:[
-      {title:'Tank', cols:1, slots:[{key:'mt', label:'Magmadar', markIdx:0, healerKey:'mth'}]},
-      {title:'Healer', cols:1, isHealRow:true, slots:[{key:'mth', label:'Healer \u2014 MT', isHealer:true}]}
-    ]
-  },
-  {
-    id:'gehennas', name:'Gehennas',
-    hint:'3 tanks (boss + 2 adds), 1 healer each',
-    note:'Mages decurse Gehennas Curse constantly. Kill adds first. Spread to avoid Rain of Fire.',
-    segments:[
-      {title:'Tanks', cols:3, slots:[
-        {key:'mt',  label:'Gehennas', markIdx:2, healerKey:'mth'},
-        {key:'ot1', label:'Add 1',   markIdx:0, healerKey:'ot1h'},
-        {key:'ot2', label:'Add 2',   markIdx:1, healerKey:'ot2h'}
-      ]},
-      {title:'Healers', cols:3, isHealRow:true, slots:[
-        {key:'mth',  label:'Healer \u2014 Gehennas', isHealer:true},
-        {key:'ot1h', label:'Healer \u2014 Add 1',     isHealer:true},
-        {key:'ot2h', label:'Healer \u2014 Add 2',     isHealer:true}
-      ]}
-    ]
-  },
-  {
-    id:'garr', name:'Garr',
-    hint:'MT on Garr + 4 OTs on Firesworn adds, 1 healer each (rest Banished)',
-    note:'Warlocks Banish remaining adds. Stay within 15 yards of Garr. Kill Garr first \u2014 adds die with him.',
-    segments:[
-      {title:'Tanks', cols:5, slots:[
-        {key:'mt',  label:'Garr',  markIdx:4, healerKey:'mth'},
-        {key:'ot1', label:'Add 1', markIdx:0, healerKey:'ot1h'},
-        {key:'ot2', label:'Add 2', markIdx:1, healerKey:'ot2h'},
-        {key:'ot3', label:'Add 3', markIdx:2, healerKey:'ot3h'},
-        {key:'ot4', label:'Add 4', markIdx:3, healerKey:'ot4h'}
-      ]},
-      {title:'Healers', cols:5, isHealRow:true, slots:[
-        {key:'mth',  label:'Heal \u2014 Garr',  isHealer:true},
-        {key:'ot1h', label:'Heal \u2014 Add 1', isHealer:true},
-        {key:'ot2h', label:'Heal \u2014 Add 2', isHealer:true},
-        {key:'ot3h', label:'Heal \u2014 Add 3', isHealer:true},
-        {key:'ot4h', label:'Heal \u2014 Add 4', isHealer:true}
-      ]}
-    ]
-  },
-  {
-    id:'geddon', name:'Baron Geddon',
-    hint:'Single MT with 2 healers',
-    note:'Dispel Ignite Mana constantly. Kite at low HP. AoE heal at 10% Armageddon.',
-    segments:[
-      {title:'Tank', cols:1, slots:[{key:'mt', label:'Baron Geddon', markIdx:0, healerKey:'h1'}]},
-      {title:'Healers', cols:2, isHealRow:true, slots:[
-        {key:'h1', label:'Healer 1 \u2014 MT', isHealer:true},
-        {key:'h2', label:'Healer 2 \u2014 MT', isHealer:true}
-      ]}
-    ]
-  },
-  {
-    id:'shazzrah', name:'Shazzrah',
-    hint:'1 MT only \u2014 melee DPS preferred',
-    note:'Shazzrah Counterspells casters \u2014 use melee. Mages decurse. He blinks; MT must reposition quickly.',
-    segments:[
-      {title:'Tank', cols:1, slots:[{key:'mt', label:'Shazzrah', markIdx:0, healerKey:'mth'}]},
-      {title:'Healer', cols:1, isHealRow:true, slots:[{key:'mth', label:'Healer \u2014 MT', isHealer:true}]}
-    ]
-  },
-  {
-    id:'sulfuron', name:'Sulfuron',
-    hint:'MT on boss + 5 OTs on Flamewaker Priests, 1 healer each',
-    note:'Interrupt Dark Mending (top priority!). Drag priests apart. Kill priests one by one, Sulfuron last.',
-    segments:[
-      {title:'Tanks', cols:6, slots:[
-        {key:'mt',  label:'Sulfuron',  markIdx:5, healerKey:'mth'},
-        {key:'ot1', label:'Priest 1',  markIdx:0, healerKey:'ot1h'},
-        {key:'ot2', label:'Priest 2',  markIdx:1, healerKey:'ot2h'},
-        {key:'ot3', label:'Priest 3',  markIdx:2, healerKey:'ot3h'},
-        {key:'ot4', label:'Priest 4',  markIdx:3, healerKey:'ot4h'},
-        {key:'ot5', label:'Priest 5',  markIdx:4, healerKey:'ot5h'}
-      ]},
-      {title:'Healers', cols:6, isHealRow:true, slots:[
-        {key:'mth',  label:'Heal \u2014 Sulfuron',  isHealer:true},
-        {key:'ot1h', label:'Heal \u2014 Priest 1',  isHealer:true},
-        {key:'ot2h', label:'Heal \u2014 Priest 2',  isHealer:true},
-        {key:'ot3h', label:'Heal \u2014 Priest 3',  isHealer:true},
-        {key:'ot4h', label:'Heal \u2014 Priest 4',  isHealer:true},
-        {key:'ot5h', label:'Heal \u2014 Priest 5',  isHealer:true}
-      ]}
-    ]
-  },
-  {
-    id:'golemagg', name:'Golemagg',
-    hint:'1 MT on Golemagg + 2 OTs on Core Hounds, 1 healer each',
-    note:'Stack boss and hounds for cleave. Hounds must NOT reach 50% \u2014 they heal each other.',
-    segments:[
-      {title:'Tanks', cols:3, slots:[
-        {key:'mt',  label:'Golemagg',   markIdx:2, healerKey:'mth'},
-        {key:'ot1', label:'Core Hound 1', markIdx:0, healerKey:'ot1h'},
-        {key:'ot2', label:'Core Hound 2', markIdx:1, healerKey:'ot2h'}
-      ]},
-      {title:'Healers', cols:3, isHealRow:true, slots:[
-        {key:'mth',  label:'Heal \u2014 MT',     isHealer:true},
-        {key:'ot1h', label:'Heal \u2014 Hound 1', isHealer:true},
-        {key:'ot2h', label:'Heal \u2014 Hound 2', isHealer:true}
-      ]}
-    ]
-  },
-  {
-    id:'domo', name:'Domo',
-    hint:'MT on Domo (unmarked) + 4 OTs on guards + 4 Mages sheep targets',
-    note:'Kill all 8 Elite Firelords and 20 Flamewaker Handlers first. Sheep 4 targets. He surrenders at low HP \u2014 Ragnaros spawns.',
-    segments:[
-      {title:'Tanks', cols:5, slots:[
-        {key:'mt',  label:'Domo (boss)',  markIdx:null, healerKey:'mth'},
-        {key:'ot1', label:'Guard 1',      markIdx:0,    healerKey:'ot1h'},
-        {key:'ot2', label:'Guard 2',      markIdx:1,    healerKey:'ot2h'},
-        {key:'ot3', label:'Guard 3',      markIdx:2,    healerKey:'ot3h'},
-        {key:'ot4', label:'Guard 4',      markIdx:3,    healerKey:'ot4h'}
-      ]},
-      {title:'Healers', cols:5, isHealRow:true, slots:[
-        {key:'mth',  label:'Heal \u2014 Domo',    isHealer:true},
-        {key:'ot1h', label:'Heal \u2014 Guard 1', isHealer:true},
-        {key:'ot2h', label:'Heal \u2014 Guard 2', isHealer:true},
-        {key:'ot3h', label:'Heal \u2014 Guard 3', isHealer:true},
-        {key:'ot4h', label:'Heal \u2014 Guard 4', isHealer:true}
-      ]},
-      {title:'Sheep Targets', cols:4, isSheepRow:true, slots:[
-        {key:'sh1', label:'Sheep 1', markIdx:4, isSheep:true},
-        {key:'sh2', label:'Sheep 2', markIdx:5, isSheep:true},
-        {key:'sh3', label:'Sheep 3', markIdx:6, isSheep:true},
-        {key:'sh4', label:'Sheep 4', markIdx:7, isSheep:true}
-      ]}
-    ]
-  },
-  {
-    id:'ragnaros', name:'Ragnaros',
-    hint:'2 MTs taunt-swapping + 3 healers on tanks',
-    note:'Maximize Fire Resistance (MT 305 FR, melee 200 FR, ranged 150 FR). Melee run out during Wrath of Ragnaros. AoE heal aggressively.',
-    segments:[
-      {title:'Tanks', cols:2, slots:[
-        {key:'mt1', label:'MT 1', markIdx:0},
-        {key:'mt2', label:'MT 2', markIdx:1}
-      ]},
-      {title:'Healers', cols:3, isHealRow:true, slots:[
-        {key:'h1', label:'Healer 1', isHealer:true},
-        {key:'h2', label:'Healer 2', isHealer:true},
-        {key:'h3', label:'Healer 3', isHealer:true}
-      ]}
-    ]
-  }
-];
+/* ── BOSS DEFINITIONS BY RAID ── */
+var BOSSES_BY_RAID={
+
+mc:[
+  {id:'trash',name:'Trash',isTrash:true},
+  {id:'lucifron',name:'Lucifron',hint:'MT on Lucifron + OT on each add, 1 healer each',note:'Kill adds first. Dispel Dominate Mind and Shadow Shock curse off tanks.',segments:[{title:'Tanks',cols:3,slots:[{key:'mt',label:'Lucifron',markIdx:2,healerKey:'mth'},{key:'ot1',label:'Add 1',markIdx:0,healerKey:'ot1h'},{key:'ot2',label:'Add 2',markIdx:1,healerKey:'ot2h'}]},{title:'Healers',cols:3,isHealRow:true,slots:[{key:'mth',label:'Healer \u2014 Lucifron',isHealer:true},{key:'ot1h',label:'Healer \u2014 Add 1',isHealer:true},{key:'ot2h',label:'Healer \u2014 Add 2',isHealer:true}]}]},
+  {id:'magmadar',name:'Magmadar',hint:'1 MT with 1 dedicated healer',note:'Hunters Tranquilizing Shot on Frenzy. Face boss away from raid. Fear Ward on MT.',segments:[{title:'Tank',cols:1,slots:[{key:'mt',label:'Magmadar',markIdx:0,healerKey:'mth'}]},{title:'Healer',cols:1,isHealRow:true,slots:[{key:'mth',label:'Healer \u2014 MT',isHealer:true}]}]},
+  {id:'gehennas',name:'Gehennas',hint:'3 tanks (boss + 2 adds), 1 healer each',note:'Mages decurse Gehennas Curse constantly. Kill adds first. Spread to avoid Rain of Fire.',segments:[{title:'Tanks',cols:3,slots:[{key:'mt',label:'Gehennas',markIdx:2,healerKey:'mth'},{key:'ot1',label:'Add 1',markIdx:0,healerKey:'ot1h'},{key:'ot2',label:'Add 2',markIdx:1,healerKey:'ot2h'}]},{title:'Healers',cols:3,isHealRow:true,slots:[{key:'mth',label:'Healer \u2014 Gehennas',isHealer:true},{key:'ot1h',label:'Healer \u2014 Add 1',isHealer:true},{key:'ot2h',label:'Healer \u2014 Add 2',isHealer:true}]}]},
+  {id:'garr',name:'Garr',hint:'MT on Garr + 4 OTs on adds, rest Banished',note:'Warlocks Banish remaining adds. Stay within 15 yards of Garr. Kill Garr first \u2014 adds die with him.',segments:[{title:'Tanks',cols:5,slots:[{key:'mt',label:'Garr',markIdx:4,healerKey:'mth'},{key:'ot1',label:'Add 1',markIdx:0,healerKey:'ot1h'},{key:'ot2',label:'Add 2',markIdx:1,healerKey:'ot2h'},{key:'ot3',label:'Add 3',markIdx:2,healerKey:'ot3h'},{key:'ot4',label:'Add 4',markIdx:3,healerKey:'ot4h'}]},{title:'Healers',cols:5,isHealRow:true,slots:[{key:'mth',label:'Heal \u2014 Garr',isHealer:true},{key:'ot1h',label:'Heal \u2014 Add 1',isHealer:true},{key:'ot2h',label:'Heal \u2014 Add 2',isHealer:true},{key:'ot3h',label:'Heal \u2014 Add 3',isHealer:true},{key:'ot4h',label:'Heal \u2014 Add 4',isHealer:true}]}]},
+  {id:'geddon',name:'Baron Geddon',hint:'Single MT with 2 healers',note:'Dispel Ignite Mana constantly. Kite at low HP. AoE heal at 10% Armageddon.',segments:[{title:'Tank',cols:1,slots:[{key:'mt',label:'Baron Geddon',markIdx:0,healerKey:'h1'}]},{title:'Healers',cols:2,isHealRow:true,slots:[{key:'h1',label:'Healer 1 \u2014 MT',isHealer:true},{key:'h2',label:'Healer 2 \u2014 MT',isHealer:true}]}]},
+  {id:'shazzrah',name:'Shazzrah',hint:'1 MT only \u2014 melee DPS preferred',note:'Shazzrah Counterspells casters \u2014 use melee. Mages decurse. He blinks; MT must reposition quickly.',segments:[{title:'Tank',cols:1,slots:[{key:'mt',label:'Shazzrah',markIdx:0,healerKey:'mth'}]},{title:'Healer',cols:1,isHealRow:true,slots:[{key:'mth',label:'Healer \u2014 MT',isHealer:true}]}]},
+  {id:'sulfuron',name:'Sulfuron',hint:'MT on boss + 5 OTs on Flamewaker Priests',note:'Interrupt Dark Mending (top priority!). Drag priests apart. Kill priests one by one, Sulfuron last.',segments:[{title:'Tanks',cols:6,slots:[{key:'mt',label:'Sulfuron',markIdx:5,healerKey:'mth'},{key:'ot1',label:'Priest 1',markIdx:0,healerKey:'ot1h'},{key:'ot2',label:'Priest 2',markIdx:1,healerKey:'ot2h'},{key:'ot3',label:'Priest 3',markIdx:2,healerKey:'ot3h'},{key:'ot4',label:'Priest 4',markIdx:3,healerKey:'ot4h'},{key:'ot5',label:'Priest 5',markIdx:4,healerKey:'ot5h'}]},{title:'Healers',cols:6,isHealRow:true,slots:[{key:'mth',label:'Heal \u2014 Sulfuron',isHealer:true},{key:'ot1h',label:'Heal \u2014 Priest 1',isHealer:true},{key:'ot2h',label:'Heal \u2014 Priest 2',isHealer:true},{key:'ot3h',label:'Heal \u2014 Priest 3',isHealer:true},{key:'ot4h',label:'Heal \u2014 Priest 4',isHealer:true},{key:'ot5h',label:'Heal \u2014 Priest 5',isHealer:true}]}]},
+  {id:'golemagg',name:'Golemagg',hint:'1 MT on Golemagg + 2 OTs on Core Hounds',note:'Stack boss and hounds for cleave. Hounds must NOT reach 50% \u2014 they heal each other.',segments:[{title:'Tanks',cols:3,slots:[{key:'mt',label:'Golemagg',markIdx:2,healerKey:'mth'},{key:'ot1',label:'Core Hound 1',markIdx:0,healerKey:'ot1h'},{key:'ot2',label:'Core Hound 2',markIdx:1,healerKey:'ot2h'}]},{title:'Healers',cols:3,isHealRow:true,slots:[{key:'mth',label:'Heal \u2014 MT',isHealer:true},{key:'ot1h',label:'Heal \u2014 Hound 1',isHealer:true},{key:'ot2h',label:'Heal \u2014 Hound 2',isHealer:true}]}]},
+  {id:'domo',name:'Domo',hint:'MT on Domo + 4 OTs on guards + 4 Mages sheep',note:'Kill all Elite Firelords and Flamewaker Handlers first. Sheep 4 targets. He surrenders at low HP.',segments:[{title:'Tanks',cols:5,slots:[{key:'mt',label:'Domo',markIdx:null,healerKey:'mth'},{key:'ot1',label:'Guard 1',markIdx:0,healerKey:'ot1h'},{key:'ot2',label:'Guard 2',markIdx:1,healerKey:'ot2h'},{key:'ot3',label:'Guard 3',markIdx:2,healerKey:'ot3h'},{key:'ot4',label:'Guard 4',markIdx:3,healerKey:'ot4h'}]},{title:'Healers',cols:5,isHealRow:true,slots:[{key:'mth',label:'Heal \u2014 Domo',isHealer:true},{key:'ot1h',label:'Heal \u2014 Guard 1',isHealer:true},{key:'ot2h',label:'Heal \u2014 Guard 2',isHealer:true},{key:'ot3h',label:'Heal \u2014 Guard 3',isHealer:true},{key:'ot4h',label:'Heal \u2014 Guard 4',isHealer:true}]},{title:'Sheep Targets',cols:4,isSheepRow:true,slots:[{key:'sh1',label:'Sheep 1',markIdx:4,isSheep:true},{key:'sh2',label:'Sheep 2',markIdx:5,isSheep:true},{key:'sh3',label:'Sheep 3',markIdx:6,isSheep:true},{key:'sh4',label:'Sheep 4',markIdx:7,isSheep:true}]}]},
+  {id:'ragnaros',name:'Ragnaros',hint:'2 MTs taunt-swapping + 3 healers on tanks',note:'Maximize Fire Resistance. Melee run out on Wrath of Ragnaros. AoE heal aggressively.',segments:[{title:'Tanks',cols:2,slots:[{key:'mt1',label:'MT 1',markIdx:0},{key:'mt2',label:'MT 2',markIdx:1}]},{title:'Healers',cols:3,isHealRow:true,slots:[{key:'h1',label:'Healer 1',isHealer:true},{key:'h2',label:'Healer 2',isHealer:true},{key:'h3',label:'Healer 3',isHealer:true}]}]}
+],
+
+bwl:[
+  {id:'trash',name:'Trash',isTrash:true},
+  {id:'razorgore',name:'Razorgore',hint:'Split raid into 4 corner groups to handle adds, 1 controller on orb',note:'One player controls the orb to destroy eggs. Warriors kite Legionnaires. CC Dragon adds. Kill all eggs before burning Razorgore.',segments:[{title:'Orb Controller',cols:1,slots:[{key:'ctrl',label:'Orb Controller',markIdx:0}]},{title:'Corner Groups',cols:4,slots:[{key:'c1',label:'Corner 1',markIdx:null},{key:'c2',label:'Corner 2',markIdx:null},{key:'c3',label:'Corner 3',markIdx:null},{key:'c4',label:'Corner 4',markIdx:null}]},{title:'Healers',cols:2,isHealRow:true,slots:[{key:'h1',label:'Healer 1',isHealer:true},{key:'h2',label:'Healer 2',isHealer:true}]}]},
+  {id:'vael',name:'Vaelastrasz',hint:'Multiple MTs rotating \u2014 Burning Adrenaline forces tank swaps every ~45s',note:'Stack tanks and rotate quickly. DPS must be high \u2014 10 min enrage. Burning Adrenaline on DPS: run to edge.',segments:[{title:'Tanks',cols:3,slots:[{key:'mt1',label:'MT 1',markIdx:0,healerKey:'h1'},{key:'mt2',label:'MT 2',markIdx:1,healerKey:'h2'},{key:'mt3',label:'MT 3',markIdx:2,healerKey:'h3'}]},{title:'Healers',cols:3,isHealRow:true,slots:[{key:'h1',label:'Healer 1',isHealer:true},{key:'h2',label:'Healer 2',isHealer:true},{key:'h3',label:'Healer 3',isHealer:true}]}]},
+  {id:'broodlord',name:'Broodlord Lashlayer',hint:'MT with high magic resistance, OT on add',note:'Requires high magic resistance on MT. Suppress \u2014 interrupt or dispel. Off-tank Whelps. Melee stack behind boss.',segments:[{title:'Tanks',cols:2,slots:[{key:'mt',label:'Broodlord',markIdx:0,healerKey:'mth'},{key:'ot',label:'Add OT',markIdx:1,healerKey:'oth'}]},{title:'Healers',cols:2,isHealRow:true,slots:[{key:'mth',label:'Healer \u2014 MT',isHealer:true},{key:'oth',label:'Healer \u2014 OT',isHealer:true}]}]},
+  {id:'firemaw',name:'Firemaw',hint:'1 MT, rotate out on Wing Buffet stacks. High FR required.',note:'Wing Buffet builds stacks \u2014 rotate MTs. Stack 2 tanks minimum. Shadow Flame \u2014 stay behind. FR cloak enchant on all.',segments:[{title:'Tanks',cols:2,slots:[{key:'mt1',label:'MT 1',markIdx:0,healerKey:'h1'},{key:'mt2',label:'MT 2',markIdx:1,healerKey:'h2'}]},{title:'Healers',cols:2,isHealRow:true,slots:[{key:'h1',label:'Healer 1',isHealer:true},{key:'h2',label:'Healer 2',isHealer:true}]}]},
+  {id:'ebonroc',name:'Ebonroc',hint:'2 MTs rotating \u2014 Shadow of Ebonroc heals boss off the marked tank',note:'Shadow of Ebonroc: when it lands on a player, swap tanks immediately or boss heals. FR gear required.',segments:[{title:'Tanks',cols:2,slots:[{key:'mt1',label:'MT 1',markIdx:0,healerKey:'h1'},{key:'mt2',label:'MT 2',markIdx:1,healerKey:'h2'}]},{title:'Healers',cols:2,isHealRow:true,slots:[{key:'h1',label:'Healer 1',isHealer:true},{key:'h2',label:'Healer 2',isHealer:true}]}]},
+  {id:'flamegor',name:'Flamegor',hint:'2 MTs rotating \u2014 Frenzy must be Tranquilized',note:'Similar to Firemaw. Wing Buffet stacks \u2014 rotate MTs. Hunters Tranquilizing Shot on Frenzy. FR gear required.',segments:[{title:'Tanks',cols:2,slots:[{key:'mt1',label:'MT 1',markIdx:0,healerKey:'h1'},{key:'mt2',label:'MT 2',markIdx:1,healerKey:'h2'}]},{title:'Healers',cols:2,isHealRow:true,slots:[{key:'h1',label:'Healer 1',isHealer:true},{key:'h2',label:'Healer 2',isHealer:true}]}]},
+  {id:'chromaggus',name:'Chromaggus',hint:'2 MTs with resistance sets for current vulnerabilities',note:'Identifies two vulnerabilities each reset. Assign tanks with correct resistance. Frenzy \u2014 Hunters Tranq Shot. Time Lapse \u2014 run out.',segments:[{title:'Tanks',cols:2,slots:[{key:'mt1',label:'MT 1',markIdx:0,healerKey:'h1'},{key:'mt2',label:'MT 2',markIdx:1,healerKey:'h2'}]},{title:'Healers',cols:3,isHealRow:true,slots:[{key:'h1',label:'Healer 1',isHealer:true},{key:'h2',label:'Healer 2',isHealer:true},{key:'h3',label:'Healer 3',isHealer:true}]}]},
+  {id:'nefarian',name:'Nefarian',hint:'2 MTs + 1 OT on adds in Phase 1, 8 Warriors tank adds P1',note:'P1: 8 Warriors tank drakonid adds in corners. P2: MT + OT on Nefarian, class calls \u2014 know your call. P3: Zombies spawn \u2014 AoE down fast.',segments:[{title:'Add Tanks (P1)',cols:4,slots:[{key:'at1',label:'Add Tank 1',markIdx:0},{key:'at2',label:'Add Tank 2',markIdx:1},{key:'at3',label:'Add Tank 3',markIdx:2},{key:'at4',label:'Add Tank 4',markIdx:3}]},{title:'Boss Tanks (P2)',cols:2,slots:[{key:'mt',label:'MT \u2014 Nefarian',markIdx:4,healerKey:'mth'},{key:'ot',label:'OT',markIdx:5,healerKey:'oth'}]},{title:'Healers',cols:2,isHealRow:true,slots:[{key:'mth',label:'Healer \u2014 MT',isHealer:true},{key:'oth',label:'Healer \u2014 OT',isHealer:true}]}]}
+],
+
+aq40:[
+  {id:'trash',name:'Trash',isTrash:true},
+  {id:'skeram',name:'The Prophet Skeram',hint:'MT on Skeram, OT on each mind-controlled player. Splits at 75/50/25%.',note:'Splits into 3 at 75%, 50%, 25% \u2014 burn each copy fast. Interrupt Arcane Explosion. CC mind controlled players.',segments:[{title:'Tanks',cols:3,slots:[{key:'mt',label:'Skeram',markIdx:0,healerKey:'mth'},{key:'ot1',label:'Copy OT 1',markIdx:1,healerKey:'ot1h'},{key:'ot2',label:'Copy OT 2',markIdx:2,healerKey:'ot2h'}]},{title:'Healers',cols:3,isHealRow:true,slots:[{key:'mth',label:'Healer \u2014 MT',isHealer:true},{key:'ot1h',label:'Healer \u2014 OT1',isHealer:true},{key:'ot2h',label:'Healer \u2014 OT2',isHealer:true}]}]},
+  {id:'bugs',name:'Silithid Royalty',hint:'Optional. 3 bugs: Lord Kri, Princess Yauj, Vem. Last bug killed determines loot.',note:'Kri: Poison DoT \u2014 decurse/dispel. Yauj: Fears melee, heals others \u2014 interrupt heals. Vem: Charges and enrages. Kill order: Vem \u2192 Kri \u2192 Yauj (kill Yauj last to avoid spawn adds).',segments:[{title:'Tanks',cols:3,slots:[{key:'tkri',label:'Lord Kri',markIdx:0,healerKey:'hkri'},{key:'tyauj',label:'Princess Yauj',markIdx:1,healerKey:'hyauj'},{key:'tvem',label:'Vem',markIdx:2,healerKey:'hvem'}]},{title:'Healers',cols:3,isHealRow:true,slots:[{key:'hkri',label:'Heal \u2014 Kri',isHealer:true},{key:'hyauj',label:'Heal \u2014 Yauj',isHealer:true},{key:'hvem',label:'Heal \u2014 Vem',isHealer:true}]}]},
+  {id:'sartura',name:'Battleguard Sartura',hint:'MT on Sartura + 3 OTs on whirlwinding adds. Face adds against walls.',note:'Sartura and adds whirlwind \u2014 spread melee. Keep adds against walls. Kill adds, then Sartura.',segments:[{title:'Tanks',cols:4,slots:[{key:'mt',label:'Sartura',markIdx:0,healerKey:'mth'},{key:'ot1',label:'Add 1',markIdx:1,healerKey:'ot1h'},{key:'ot2',label:'Add 2',markIdx:2,healerKey:'ot2h'},{key:'ot3',label:'Add 3',markIdx:3,healerKey:'ot3h'}]},{title:'Healers',cols:4,isHealRow:true,slots:[{key:'mth',label:'Heal \u2014 Sartura',isHealer:true},{key:'ot1h',label:'Heal \u2014 Add 1',isHealer:true},{key:'ot2h',label:'Heal \u2014 Add 2',isHealer:true},{key:'ot3h',label:'Heal \u2014 Add 3',isHealer:true}]}]},
+  {id:'fankriss',name:'Fankriss the Unyielding',hint:'1 MT. Kills a player and spawns adds at 66% and 33%.',note:'MT faces boss away. Hunters Serpent Sting all Spawn adds as priority. Silithid Spawn burst targets \u2014 top off HP. Nature resistance helps.',segments:[{title:'Tank',cols:1,slots:[{key:'mt',label:'Fankriss',markIdx:0,healerKey:'mth'}]},{title:'Healers',cols:2,isHealRow:true,slots:[{key:'mth',label:'Healer 1 \u2014 MT',isHealer:true},{key:'h2',label:'Healer 2',isHealer:true}]}]},
+  {id:'viscidus',name:'Viscidus',hint:'Optional. Requires heavy Frost damage to freeze, then melee to shatter.',note:'Phase 1: Frost spells to slow then freeze. Phase 2: All melee attack to shatter into globes. Phase 3: Chase and kill globes before they reform. Bring Frost DPS.',segments:[{title:'Tank',cols:1,slots:[{key:'mt',label:'Viscidus',markIdx:0,healerKey:'mth'}]},{title:'Healers',cols:2,isHealRow:true,slots:[{key:'mth',label:'Healer 1',isHealer:true},{key:'h2',label:'Healer 2',isHealer:true}]}]},
+  {id:'huhuran',name:'Princess Huhuran',hint:'High Nature Resistance required on tanks. Hunters Tranq Shot on Frenzy.',note:'NR minimum: tanks 200+, melee 150+, ranged 100+. Wyvern Sting: move out. Frenzy at 30% \u2014 Hunters Tranq. Burn fast in execute phase.',segments:[{title:'Tanks',cols:2,slots:[{key:'mt1',label:'MT 1',markIdx:0,healerKey:'h1'},{key:'mt2',label:'MT 2',markIdx:1,healerKey:'h2'}]},{title:'Healers',cols:3,isHealRow:true,slots:[{key:'h1',label:'Healer 1',isHealer:true},{key:'h2',label:'Healer 2',isHealer:true},{key:'h3',label:'Healer 3',isHealer:true}]}]},
+  {id:'twins',name:'Twin Emperors',hint:'Veklor (magic) and Veknilash (physical) must be tanked apart and swapped on teleport.',note:'Tank swap on Teleport every 30s. Melee on Veknilash (physical). Casters on Veklor (magic). Heal both tanks continuously. Must die simultaneously.',segments:[{title:'Tanks',cols:2,slots:[{key:'mt1',label:'Veknilash (physical)',markIdx:0,healerKey:'h1'},{key:'mt2',label:'Veklor (magic)',markIdx:1,healerKey:'h2'}]},{title:'Healers',cols:4,isHealRow:true,slots:[{key:'h1',label:'Healer \u2014 Physical',isHealer:true},{key:'h2',label:'Healer \u2014 Magic',isHealer:true},{key:'h3',label:'Healer 3',isHealer:true},{key:'h4',label:'Healer 4',isHealer:true}]}]},
+  {id:'ouro',name:'Ouro',hint:'1-2 MTs. Submerges periodically \u2014 spread out for Sand Blast.',note:'Submerges every 90s. Spread for Sand Blast. Tank facing away. Spawn adds on submerge \u2014 AoE them. Burns at 20%.',segments:[{title:'Tanks',cols:2,slots:[{key:'mt1',label:'MT 1',markIdx:0,healerKey:'h1'},{key:'mt2',label:'MT 2',markIdx:1,healerKey:'h2'}]},{title:'Healers',cols:2,isHealRow:true,slots:[{key:'h1',label:'Healer 1',isHealer:true},{key:'h2',label:'Healer 2',isHealer:true}]}]},
+  {id:'cthun',name:"C'Thun",hint:"Phase 1: spread for Eye Beam. Phase 2: tanks in stomach. Set group order below.",note:"P1: Spread around room, avoid Eye Beam chains. P2: Two tanks enter stomach, call order for swallowed players. Eye Tentacles and Claw Tentacles spawn \u2014 kill immediately. Weekly group order can be set below.",segments:[{title:'Eye Phase Tanks (P1)',cols:2,slots:[{key:'et1',label:'Eye Tank 1',markIdx:0,healerKey:'eh1'},{key:'et2',label:'Eye Tank 2',markIdx:1,healerKey:'eh2'}]},{title:'Stomach Tanks (P2)',cols:2,slots:[{key:'st1',label:'Stomach MT 1',markIdx:2,healerKey:'sh1'},{key:'st2',label:'Stomach MT 2',markIdx:3,healerKey:'sh2'}]},{title:'Healers',cols:4,isHealRow:true,slots:[{key:'eh1',label:'Heal \u2014 Eye 1',isHealer:true},{key:'eh2',label:'Heal \u2014 Eye 2',isHealer:true},{key:'sh1',label:'Heal \u2014 Stom 1',isHealer:true},{key:'sh2',label:'Heal \u2014 Stom 2',isHealer:true}]}],hasGroupOrder:true}
+],
+
+naxx:[
+  {id:'trash',name:'Trash',isTrash:true},
+  /* Arachnid Quarter */
+  {id:'anub',name:"Anub'Rekhan",hint:'1 MT kiting during Locust Swarm, 1 OT on Crypt Guard adds.',note:'Locust Swarm: MT kites boss clockwise. OT picks up Crypt Guards. Impale: move adds away from raid. AoE Crypt Guards.',segments:[{title:'Tanks',cols:2,slots:[{key:'mt',label:"Anub'Rekhan",markIdx:0,healerKey:'mth'},{key:'ot',label:'Crypt Guard OT',markIdx:1,healerKey:'oth'}]},{title:'Healers',cols:2,isHealRow:true,slots:[{key:'mth',label:'Healer \u2014 MT',isHealer:true},{key:'oth',label:'Healer \u2014 OT',isHealer:true}]}]},
+  {id:'faerlina',name:'Grand Widow Faerlina',hint:'MT on Faerlina + OTs on Worshippers for Frenzy dispel via Mind Control.',note:'Frenzy at 30%: MC a Worshipper and sacrifice it to dispel her Frenzy. Kill remaining Worshippers after. Poison Bolt Volley \u2014 dispel.',segments:[{title:'Tanks',cols:2,slots:[{key:'mt',label:'Faerlina',markIdx:0,healerKey:'mth'},{key:'ot',label:'Worshippers OT',markIdx:1,healerKey:'oth'}]},{title:'Healers',cols:2,isHealRow:true,slots:[{key:'mth',label:'Healer \u2014 MT',isHealer:true},{key:'oth',label:'Healer \u2014 OT',isHealer:true}]}]},
+  {id:'maexxna',name:'Maexxna',hint:'1 MT, AoE spiders after Web Spray, burst before enrage at 30%.',note:'Web Spray stuns raid for 5s \u2014 pre-hot tanks. Cocoon: free players fast. Baby Spiders spawn every 40s \u2014 AoE. Enrages at 30% \u2014 burn.',segments:[{title:'Tank',cols:1,slots:[{key:'mt',label:'Maexxna',markIdx:0,healerKey:'mth'}]},{title:'Healers',cols:3,isHealRow:true,slots:[{key:'mth',label:'Healer 1 \u2014 MT',isHealer:true},{key:'h2',label:'Healer 2',isHealer:true},{key:'h3',label:'Healer 3',isHealer:true}]}]},
+  /* Plague Quarter */
+  {id:'noth',name:'Noth the Plaguebringer',hint:'1 MT, handle Skeleton waves during teleport phase.',note:'Blink: teleports to balcony, Skeletons spawn \u2014 2 OTs handle adds. Curse of the Plaguebringer \u2014 decurse immediately. Resume burn when he returns.',segments:[{title:'Tanks',cols:2,slots:[{key:'mt',label:'Noth',markIdx:0,healerKey:'mth'},{key:'ot',label:'Add OT',markIdx:1,healerKey:'oth'}]},{title:'Healers',cols:2,isHealRow:true,slots:[{key:'mth',label:'Healer \u2014 MT',isHealer:true},{key:'oth',label:'Healer \u2014 OT',isHealer:true}]}]},
+  {id:'heigan',name:'Heigan the Unclean',hint:'1 MT. Entire raid must dance during Eruption phase \u2014 no exceptions.',note:'The Dance: move between safe zones in order during Eruption. Learn the dance. MT stays on boss. Phase 2: everyone dances, boss follows slowly. Most wipes are individual errors.',segments:[{title:'Tank',cols:1,slots:[{key:'mt',label:'Heigan',markIdx:0,healerKey:'mth'}]},{title:'Healers',cols:2,isHealRow:true,slots:[{key:'mth',label:'Healer 1 \u2014 MT',isHealer:true},{key:'h2',label:'Healer 2',isHealer:true}]}]},
+  {id:'loatheb',name:'Loatheb',hint:'1 MT. Healers can ONLY heal during 3s Spore windows. Pre-hot before each Spore.',note:'Fungal Creep: no healing except 3s after Spore lands. Heal on Spore window only. CURSE OF LOATHEB: blocks healing \u2014 track carefully. Maximize DPS.',segments:[{title:'Tank',cols:1,slots:[{key:'mt',label:'Loatheb',markIdx:0,healerKey:'mth'}]},{title:'Healer (Spore windows only)',cols:3,isHealRow:true,slots:[{key:'mth',label:'Healer 1',isHealer:true},{key:'h2',label:'Healer 2',isHealer:true},{key:'h3',label:'Healer 3',isHealer:true}]}]},
+  /* Deathknight Quarter */
+  {id:'razuvious',name:'Instructor Razuvious',hint:'Priests MC the Understudies to tank Razuvious. 2 Priests rotating.',note:'Two Understudies MC\'d by Priests tank Razuvious. Rotate MC every ~20s. All others DPS. Disrupting Shout hits entire raid.',segments:[{title:'MC Priests (tanking via Understudy)',cols:2,slots:[{key:'mc1',label:'Priest MC 1',markIdx:0},{key:'mc2',label:'Priest MC 2',markIdx:1}]},{title:'Healers',cols:2,isHealRow:true,slots:[{key:'h1',label:'Healer 1',isHealer:true},{key:'h2',label:'Healer 2',isHealer:true}]}]},
+  {id:'gothik',name:'Gothik the Harvester',hint:'Split raid 50/50 on Living and Undead sides. Set group order below.',note:'Living side kills mounted and unmounted trainees. Undead side handles spectral versions. Gothik teleports at 55% \u2014 burn him. Assign groups to each side.',segments:[{title:'Living Side Lead',cols:1,slots:[{key:'ll',label:'Living Side Lead',markIdx:0}]},{title:'Undead Side Lead',cols:1,slots:[{key:'ul',label:'Undead Side Lead',markIdx:1}]},{title:'Healers',cols:4,isHealRow:true,slots:[{key:'h1',label:'Heal \u2014 Living',isHealer:true},{key:'h2',label:'Heal \u2014 Living 2',isHealer:true},{key:'h3',label:'Heal \u2014 Undead',isHealer:true},{key:'h4',label:'Heal \u2014 Undead 2',isHealer:true}]}],hasGroupOrder:true},
+  {id:'horsemen',name:'The Four Horsemen',hint:'4 tanks kiting between corners. Each pair of tanks rotates on Mark stacks.',note:'Mark of the Baron/Lady/Blaumeux/Zeliek stacks every 12s \u2014 swap at 4-5 stacks. Assign 2 tanks per side (front/back). Thane+Blaumeux front, Baron+Zeliek back. All 4 must die within 15s of each other.',segments:[{title:'Front Tanks',cols:2,slots:[{key:'ft1',label:'Thane Korth\'azz',markIdx:0,healerKey:'fh1'},{key:'ft2',label:'Lady Blaumeux',markIdx:1,healerKey:'fh2'}]},{title:'Back Tanks',cols:2,slots:[{key:'bt1',label:'Baron Rivendare',markIdx:2,healerKey:'bh1'},{key:'bt2',label:"Sir Zeliek",markIdx:3,healerKey:'bh2'}]},{title:'Front Healers',cols:2,isHealRow:true,slots:[{key:'fh1',label:'Heal \u2014 Front 1',isHealer:true},{key:'fh2',label:'Heal \u2014 Front 2',isHealer:true}]},{title:'Back Healers',cols:2,isHealRow:true,slots:[{key:'bh1',label:'Heal \u2014 Back 1',isHealer:true},{key:'bh2',label:'Heal \u2014 Back 2',isHealer:true}]}]},
+  /* Abomination Quarter */
+  {id:'patchwerk',name:'Patchwerk',hint:'2-3 MTs rotating Hateful Strike. Pure gear check \u2014 maximum DPS and healing.',note:'Hateful Strike hits highest HP non-tank player in melee \u2014 keep 2 tanks in melee always. Hard DPS check: 6 min enrage. No mechanics otherwise.',segments:[{title:'Tanks',cols:3,slots:[{key:'mt1',label:'MT 1',markIdx:0,healerKey:'h1'},{key:'mt2',label:'Hateful Tank 1',markIdx:1,healerKey:'h2'},{key:'mt3',label:'Hateful Tank 2',markIdx:2,healerKey:'h3'}]},{title:'Healers',cols:3,isHealRow:true,slots:[{key:'h1',label:'Healer \u2014 MT',isHealer:true},{key:'h2',label:'Healer \u2014 HT1',isHealer:true},{key:'h3',label:'Healer \u2014 HT2',isHealer:true}]}]},
+  {id:'grobbulus',name:'Grobbulus',hint:'1 MT kiting slowly. Injected players run out immediately.',note:'MT kites boss slowly around room. Mutating Injection: run to wall immediately \u2014 green cloud poisons. Slime Spray: move out. Spread raid loosely.',segments:[{title:'Tank',cols:1,slots:[{key:'mt',label:'Grobbulus',markIdx:0,healerKey:'mth'}]},{title:'Healers',cols:2,isHealRow:true,slots:[{key:'mth',label:'Healer 1 \u2014 MT',isHealer:true},{key:'h2',label:'Healer 2',isHealer:true}]}]},
+  {id:'gluth',name:'Gluth',hint:'1 MT on Gluth, 1-2 kiters on Zombie Chow adds. Decimate every 105s.',note:'Decimate: drops all to 5% HP \u2014 raid must be topped BEFORE. Zombie Chow kiter runs adds in circles. Slowing traps / Frost Nova helps. Kill Gluth fast after Decimate.',segments:[{title:'Tanks',cols:2,slots:[{key:'mt',label:'Gluth',markIdx:0,healerKey:'mth'},{key:'kite',label:'Zombie Kiter',markIdx:1}]},{title:'Healers',cols:2,isHealRow:true,slots:[{key:'mth',label:'Healer 1 \u2014 MT',isHealer:true},{key:'h2',label:'Healer 2',isHealer:true}]}]},
+  {id:'thaddius',name:'Thaddius',hint:'Kill Stalagg and Feugen simultaneously in P1. P2: polarity shift \u2014 move to correct side.',note:'P1: 1 tank each on Stalagg and Feugen, die within 5s of each other. P2: Polarity Shift \u2014 positive right, negative left. Wrong side = wipe. Stacking correct polarity increases DPS greatly.',segments:[{title:'P1 Tanks',cols:2,slots:[{key:'ts',label:'Stalagg',markIdx:0,healerKey:'h1'},{key:'tf',label:'Feugen',markIdx:1,healerKey:'h2'}]},{title:'P2 Tank',cols:1,slots:[{key:'mt',label:'Thaddius MT',markIdx:2,healerKey:'h3'}]},{title:'Healers',cols:3,isHealRow:true,slots:[{key:'h1',label:'Heal \u2014 Stalagg',isHealer:true},{key:'h2',label:'Heal \u2014 Feugen',isHealer:true},{key:'h3',label:'Heal \u2014 Thaddius',isHealer:true}]}]},
+  /* Frostwyrm Lair */
+  {id:'sapphiron',name:'Sapphiron',hint:'1 MT. High Frost Resistance required. Hide behind Ice Blocks during Blizzard.',note:'Frost Aura hits whole raid constantly \u2014 FR gear required (150+ all, 200+ tanks). Air phase: Blizzard \u2014 hide behind Ice Block corpses. Land phase: burn. Drain Life: interrupt.',segments:[{title:'Tank',cols:1,slots:[{key:'mt',label:'Sapphiron',markIdx:0,healerKey:'mth'}]},{title:'Healers',cols:4,isHealRow:true,slots:[{key:'mth',label:'Healer 1',isHealer:true},{key:'h2',label:'Healer 2',isHealer:true},{key:'h3',label:'Healer 3',isHealer:true},{key:'h4',label:'Healer 4',isHealer:true}]}],hasGroupOrder:true},
+  {id:'kelthuzad',name:"Kel'Thuzad",hint:"P1: kill adds. P2: MT on KT, OT on MCd players. Set group order below.",note:"P1 (4 min): Kill Cultists, Abominations, Banshees \u2014 do not touch KT. P2: Tank KT, interrupt Frostbolt Volley. MC: OT picks up mind-controlled player. Chains of Kel'Thuzad at low HP \u2014 assign OTs in advance.",segments:[{title:'P1 Add Tanks',cols:2,slots:[{key:'at1',label:'Add Tank 1',markIdx:0},{key:'at2',label:'Add Tank 2',markIdx:1}]},{title:'P2 Boss Tank',cols:1,slots:[{key:'mt',label:"Kel'Thuzad MT",markIdx:2,healerKey:'mth'}]},{title:'MC OT',cols:1,slots:[{key:'mct',label:'MC OT',markIdx:3,healerKey:'mcth'}]},{title:'Healers',cols:4,isHealRow:true,slots:[{key:'mth',label:'Heal \u2014 MT',isHealer:true},{key:'mcth',label:'Heal \u2014 MC OT',isHealer:true},{key:'h3',label:'Healer 3',isHealer:true},{key:'h4',label:'Healer 4',isHealer:true}]}],hasGroupOrder:true}
+]
+
+}; /* end BOSSES_BY_RAID */
+
+var activeRaid='mc';
+var BOSSES=BOSSES_BY_RAID.mc;
 
 var TRASH_MARKS=[{name:'Skull',col:'#e03030'},{name:'Cross',col:'#e05020'},{name:'Square',col:'#4080e0'},{name:'Moon',col:'#a070e0'},{name:'Triangle',col:'#30b050'}];
 
@@ -470,6 +375,45 @@ var DEMO=[
 var players=[],groups=[],trashMarks=[],bossData={},puller=null,filt='all',sel=null,activeTab='trash';
 var benched=[],lateList=[],absentList=[],tentativeList=[];
 var originalStatus={}; /* pid -> 'active'|'bench'|'late'|'absent'|'tentative' */
+var groupOrderData={}; /* bossId -> array of 8 group indices (0-based) into groups[] */
+
+function getGroupOrder(bossId){
+  /* Returns array of group indices. Default is natural order 0..7. */
+  return groupOrderData[bossId]||[0,1,2,3,4,5,6,7];
+}
+
+function switchRaid(raidId){
+  if(!BOSSES_BY_RAID[raidId])return;
+  activeRaid=raidId;
+  BOSSES=BOSSES_BY_RAID[raidId];
+  /* Reset assignments but keep pool */
+  trashMarks=TRASH_MARKS.map(function(m){return{name:m.name,col:m.col,tank:null,healer:null};});
+  puller=null;bossData={};groupOrderData={};
+  BOSSES.forEach(function(b){
+    if(b.isTrash)return;
+    var d={notes:''};
+    b.segments.forEach(function(seg){seg.slots.forEach(function(sl){d[sl.key]=null;});});
+    bossData[b.id]=d;
+    if(b.hasGroupOrder){
+      groupOrderData[b.id]=[0,1,2,3,4,5,6,7];
+    }
+  });
+  activeTab='trash';
+  /* Update raid selector button styles */
+  var RAID_NAMES={mc:'&#128293; Molten Core',bwl:'&#128009; Blackwing Lair',aq40:"&#129412; Temple of Ahn'Qiraj",naxx:'&#128128; Naxxramas'};
+  document.querySelectorAll('.raid-sel-btn').forEach(function(b){
+    var active=b.dataset.raid===raidId;
+    b.style.background=active?'#1a3a80':'#131726';
+    b.style.borderColor=active?'#3a6ae0':'#2a3050';
+    b.style.color=active?'#c8d8ff':'#7ab0ff';
+    b.style.fontWeight=active?'700':'400';
+  });
+  /* Update subtitle */
+  var subtitles={mc:'Ragnaros awaits \u2014 organize your 40-man raid',bwl:'Nefarian awaits \u2014 Blackwing Lair',aq40:"C'Thun awaits \u2014 Temple of Ahn'Qiraj",naxx:"Kel'Thuzad awaits \u2014 Naxxramas"};
+  var subEl=document.querySelector('.sub');
+  if(subEl)subEl.textContent=subtitles[raidId]||'';
+  rAll();
+}
 
 function deriveRole(cls,spec){
   var s=(spec||'').toLowerCase().replace(/\d+$/,''),c=(cls||'').toLowerCase();
@@ -511,13 +455,16 @@ function expandRealm(n){
 function mkG(){groups=[];for(var i=0;i<8;i++){var s=[];for(var j=0;j<5;j++)s.push({p:null});groups.push({id:i+1,slots:s});}}
 function mkMarks(){
   trashMarks=TRASH_MARKS.map(function(m){return{name:m.name,col:m.col,tank:null,healer:null};});
-  puller=null; bossData={};
+  puller=null; bossData={};groupOrderData={};
   benched=[];lateList=[];absentList=[];tentativeList=[];originalStatus={};
   BOSSES.forEach(function(b){
     if(b.isTrash)return;
     var d={notes:''};
     b.segments.forEach(function(seg){seg.slots.forEach(function(sl){d[sl.key]=null;});});
     bossData[b.id]=d;
+    if(b.hasGroupOrder){
+      groupOrderData[b.id]=[0,1,2,3,4,5,6,7];
+    }
   });
 }
 function aset(){var s={};for(var i=0;i<groups.length;i++)for(var j=0;j<groups[i].slots.length;j++)if(groups[i].slots[j].p)s[groups[i].slots[j].p.id]=1;return s;}
@@ -554,7 +501,28 @@ function buildMRT(homeRealm){
   return '"'+n.join('\n')+'"';
 }
 
-function pbar(p,isDup,rmAction,rmExtra){
+function buildMRTForBoss(bossId,homeRealm){
+  /* Build MRT string using the boss-specific group order */
+  var go=getGroupOrder(bossId);
+  var n=[];
+  for(var i=0;i<go.length;i++){
+    var grpIdx=go[i];
+    if(grpIdx<0||grpIdx>=groups.length)continue;
+    var g=groups[grpIdx];
+    for(var j=0;j<g.slots.length;j++){
+      if(g.slots[j].p){
+        var expanded=expandRealm(g.slots[j].p.name);
+        if(homeRealm){
+          var suffix='-'+homeRealm;
+          if(expanded.endsWith(suffix))expanded=expanded.slice(0,expanded.length-suffix.length);
+        }
+        n.push(expanded);
+      }
+    }
+  }
+  if(!n.length)return '';
+  return '"'+n.join('\n')+'"';
+}
   var c=cd(p.cls);
   var rm=rmAction?'<button class="bx" data-a="'+rmAction+'" '+(rmExtra||'')+'>x</button>':'';
   return '<div style="background:'+c.bg+';border:2px solid '+c.bd+';border-radius:5px;padding:4px 8px;display:flex;align-items:center;gap:6px;flex:1;min-width:0">'
@@ -847,13 +815,69 @@ function renderBossTab(boss){
   h+='<hr class="div-sep">';
   h+='<div class="note-box">'+he(boss.note||'')+'</div>';
 
+  /* Group order UI for special bosses */
+  if(boss.hasGroupOrder){
+    var go=getGroupOrder(boss.id);
+    h+='<div style="margin:.6rem 0">';
+    h+='<div style="font-family:Cinzel,serif;font-size:.72rem;color:#7ab0ff;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.5rem;display:flex;justify-content:space-between;align-items:center">';
+    h+='<span>Group Order for '+he(boss.name)+'</span>';
+    h+='<button class="btn bsm" data-a="resetGroupOrder" data-bid="'+boss.id+'" style="font-size:.6rem">Reset to default</button>';
+    h+='</div>';
+    h+='<div style="font-size:.68rem;color:#4a6090;margin-bottom:.5rem">Click a slot below to change which group goes there. This order is used for the MRT export when you copy for this boss.</div>';
+    /* 8 slots showing current assignment */
+    h+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:5px">';
+    for(var goi=0;goi<8;goi++){
+      var grpIdx=go[goi];
+      var grp=groups[grpIdx]||null;
+      var filled=grp?grp.slots.filter(function(s){return s.p;}).length:0;
+      var grpLabel=grp?'Group '+grp.id:'—';
+      h+='<div style="background:#0d1020;border:1.5px solid #2a3a60;border-radius:5px;overflow:hidden;cursor:pointer" data-a="goSlotClick" data-bid="'+boss.id+'" data-goi="'+goi+'">';
+      h+='<div style="background:#131726;padding:2px 7px;font-size:.6rem;font-family:Cinzel,serif;color:#4a6090;display:flex;justify-content:space-between"><span>Slot '+(goi+1)+'</span><span style="color:#7ab0ff">'+he(grpLabel)+'</span></div>';
+      h+='<div style="padding:3px 6px;min-height:22px">';
+      if(grp){
+        var names=grp.slots.filter(function(s){return s.p;}).map(function(s){return s.p.name;});
+        if(names.length){
+          h+='<div style="font-size:.65rem;color:#e0d8f8;line-height:1.4">'+names.slice(0,3).map(function(n){return he(n);}).join(', ')+(names.length>3?' +&hellip;':'')+'</div>';
+        } else {
+          h+='<div style="font-size:.62rem;color:#3a5080;font-style:italic">empty</div>';
+        }
+      } else {
+        h+='<div style="font-size:.62rem;color:#3a5080;font-style:italic">—</div>';
+      }
+      h+='</div></div>';
+    }
+    h+='</div>';
+    /* Group picker dropdown (hidden, shown on slot click) */
+    h+='<div id="goPickerWrap_'+boss.id+'" style="display:none;margin-top:6px;background:#131726;border:1px solid #3a5090;border-radius:6px;padding:7px">';
+    h+='<div style="font-size:.68rem;color:#7ab0ff;font-family:Cinzel,serif;margin-bottom:5px">Choose group for slot <span id="goPickerSlotLbl_'+boss.id+'"></span>:</div>';
+    h+='<div style="display:flex;gap:5px;flex-wrap:wrap">';
+    for(var gi2=0;gi2<groups.length;gi2++){
+      var g2=groups[gi2];
+      var f2=g2.slots.filter(function(s){return s.p;}).length;
+      h+='<button class="btn bsm" data-a="goPickGroup" data-bid="'+boss.id+'" data-grpidx="'+gi2+'" style="font-size:.68rem;padding:3px 10px">Group '+g2.id+' ('+f2+')</button>';
+    }
+    h+='<button class="btn bsm" data-a="goPickGroup" data-bid="'+boss.id+'" data-grpidx="-1" style="font-size:.68rem;padding:3px 10px;color:#e06060;border-color:#4a1020">Clear</button>';
+    h+='</div></div>';
+    /* Boss-specific MRT export */
+    h+='<div style="margin-top:.6rem">';
+    h+='<div style="font-size:.68rem;color:#4a6090;margin-bottom:.4rem">MRT export using this group order:</div>';
+    h+='<div style="display:flex;gap:5px;flex-wrap:wrap">';
+    h+='<button class="btn bsm mrt-boss-btn" data-bid="'+boss.id+'" data-realm="PyrewoodVillage" style="font-size:.68rem;padding:3px 10px">Copy \u2014 Pyrewood</button>';
+    h+='<button class="btn bsm mrt-boss-btn" data-bid="'+boss.id+'" data-realm="NethergardeKeep" style="font-size:.68rem;padding:3px 10px">Copy \u2014 Nethergarde</button>';
+    h+='<button class="btn bsm mrt-boss-btn" data-bid="'+boss.id+'" data-realm="MirageRaceway" style="font-size:.68rem;padding:3px 10px">Copy \u2014 Mirage</button>';
+    h+='</div>';
+    h+='<div class="expbox" id="mrtBossBox_'+boss.id+'" style="margin-top:.35rem"></div>';
+    h+='</div>';
+    h+='</div>';
+  }
+
   /* Preview */
   var prevText=buildBossPreview(boss,bd);
   h+='<div class="prev-row"><span class="prev-lbl">Preview</span><button class="btn bsm" data-a="copyBoss" data-bid="'+boss.id+'">Copy</button></div>';
   h+='<div class="expbox" id="bossExpBox_'+boss.id+'">'+he(prevText)+'</div>';
 
-  h+='<div style="font-family:Cinzel,serif;font-size:.62rem;color:#7a6030;text-transform:uppercase;letter-spacing:.06em;margin:.4rem 0 .3rem">Extra notes</div>';
-  h+='<textarea style="height:50px;border-color:#3a2a10" data-a="bossnote" data-bid="'+boss.id+'" placeholder="Add raid-specific notes...">'+he(bd.notes||'')+'</textarea>';
+  h+='<div style="font-family:Cinzel,serif;font-size:.62rem;color:#7ab0ff;text-transform:uppercase;letter-spacing:.06em;margin:.4rem 0 .3rem">Extra notes</div>';
+  h+='<textarea style="height:50px" data-a="bossnote" data-bid="'+boss.id+'" placeholder="Add raid-specific notes...">'+he(bd.notes||'')+'</textarea>';
   return h;
 }
 
@@ -1208,7 +1232,59 @@ document.getElementById('bClear').addEventListener('click',function(){
   document.getElementById('logbox').style.display='none';
   rAll();
 });
-/* MRT export — one button per server */
+/* Raid selector */
+document.querySelectorAll('.raid-sel-btn').forEach(function(btn){
+  btn.addEventListener('click',function(){switchRaid(btn.dataset.raid);});
+});
+
+/* Group order interactions (delegated) */
+var _goActiveBid=null,_goActiveSlot=-1;
+document.addEventListener('click',function(e){
+  var el=e.target.closest('[data-a]');if(!el)return;
+  var a=el.dataset.a;
+
+  if(a==='goSlotClick'){
+    var bid=el.dataset.bid,goi=+el.dataset.goi;
+    _goActiveBid=bid;_goActiveSlot=goi;
+    var wrap=document.getElementById('goPickerWrap_'+bid);
+    var lbl=document.getElementById('goPickerSlotLbl_'+bid);
+    if(wrap){
+      var showing=wrap.style.display!=='none'&&_goActiveBid===bid;
+      /* Always show, update label */
+      wrap.style.display='block';
+      if(lbl)lbl.textContent=goi+1;
+    }
+    return;
+  }
+  if(a==='goPickGroup'){
+    var bid2=el.dataset.bid,grpIdx=+el.dataset.grpidx;
+    if(!groupOrderData[bid2])groupOrderData[bid2]=[0,1,2,3,4,5,6,7];
+    groupOrderData[bid2][_goActiveSlot]=grpIdx;
+    var wrap2=document.getElementById('goPickerWrap_'+bid2);
+    if(wrap2)wrap2.style.display='none';
+    _goActiveBid=null;_goActiveSlot=-1;
+    rAll();return;
+  }
+  if(a==='resetGroupOrder'){
+    var bid3=el.dataset.bid;
+    groupOrderData[bid3]=[0,1,2,3,4,5,6,7];
+    var wrap3=document.getElementById('goPickerWrap_'+bid3);
+    if(wrap3)wrap3.style.display='none';
+    rAll();return;
+  }
+},true); /* capture phase so it fires before other handlers */
+
+/* Boss-specific MRT copy buttons */
+document.addEventListener('click',function(e){
+  var btn=e.target.closest('.mrt-boss-btn');if(!btn)return;
+  var bid=btn.dataset.bid,realm=btn.dataset.realm;
+  var text=buildMRTForBoss(bid,realm);
+  var box=document.getElementById('mrtBossBox_'+bid);
+  if(box)box.textContent=text;
+  navigator.clipboard.writeText(text).catch(function(){});
+  var orig=btn.textContent;btn.textContent='Copied!';
+  setTimeout(function(){btn.textContent=orig;},1400);
+});
 var REALM_LABELS={'PyrewoodVillage':'Pyrewood Village','NethergardeKeep':'Nethergarde Keep','MirageRaceway':'Mirage Raceway'};
 document.querySelectorAll('.mrt-server-btn').forEach(function(btn){
   btn.addEventListener('click',function(){
@@ -1256,6 +1332,7 @@ document.getElementById('mName').addEventListener('keydown',function(e){if(e.key
 function buildSharePayload(){
   /* Encode minimal state: groups, trashMarks, bossData, puller */
   var payload={
+    raid: activeRaid,
     players: players.map(function(p){return{id:p.id,name:p.name,cls:p.cls,spec:p.spec,role:p.role};}),
     benched: benched.map(function(p){return{id:p.id,name:p.name,cls:p.cls,spec:p.spec,role:p.role};}),
     lateList: lateList.map(function(p){return{id:p.id,name:p.name,cls:p.cls,spec:p.spec,role:p.role};}),
@@ -1264,7 +1341,8 @@ function buildSharePayload(){
     groups: groups.map(function(g){return g.slots.map(function(s){return s.p?s.p.id:null;});}),
     trash: trashMarks.map(function(m){return{tank:m.tank?m.tank.id:null,healer:m.healer?m.healer.id:null};}),
     puller: puller?puller.id:null,
-    bosses: (function(){var o={};for(var bid in bossData){o[bid]={};for(var k in bossData[bid]){var v=bossData[bid][k];if(v&&typeof v==='object'&&v.id)o[bid][k]=v.id;else if(k==='notes')o[bid][k]=v||'';}}return o;})()
+    bosses: (function(){var o={};for(var bid in bossData){o[bid]={};for(var k in bossData[bid]){var v=bossData[bid][k];if(v&&typeof v==='object'&&v.id)o[bid][k]=v.id;else if(k==='notes')o[bid][k]=v||'';}}return o;})(),
+    groupOrders: groupOrderData
   };
   return payload;
 }
@@ -1318,6 +1396,11 @@ function renderViewMode(data){
   var trash=data.trash||[];
   var pullerP=pmap[data.puller]||null;
   var bd=data.bosses||{};
+  var groupOrders=data.groupOrders||{};
+
+  var RAID_TITLES={mc:'Molten Core',bwl:'Blackwing Lair',aq40:"Temple of Ahn'Qiraj",naxx:'Naxxramas'};
+  var raidTitle=RAID_TITLES[data.raid||'mc']||'Raid';
+  var viewBosses=BOSSES_BY_RAID[data.raid||'mc']||BOSSES_BY_RAID.mc;
 
   var css=''
     +'*{box-sizing:border-box;margin:0;padding:0;}'
@@ -1354,12 +1437,12 @@ function renderViewMode(data){
 
   var h='<!DOCTYPE html><html lang="en"><head>'
     +'<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
-    +'<title>Raid View \u2014 Molten Core</title>'
+    +'<title>Raid View \u2014 '+raidTitle+'</title>'
     +'<link rel="preconnect" href="https://fonts.googleapis.com">'
     +'<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:wght@400;500&display=swap" rel="stylesheet">'
     +'<style>'+css+'</style></head><body>';
 
-  h+='<h1>Molten Core Raid</h1><div class="sub">Read-only raid view</div>';
+  h+='<h1>'+he(raidTitle)+' Raid</h1><div class="sub">Read-only raid view</div>';
 
   /* Groups */
   h+='<div class="section"><div class="sh">Raid Groups</div><div class="ggrid">';
@@ -1414,7 +1497,7 @@ function renderViewMode(data){
 
   /* Boss assignments */
   h+='<div class="section"><div class="sh">Boss Assignments</div>';
-  BOSSES.forEach(function(boss){
+  viewBosses.forEach(function(boss){
     if(boss.isTrash)return;
     var bdata=bd[boss.id]||{};
     h+='<div class="boss-sec">';
@@ -1436,6 +1519,18 @@ function renderViewMode(data){
       h+='</div>';
     });
     if(bdata.notes)h+='<div class="note-box">'+he(bdata.notes)+'</div>';
+    /* Group order */
+    if(boss.hasGroupOrder&&groupOrders[boss.id]){
+      var go=groupOrders[boss.id];
+      h+='<div class="rlbl" style="color:#7ab0ff;margin-top:.4rem">Group Order</div>';
+      h+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:.2rem">';
+      for(var gi2=0;gi2<8;gi2++){
+        var grpIdx2=go[gi2];
+        var grpLabel2=(grpIdx2>=0&&grpIdx2<8)?('Group '+(grpIdx2+1)):'—';
+        h+='<div style="background:#0d1020;border:1px solid #2a3050;border-radius:3px;padding:3px 7px;font-size:.82rem"><span style="color:#4a6090;font-size:.62rem;font-family:Cinzel,serif">'+(gi2+1)+'. </span><span style="color:#e0d8f8">'+he(grpLabel2)+'</span></div>';
+      }
+      h+='</div>';
+    }
     h+='</div>';
   });
   h+='</div>';
