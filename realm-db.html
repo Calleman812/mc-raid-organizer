@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Realm Database — MC Raid Organizer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:wght@400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#0a0d18;color:#e0d8f8;font-family:'Crimson Pro',Georgia,serif;font-size:15px;}
+.app{max-width:1000px;margin:0 auto;padding:1.2rem 1.5rem;}
+h1{font-family:'Cinzel',serif;font-size:1.5rem;font-weight:700;color:#7ab0ff;text-align:center;letter-spacing:.05em;margin-bottom:.2rem;}
+.sub{text-align:center;color:#4a6090;font-size:.82rem;margin-bottom:1.2rem;font-family:'Cinzel',serif;}
+.card{background:#131726;border:1px solid #2a3050;border-radius:8px;padding:.85rem 1.1rem;margin-bottom:1rem;}
+.sh{font-family:'Cinzel',serif;font-size:.82rem;color:#7ab0ff;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.65rem;border-bottom:1px solid #2a3050;padding-bottom:.4rem;display:flex;justify-content:space-between;align-items:center;}
+.sh small{font-size:.65rem;color:#4a6090;font-family:'Crimson Pro',serif;text-transform:none;letter-spacing:0;}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+input[type=text]{flex:1;min-width:160px;background:#0d1020;border:1px solid #2a3050;color:#e0d8f8;padding:6px 10px;border-radius:4px;font-family:'Crimson Pro',serif;font-size:.88rem;}
+input[type=text]::placeholder{color:#3a5080;}
+input[type=text]:focus{outline:none;border-color:#5a80c0;}
+select{background:#0d1020;border:1px solid #2a3050;color:#e0d8f8;padding:6px 9px;border-radius:4px;font-family:'Crimson Pro',serif;font-size:.85rem;cursor:pointer;}
+select option{background:#131726;}
+.btn{font-family:'Cinzel',serif;cursor:pointer;border-radius:4px;letter-spacing:.04em;transition:background .15s;white-space:nowrap;}
+.bprimary{background:#1a3a80;color:#c8d8ff;padding:6px 15px;font-size:.74rem;border:1px solid #3a6ae0;}
+.bprimary:hover{background:#2a4a90;}
+.bsecondary{background:#1c2236;color:#7ab0ff;padding:5px 13px;font-size:.72rem;border:1px solid #2a3a70;}
+.bsecondary:hover{background:#222a44;}
+.bdanger{background:#2a0a10;color:#e06060;padding:4px 10px;font-size:.7rem;border:1px solid #5a1a20;}
+.bdanger:hover{background:#3a1020;}
+.bsm{background:#131726;color:#7ab0ff;padding:3px 9px;font-size:.68rem;border:1px solid #2a3050;}
+.bsm:hover{background:#1c2236;}
+.tip{font-size:.74rem;color:#4a6090;margin-top:.4rem;font-style:italic;min-height:14px;}
+.tip.ok{color:#60cc80;}
+.tip.err{color:#e06060;}
+.tip.warn{color:#e8c040;}
+textarea{width:100%;background:#0d1020;border:1px solid #2a3050;color:#e0d8f8;padding:7px 10px;border-radius:4px;font-family:monospace;font-size:.78rem;resize:vertical;}
+textarea:focus{outline:none;border-color:#5a80c0;}
+
+/* Stats bar */
+.statsbar{display:flex;gap:.8rem;background:#0d1020;border:1px solid #2a3050;border-radius:7px;padding:.55rem .9rem;flex-wrap:wrap;align-items:center;margin-bottom:.9rem;}
+.sv{font-family:'Cinzel',serif;font-size:1rem;color:#7ab0ff;text-align:center;min-width:32px;}
+.sl{font-size:.62rem;color:#4a6090;text-transform:uppercase;letter-spacing:.07em;text-align:center;}
+.vsep{width:1px;background:#2a3050;height:24px;}
+
+/* Search & filters */
+.search-bar{display:flex;gap:7px;margin-bottom:.65rem;align-items:center;}
+.filter-row{display:flex;gap:4px;margin-bottom:.65rem;flex-wrap:wrap;}
+.fbtn{background:#0d1020;color:#4a6090;padding:3px 10px;font-size:.68rem;border:1px solid #2a3050;border-radius:3px;cursor:pointer;font-family:'Cinzel',serif;}
+.fbtn.on{background:#1a2a50;color:#7ab0ff;border-color:#3a5090;}
+
+/* Player table */
+.ptable{width:100%;border-collapse:collapse;}
+.ptable th{font-family:'Cinzel',serif;font-size:.68rem;color:#4a6090;text-transform:uppercase;letter-spacing:.06em;padding:5px 9px;border-bottom:2px solid #2a3050;text-align:left;}
+.ptable td{padding:5px 9px;border-bottom:1px solid #1a2040;font-size:.88rem;vertical-align:middle;}
+.ptable tr:hover td{background:#0f1530;}
+.ptable tr.edited td{background:#0f1a30;}
+.realm-badge{display:inline-block;font-size:.68rem;padding:2px 7px;border-radius:3px;font-family:'Cinzel',serif;font-weight:600;letter-spacing:.03em;}
+.realm-PV{background:#1a2a50;color:#7ab0ff;border:1px solid #2a4080;}
+.realm-NK{background:#1a3020;color:#60cc80;border:1px solid #2a5030;}
+.realm-MR{background:#2a1a40;color:#b080f8;border:1px solid #4a2a80;}
+.cls-badge{display:inline-block;font-size:.65rem;padding:1px 6px;border-radius:3px;color:rgba(248,248,248,0.7);}
+.inline-edit{background:#0d1020;border:1px solid #3a5090;color:#e0d8f8;padding:3px 7px;border-radius:3px;font-size:.85rem;font-family:'Crimson Pro',serif;width:100%;}
+.inline-edit:focus{outline:none;border-color:#7ab0ff;}
+.no-results{text-align:center;padding:2rem;color:#3a5080;font-style:italic;}
+
+/* Import preview */
+.preview-box{background:#0a0d18;border:1px solid #2a3050;border-radius:5px;padding:.5rem .7rem;font-size:.75rem;color:#8090c0;line-height:1.6;font-family:monospace;max-height:140px;overflow-y:auto;margin-top:.5rem;}
+
+/* Pagination */
+.pager{display:flex;align-items:center;gap:6px;margin-top:.65rem;flex-wrap:wrap;}
+.pager-btn{background:#0d1020;border:1px solid #2a3050;color:#7ab0ff;padding:3px 10px;border-radius:3px;cursor:pointer;font-family:'Cinzel',serif;font-size:.68rem;}
+.pager-btn:hover{background:#1a2a50;}
+.pager-btn:disabled{opacity:.35;cursor:default;}
+.pager-info{font-size:.72rem;color:#4a6090;}
+
+/* Class colours */
+.cls-Warrior{background:#1e3858;}
+.cls-Druid{background:#3a2000;}
+.cls-Paladin{background:#3e1848;}
+.cls-Rogue{background:#2e2e00;}
+.cls-Hunter{background:#0e2e0e;}
+.cls-Priest{background:#323232;}
+.cls-Mage{background:#0e1e3a;}
+.cls-Warlock{background:#200838;}
+.cls-Shaman{background:#0a1a30;}
+</style>
+</head>
+<body>
+<div class="app">
+<h1>Realm Database</h1>
+<div class="sub">Persistent player &rarr; server name lookup &mdash; used by the Raid Organizer for MRT export</div>
+
+<!-- Stats -->
+<div class="statsbar" id="statsBar">
+  <div><div class="sv" id="statTotal">0</div><div class="sl">Players</div></div><div class="vsep"></div>
+  <div><div class="sv" id="statPV">0</div><div class="sl">Pyrewood</div></div><div class="vsep"></div>
+  <div><div class="sv" id="statNK">0</div><div class="sl">Nethergarde</div></div><div class="vsep"></div>
+  <div><div class="sv" id="statMR">0</div><div class="sl">Mirage</div></div>
+  <div style="flex:1"></div>
+  <button class="btn bsecondary" id="bExport">&#8615; Export as .txt</button>
+  <button class="btn bdanger" id="bClearAll" style="margin-left:4px">Clear All</button>
+</div>
+
+<!-- Import -->
+<div class="card">
+  <div class="sh">Import from file <small>Paste your Name;Class;Realm Name list below (header row optional)</small></div>
+  <textarea id="importBox" rows="5" placeholder="Name;Class;Realm Name&#10;Dehuel;Warrior;PyrewoodVillage&#10;Willheim;Warrior;MirageRaceway&#10;Skallrock;Warrior;PyrewoodVillage"></textarea>
+  <div style="display:flex;gap:8px;margin-top:.55rem;align-items:center;flex-wrap:wrap;">
+    <button class="btn bprimary" id="bImport">&#8613; Import</button>
+    <label class="btn bsecondary" style="cursor:pointer">&#128194; Load file <input type="file" id="fileInput" accept=".txt,.csv" style="display:none"></label>
+    <span style="font-size:.72rem;color:#4a6090">Duplicate names will be updated, not duplicated</span>
+  </div>
+  <div class="tip" id="importTip"></div>
+  <div class="preview-box" id="importPreview" style="display:none"></div>
+</div>
+
+<!-- Add player manually -->
+<div class="card">
+  <div class="sh">Add / Edit Player</div>
+  <div class="row">
+    <input type="text" id="addName" placeholder="Player name" style="max-width:200px">
+    <select id="addCls">
+      <option value="">— Class (optional) —</option>
+      <option>Warrior</option><option>Druid</option><option>Paladin</option><option>Rogue</option>
+      <option>Hunter</option><option>Priest</option><option>Mage</option><option>Warlock</option><option>Shaman</option>
+    </select>
+    <select id="addRealm">
+      <option value="PyrewoodVillage">PyrewoodVillage</option>
+      <option value="NethergardeKeep">NethergardeKeep</option>
+      <option value="MirageRaceway">MirageRaceway</option>
+    </select>
+    <button class="btn bprimary" id="bAdd">Add / Update</button>
+  </div>
+  <div class="tip" id="addTip"></div>
+</div>
+
+<!-- Database table -->
+<div class="card">
+  <div class="sh">Database <small id="shCount"></small></div>
+  <div class="search-bar">
+    <input type="text" id="searchBox" placeholder="Search by name..." style="max-width:260px">
+    <select id="filterRealm">
+      <option value="">All realms</option>
+      <option value="PyrewoodVillage">PyrewoodVillage</option>
+      <option value="NethergardeKeep">NethergardeKeep</option>
+      <option value="MirageRaceway">MirageRaceway</option>
+    </select>
+    <select id="filterCls">
+      <option value="">All classes</option>
+      <option>Warrior</option><option>Druid</option><option>Paladin</option><option>Rogue</option>
+      <option>Hunter</option><option>Priest</option><option>Mage</option><option>Warlock</option><option>Shaman</option>
+    </select>
+    <button class="btn bsm" id="bClearFilter">Clear</button>
+  </div>
+  <div style="overflow-x:auto">
+    <table class="ptable" id="dbTable">
+      <thead><tr>
+        <th style="width:200px">Name</th>
+        <th style="width:120px">Class</th>
+        <th>Realm</th>
+        <th style="width:90px;text-align:right">Actions</th>
+      </tr></thead>
+      <tbody id="dbBody"></tbody>
+    </table>
+  </div>
+  <div class="no-results" id="noResults" style="display:none">No players found</div>
+  <div class="pager" id="pager"></div>
+</div>
+
+<!-- Usage hint -->
+<div class="card" style="border-color:#1a3050;">
+  <div class="sh" style="color:#4a6090;border-color:#1a3050">How it works</div>
+  <div style="font-size:.8rem;color:#4a6090;line-height:1.7">
+    <p>This database is stored in your browser (<code style="background:#0d1020;padding:1px 5px;border-radius:3px;color:#7ab0ff">localStorage</code>) and persists permanently on this device.</p>
+    <p style="margin-top:.4rem">When the Raid Organizer builds the MRT export, it looks up each player name here. If found, it appends <code style="background:#0d1020;padding:1px 5px;border-radius:3px;color:#7ab0ff">-RealmName</code> to their name automatically.</p>
+    <p style="margin-top:.4rem">Players whose names already contain a <code style="background:#0d1020;padding:1px 5px;border-radius:3px;color:#7ab0ff">-</code> (from Raid-Helper) are expanded using the built-in abbreviation table and are not looked up here.</p>
+    <p style="margin-top:.4rem"><strong style="color:#7ab0ff">Moving to a new device?</strong> Use the Export button to download a .txt file, then Import it on the new browser.</p>
+  </div>
+</div>
+</div>
+
+<script>
+var STORAGE_KEY='mc_realm_db_v1';
+var PAGE_SIZE=50;
+var db={};   /* name (lowercase) -> {name, cls, realm} */
+var currentPage=1;
+var filteredKeys=[];
+
+var REALM_SHORT={'PyrewoodVillage':'PV','NethergardeKeep':'NK','MirageRaceway':'MR'};
+var REALM_LABEL={'PyrewoodVillage':'Pyrewood Village','NethergardeKeep':'Nethergarde Keep','MirageRaceway':'Mirage Raceway'};
+var CLS_COL={Warrior:'#c8d8f8',Druid:'#f8a040',Paladin:'#f8b0d8',Rogue:'#e8d040',Hunter:'#70d870',Priest:'#e8e8e8',Mage:'#90d0ff',Warlock:'#b070e8',Shaman:'#60b0f0'};
+
+function load(){
+  try{var raw=localStorage.getItem(STORAGE_KEY);if(raw)db=JSON.parse(raw);}catch(e){db={};}
+  refresh();
+}
+function save(){
+  try{localStorage.setItem(STORAGE_KEY,JSON.stringify(db));}catch(e){alert('localStorage write failed: '+e.message);}
+}
+function upsert(name,cls,realm){
+  if(!name||!realm)return false;
+  var key=name.toLowerCase();
+  db[key]={name:name,cls:cls||'',realm:realm};
+  return true;
+}
+function remove(key){delete db[key];save();refresh();}
+function clearAll(){if(!confirm('Delete all '+Object.keys(db).length+' entries?'))return;db={};save();refresh();}
+
+function getFiltered(){
+  var q=(document.getElementById('searchBox').value||'').toLowerCase().trim();
+  var fRealm=document.getElementById('filterRealm').value;
+  var fCls=document.getElementById('filterCls').value;
+  var keys=Object.keys(db).sort(function(a,b){return a<b?-1:a>b?1:0;});
+  return keys.filter(function(k){
+    var e=db[k];
+    if(q&&e.name.toLowerCase().indexOf(q)===-1)return false;
+    if(fRealm&&e.realm!==fRealm)return false;
+    if(fCls&&e.cls!==fCls)return false;
+    return true;
+  });
+}
+
+function refresh(){
+  filteredKeys=getFiltered();
+  var total=Object.keys(db).length;
+  var pv=0,nk=0,mr=0;
+  Object.values(db).forEach(function(e){if(e.realm==='PyrewoodVillage')pv++;else if(e.realm==='NethergardeKeep')nk++;else if(e.realm==='MirageRaceway')mr++;});
+  document.getElementById('statTotal').textContent=total;
+  document.getElementById('statPV').textContent=pv;
+  document.getElementById('statNK').textContent=nk;
+  document.getElementById('statMR').textContent=mr;
+  document.getElementById('shCount').textContent=filteredKeys.length+' shown'+((filteredKeys.length!==total)?' of '+total:'');
+  renderPage();
+  renderPager();
+}
+
+function renderPage(){
+  var start=(currentPage-1)*PAGE_SIZE;
+  var pageKeys=filteredKeys.slice(start,start+PAGE_SIZE);
+  var body=document.getElementById('dbBody');
+  var noRes=document.getElementById('noResults');
+  if(!filteredKeys.length){body.innerHTML='';noRes.style.display='';return;}
+  noRes.style.display='none';
+
+  body.innerHTML=pageKeys.map(function(k){
+    var e=db[k];
+    var realmShort=REALM_SHORT[e.realm]||e.realm;
+    var realmClass='realm-'+realmShort;
+    var clsCol=CLS_COL[e.cls]||'#8090c0';
+    var clsBg=e.cls?('cls-'+e.cls):'';
+    return '<tr data-key="'+esc(k)+'">'
+      +'<td><strong style="color:#f8f8f8">'+esc(e.name)+'</strong></td>'
+      +'<td>'+(e.cls?'<span class="cls-badge '+clsBg+'" style="color:'+clsCol+'">'+esc(e.cls)+'</span>':'<span style="color:#3a5080;font-style:italic">—</span>')+'</td>'
+      +'<td><span class="realm-badge '+realmClass+'">'+esc(REALM_LABEL[e.realm]||e.realm)+'</span></td>'
+      +'<td style="text-align:right">'
+        +'<button class="btn bsm" data-a="edit" data-key="'+esc(k)+'" style="margin-right:4px">Edit</button>'
+        +'<button class="btn bdanger" data-a="del" data-key="'+esc(k)+'" style="padding:3px 8px;font-size:.65rem">✕</button>'
+      +'</td>'
+      +'</tr>';
+  }).join('');
+}
+
+function renderPager(){
+  var total=filteredKeys.length;
+  var pages=Math.ceil(total/PAGE_SIZE)||1;
+  if(currentPage>pages)currentPage=pages;
+  var p=document.getElementById('pager');
+  if(pages<=1){p.innerHTML='';return;}
+  var h='<button class="pager-btn" id="pgPrev" '+(currentPage===1?'disabled':'')+'>&#8592; Prev</button>';
+  h+='<span class="pager-info">Page '+currentPage+' / '+pages+' &nbsp;('+total+' results)</span>';
+  h+='<button class="pager-btn" id="pgNext" '+(currentPage===pages?'disabled':'')+'>Next &#8594;</button>';
+  p.innerHTML=h;
+  var pp=document.getElementById('pgPrev');
+  var pn=document.getElementById('pgNext');
+  if(pp)pp.addEventListener('click',function(){currentPage--;renderPage();renderPager();});
+  if(pn)pn.addEventListener('click',function(){currentPage++;renderPage();renderPager();});
+}
+
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+function tip(id,msg,type){var el=document.getElementById(id);el.textContent=msg;el.className='tip '+(type||'');}
+
+/* Import parser */
+function parseImport(text){
+  var lines=text.replace(/\r/g,'').split('\n').filter(function(l){return l.trim();});
+  var added=0,updated=0,skipped=0,errors=[];
+  lines.forEach(function(line,i){
+    /* Skip header row */
+    if(line.toLowerCase().startsWith('name;')||line.toLowerCase().startsWith('name,'))return;
+    /* Support both ; and , separators */
+    var parts=line.split(/;|,/);
+    if(parts.length<2){skipped++;return;}
+    var name=(parts[0]||'').trim();
+    var cls=(parts[1]||'').trim();
+    var realm=(parts[2]||'').trim();
+    if(!name){skipped++;return;}
+    /* Normalise realm */
+    if(!realm){
+      /* Try to extract from name like Dehuel-PyrewoodVillage */
+      var dash=name.indexOf('-');
+      if(dash>0){realm=name.substring(dash+1);name=name.substring(0,dash);}
+    }
+    realm=normaliseRealm(realm);
+    if(!realm){errors.push('Line '+(i+1)+': unknown realm "'+parts[2]+'" for "'+name+'"');skipped++;return;}
+    cls=normaliseCls(cls);
+    var key=name.toLowerCase();
+    var existed=!!db[key];
+    upsert(name,cls,realm);
+    if(existed)updated++;else added++;
+  });
+  save();refresh();
+  return {added,updated,skipped,errors};
+}
+
+function normaliseRealm(r){
+  r=(r||'').trim();
+  var map={
+    'pyrewoodvillage':'PyrewoodVillage','pyrewood village':'PyrewoodVillage','pyrewood':'PyrewoodVillage','pv':'PyrewoodVillage',
+    'nethergardeKeep':'NethergardeKeep','nethergarde keep':'NethergardeKeep','nethergarde':'NethergardeKeep','nk':'NethergardeKeep','nethergardeep':'NethergardeKeep',
+    'mirageraceway':'MirageRaceway','mirage raceway':'MirageRaceway','mirage':'MirageRaceway','mr':'MirageRaceway'
+  };
+  return map[r.toLowerCase()]||null;
+}
+function normaliseCls(c){
+  var map={warrior:'Warrior',druid:'Druid',paladin:'Paladin',rogue:'Rogue',hunter:'Hunter',priest:'Priest',mage:'Mage',warlock:'Warlock',shaman:'Shaman'};
+  return map[(c||'').toLowerCase()]||c||'';
+}
+
+/* Edit inline */
+function startEdit(key){
+  var e=db[key];if(!e)return;
+  var row=document.querySelector('tr[data-key="'+key+'"]');if(!row)return;
+  row.classList.add('edited');
+  var realmOpts=['PyrewoodVillage','NethergardeKeep','MirageRaceway'].map(function(r){
+    return '<option value="'+r+'"'+(e.realm===r?' selected':'')+'>'+REALM_LABEL[r]+'</option>';
+  }).join('');
+  var clsOpts=['','Warrior','Druid','Paladin','Rogue','Hunter','Priest','Mage','Warlock','Shaman'].map(function(c){
+    return '<option value="'+c+'"'+(e.cls===c?' selected':'')+'>'+( c||'— none —')+'</option>';
+  }).join('');
+  row.innerHTML='<td><input class="inline-edit" id="ei_name" value="'+esc(e.name)+'" style="max-width:180px"></td>'
+    +'<td><select class="inline-edit" id="ei_cls">'+clsOpts+'</select></td>'
+    +'<td><select class="inline-edit" id="ei_realm">'+realmOpts+'</select></td>'
+    +'<td style="text-align:right">'
+      +'<button class="btn bprimary" data-a="save" data-key="'+esc(key)+'" style="margin-right:4px;font-size:.65rem;padding:3px 9px">Save</button>'
+      +'<button class="btn bsm" data-a="cancel" data-key="'+esc(key)+'" style="font-size:.65rem;padding:3px 9px">Cancel</button>'
+    +'</td>';
+}
+function saveEdit(key){
+  var name=(document.getElementById('ei_name').value||'').trim();
+  var cls=document.getElementById('ei_cls').value;
+  var realm=document.getElementById('ei_realm').value;
+  if(!name){alert('Name cannot be empty');return;}
+  /* If name changed, remove old key */
+  if(name.toLowerCase()!==key){delete db[key];}
+  upsert(name,cls,realm);
+  save();refresh();
+}
+
+/* Event delegation */
+document.getElementById('dbBody').addEventListener('click',function(e){
+  var btn=e.target.closest('[data-a]');if(!btn)return;
+  var a=btn.dataset.a,key=btn.dataset.key;
+  if(a==='del'){if(confirm('Remove "'+db[key].name+'"?')){remove(key);}}
+  else if(a==='edit'){startEdit(key);}
+  else if(a==='save'){saveEdit(key);}
+  else if(a==='cancel'){refresh();}
+});
+
+/* Add player */
+document.getElementById('bAdd').addEventListener('click',function(){
+  var name=document.getElementById('addName').value.trim();
+  var cls=document.getElementById('addCls').value;
+  var realm=document.getElementById('addRealm').value;
+  if(!name){tip('addTip','Please enter a player name','err');return;}
+  var existed=!!db[name.toLowerCase()];
+  upsert(name,cls,realm);
+  save();refresh();
+  document.getElementById('addName').value='';
+  tip('addTip',(existed?'Updated':'Added')+': '+name+' \u2192 '+realm,'ok');
+  /* Scroll to and highlight */
+  document.getElementById('searchBox').value=name;
+  currentPage=1;refresh();
+});
+document.getElementById('addName').addEventListener('keydown',function(e){if(e.key==='Enter')document.getElementById('bAdd').click();});
+
+/* Search & filter */
+['searchBox','filterRealm','filterCls'].forEach(function(id){
+  document.getElementById(id).addEventListener('input',function(){currentPage=1;refresh();});
+});
+document.getElementById('bClearFilter').addEventListener('click',function(){
+  document.getElementById('searchBox').value='';
+  document.getElementById('filterRealm').value='';
+  document.getElementById('filterCls').value='';
+  currentPage=1;refresh();
+});
+
+/* Import */
+document.getElementById('bImport').addEventListener('click',function(){
+  var text=document.getElementById('importBox').value.trim();
+  if(!text){tip('importTip','Paste your data first','err');return;}
+  var r=parseImport(text);
+  var msg='Imported: '+r.added+' added, '+r.updated+' updated, '+r.skipped+' skipped';
+  if(r.errors.length)msg+=' — '+r.errors.length+' error(s)';
+  tip('importTip',msg,r.errors.length?'warn':'ok');
+  var prev=document.getElementById('importPreview');
+  if(r.errors.length){prev.style.display='';prev.textContent=r.errors.join('\n');}
+  else{prev.style.display='none';}
+});
+
+/* File load */
+document.getElementById('fileInput').addEventListener('change',function(e){
+  var file=e.target.files[0];if(!file)return;
+  var reader=new FileReader();
+  reader.onload=function(ev){
+    document.getElementById('importBox').value=ev.target.result;
+    tip('importTip','File loaded — click Import to apply','ok');
+  };
+  reader.readAsText(file,'UTF-8');
+  e.target.value='';
+});
+
+/* Export */
+document.getElementById('bExport').addEventListener('click',function(){
+  var keys=Object.keys(db).sort();
+  var lines=['Name;Class;Realm Name'];
+  keys.forEach(function(k){var e=db[k];lines.push(e.name+';'+(e.cls||'')+';'+e.realm);});
+  var blob=new Blob([lines.join('\n')],{type:'text/plain;charset=utf-8'});
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='realm-database.txt';
+  a.click();
+  URL.revokeObjectURL(a.href);
+});
+
+/* Clear all */
+document.getElementById('bClearAll').addEventListener('click',clearAll);
+
+/* Expose DB for use by main window */
+window.getRealmDb=function(){return db;};
+window.lookupRealm=function(name){
+  var e=db[(name||'').toLowerCase()];
+  return e?e.realm:null;
+};
+
+load();
+</script>
+</body>
+</html>
