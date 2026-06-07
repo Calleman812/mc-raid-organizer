@@ -523,6 +523,8 @@ function buildMRTForBoss(bossId,homeRealm){
   if(!n.length)return '';
   return '"'+n.join('\n')+'"';
 }
+
+function pbar(p,isDup,rmAction,rmExtra){
   var c=cd(p.cls);
   var rm=rmAction?'<button class="bx" data-a="'+rmAction+'" '+(rmExtra||'')+'>x</button>':'';
   return '<div style="background:'+c.bg+';border:2px solid '+c.bd+';border-radius:5px;padding:4px 8px;display:flex;align-items:center;gap:6px;flex:1;min-width:0">'
@@ -1092,6 +1094,7 @@ function sortBenched(){
 }
 
 /* ── Unified click handler ── */
+var _goActiveBid=null,_goActiveSlot=-1;
 document.addEventListener('click',function(e){
   var t=e.target;
   var tabEl=t.closest?t.closest('.tab'):null;
@@ -1117,6 +1120,30 @@ document.addEventListener('click',function(e){
   if(a==='rbs'){if(bossData[el.dataset.bid])bossData[el.dataset.bid][el.dataset.key]=null;rAll();return;}
   if(a==='copyTrash'){var box=document.getElementById('trashExpBox');if(box)navigator.clipboard.writeText(box.textContent.replace(/ !/g,'')).catch(function(){});return;}
   if(a==='copyBoss'){var box2=document.getElementById('bossExpBox_'+el.dataset.bid);if(box2)navigator.clipboard.writeText(box2.textContent).catch(function(){});return;}
+  if(a==='goSlotClick'){
+    var bid=el.dataset.bid,goi=+el.dataset.goi;
+    _goActiveBid=bid;_goActiveSlot=goi;
+    var wrap=document.getElementById('goPickerWrap_'+bid);
+    var lbl=document.getElementById('goPickerSlotLbl_'+bid);
+    if(wrap){wrap.style.display='block';if(lbl)lbl.textContent=goi+1;}
+    return;
+  }
+  if(a==='goPickGroup'){
+    var bid2=el.dataset.bid,grpIdx=+el.dataset.grpidx;
+    if(!groupOrderData[bid2])groupOrderData[bid2]=[0,1,2,3,4,5,6,7];
+    if(_goActiveSlot>=0)groupOrderData[bid2][_goActiveSlot]=grpIdx;
+    var wrap2=document.getElementById('goPickerWrap_'+bid2);
+    if(wrap2)wrap2.style.display='none';
+    _goActiveBid=null;_goActiveSlot=-1;
+    rAll();return;
+  }
+  if(a==='resetGroupOrder'){
+    var bid3=el.dataset.bid;
+    groupOrderData[bid3]=[0,1,2,3,4,5,6,7];
+    var wrap3=document.getElementById('goPickerWrap_'+bid3);
+    if(wrap3)wrap3.style.display='none';
+    rAll();return;
+  }
 });
 
 document.addEventListener('input',function(e){
@@ -1236,43 +1263,6 @@ document.getElementById('bClear').addEventListener('click',function(){
 document.querySelectorAll('.raid-sel-btn').forEach(function(btn){
   btn.addEventListener('click',function(){switchRaid(btn.dataset.raid);});
 });
-
-/* Group order interactions (delegated) */
-var _goActiveBid=null,_goActiveSlot=-1;
-document.addEventListener('click',function(e){
-  var el=e.target.closest('[data-a]');if(!el)return;
-  var a=el.dataset.a;
-
-  if(a==='goSlotClick'){
-    var bid=el.dataset.bid,goi=+el.dataset.goi;
-    _goActiveBid=bid;_goActiveSlot=goi;
-    var wrap=document.getElementById('goPickerWrap_'+bid);
-    var lbl=document.getElementById('goPickerSlotLbl_'+bid);
-    if(wrap){
-      var showing=wrap.style.display!=='none'&&_goActiveBid===bid;
-      /* Always show, update label */
-      wrap.style.display='block';
-      if(lbl)lbl.textContent=goi+1;
-    }
-    return;
-  }
-  if(a==='goPickGroup'){
-    var bid2=el.dataset.bid,grpIdx=+el.dataset.grpidx;
-    if(!groupOrderData[bid2])groupOrderData[bid2]=[0,1,2,3,4,5,6,7];
-    groupOrderData[bid2][_goActiveSlot]=grpIdx;
-    var wrap2=document.getElementById('goPickerWrap_'+bid2);
-    if(wrap2)wrap2.style.display='none';
-    _goActiveBid=null;_goActiveSlot=-1;
-    rAll();return;
-  }
-  if(a==='resetGroupOrder'){
-    var bid3=el.dataset.bid;
-    groupOrderData[bid3]=[0,1,2,3,4,5,6,7];
-    var wrap3=document.getElementById('goPickerWrap_'+bid3);
-    if(wrap3)wrap3.style.display='none';
-    rAll();return;
-  }
-},true); /* capture phase so it fires before other handlers */
 
 /* Boss-specific MRT copy buttons */
 document.addEventListener('click',function(e){
