@@ -206,9 +206,15 @@ textarea{width:100%;background:#0d1020;border:1px solid #2a3050;color:#e0d8f8;pa
         <div class="tabs" id="bossTabsRow"></div>
         <div class="tab-content" id="bossTabContent"></div>
       </div>
-      <div style="background:#100c05;border:1px solid #3a2a08;border-radius:8px;padding:.75rem;">
-        <div class="sectitle" style="margin-bottom:.4rem">MRT Group Export <button class="btn bsm" id="bCopyMRT">Copy for MRT</button></div>
-        <div style="font-size:.68rem;color:#7a6030;margin-bottom:.4rem;font-style:italic">Paste into MRT addon import field</div>
+      <div style="background:#131726;border:1px solid #2a3050;border-radius:8px;padding:.75rem;">
+        <div class="sectitle" style="margin-bottom:.5rem">MRT Group Export</div>
+        <div style="font-size:.72rem;color:#4a6090;margin-bottom:.6rem">Select your server — your realm suffix is omitted, others are appended.</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:.55rem">
+          <button class="btn bsm mrt-server-btn" data-realm="PyrewoodVillage" id="bMrtPV" style="font-size:.72rem;padding:4px 12px">Copy — Pyrewood Village</button>
+          <button class="btn bsm mrt-server-btn" data-realm="NethergardeKeep" id="bMrtNK" style="font-size:.72rem;padding:4px 12px">Copy — Nethergarde Keep</button>
+          <button class="btn bsm mrt-server-btn" data-realm="MirageRaceway" id="bMrtMR" style="font-size:.72rem;padding:4px 12px">Copy — Mirage Raceway</button>
+        </div>
+        <div style="font-size:.65rem;color:#4a6090;margin-bottom:.35rem;font-style:italic" id="mrtLabel">Click a button above to generate the export for your server</div>
         <div class="expbox" id="mrtBox"></div>
       </div>
     </div>
@@ -528,7 +534,25 @@ function showUI(){document.getElementById('statsWrap').style.display='block';}
 function setBan(l){document.getElementById('banLbl').textContent=l;document.getElementById('banner').className='banner on';}
 function hideBan(){document.getElementById('banner').className='banner';}
 function ihtml(cls,sz,role){sz=sz||18;var svg=(role==='tank')?TANK_ICON:(ISVG[cls]||ISVG.Warrior);return '<span style="display:inline-block;width:'+sz+'px;height:'+sz+'px;flex-shrink:0;vertical-align:middle">'+svg+'</span>';}
-function buildMRT(){var n=[];for(var gi=0;gi<groups.length;gi++){var g=groups[gi];for(var j=0;j<g.slots.length;j++)if(g.slots[j].p)n.push(expandRealm(g.slots[j].p.name));}if(!n.length)return '';return '"'+n.join('\n')+'"';}
+function buildMRT(homeRealm){
+  var n=[];
+  for(var gi=0;gi<groups.length;gi++){
+    var g=groups[gi];
+    for(var j=0;j<g.slots.length;j++){
+      if(g.slots[j].p){
+        var expanded=expandRealm(g.slots[j].p.name);
+        /* Strip the home realm suffix — home players need no suffix in MRT */
+        if(homeRealm){
+          var suffix='-'+homeRealm;
+          if(expanded.endsWith(suffix))expanded=expanded.slice(0,expanded.length-suffix.length);
+        }
+        n.push(expanded);
+      }
+    }
+  }
+  if(!n.length)return '';
+  return '"'+n.join('\n')+'"';
+}
 
 function pbar(p,isDup,rmAction,rmExtra){
   var c=cd(p.cls);
@@ -734,7 +758,10 @@ function rGroups(){
   }
   document.getElementById('benchedDisplay').innerHTML=bh;
 
-  document.getElementById('mrtBox').textContent=buildMRT();
+  /* Re-render MRT box with the last chosen server realm if one was selected */
+  var mrtBox=document.getElementById('mrtBox');
+  var activeRealm=mrtBox?mrtBox.dataset.realm:'';
+  if(mrtBox)mrtBox.textContent=activeRealm?buildMRT(activeRealm):'';
 }
 
 function rBossTabs(){
@@ -953,7 +980,9 @@ function parseRHJson(data){
     var s=signUps[i];
     var rawCls=(s.cClassName||s.className||'').toLowerCase();
     var rawSpec=(s.cSpecName||s.specName||'').replace(/\d+$/,'');
-    var pname=s.name||'Unknown';
+    /* Strip known server suffixes from the display name — MRT export re-adds them via expandRealm */
+    var rawName=s.name||'Unknown';
+    var pname=rawName.replace(/-(PyrewoodVillage|NethergardeKeep|MirageRaceway|PV|MR|NK)$/i,'');
     var pid='rh'+i;
     var pos=s.position||9999;
 
@@ -1179,7 +1208,28 @@ document.getElementById('bClear').addEventListener('click',function(){
   document.getElementById('logbox').style.display='none';
   rAll();
 });
-document.getElementById('bCopyMRT').addEventListener('click',function(){navigator.clipboard.writeText(document.getElementById('mrtBox').textContent).catch(function(){});});
+/* MRT export — one button per server */
+var REALM_LABELS={'PyrewoodVillage':'Pyrewood Village','NethergardeKeep':'Nethergarde Keep','MirageRaceway':'Mirage Raceway'};
+document.querySelectorAll('.mrt-server-btn').forEach(function(btn){
+  btn.addEventListener('click',function(){
+    var realm=btn.dataset.realm;
+    var text=buildMRT(realm);
+    var box=document.getElementById('mrtBox');
+    box.textContent=text;
+    box.dataset.realm=realm; /* remember for re-renders */
+    /* Highlight active button */
+    document.querySelectorAll('.mrt-server-btn').forEach(function(b){
+      b.style.background='';b.style.color='';b.style.borderColor='';b.style.fontWeight='';
+    });
+    btn.style.background='#1a3a80';btn.style.color='#c8d8ff';btn.style.borderColor='#3a6ae0';btn.style.fontWeight='600';
+    document.getElementById('mrtLabel').textContent='Exporting as '+(REALM_LABELS[realm]||realm)+' member — your server suffix is omitted. Click to copy and paste into MRT.';
+    navigator.clipboard.writeText(text).catch(function(){});
+    /* Brief visual feedback */
+    var orig=btn.textContent;
+    btn.textContent='Copied!';
+    setTimeout(function(){btn.textContent=orig;},1400);
+  });
+});
 document.getElementById('bAdd').addEventListener('click',function(){
   var c=document.getElementById('mCls').value,sp=(CLS[c]||{sp:[]}).sp,h='';
   for(var i=0;i<sp.length;i++)h+='<option>'+sp[i]+'</option>';
