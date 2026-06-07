@@ -26,6 +26,8 @@ select option{background:#131726;}
 .btn{font-family:'Cinzel',serif;cursor:pointer;border-radius:4px;letter-spacing:.04em;transition:background .15s;}
 .bfire{background:#1a3a80;color:#c8d8ff;padding:6px 15px;font-size:.76rem;border:1px solid #3a6ae0;}
 .bfire:hover{background:#2a4a90;}
+.bsecondary{background:#1a2050;color:#9ab8ff;padding:5px 13px;font-size:.74rem;border:1px solid #2a3a80;cursor:pointer;border-radius:4px;font-family:'Cinzel',serif;letter-spacing:.04em;transition:background .15s;}
+.bsecondary:hover{background:#222a60;}
 .bgold{background:#1c2236;color:#7ab0ff;padding:5px 13px;font-size:.74rem;border:1px solid #2a3a70;}
 .bgold:hover{background:#222a44;}
 .bsm{background:#131726;color:#7ab0ff;padding:3px 9px;font-size:.7rem;border:1px solid #2a3050;}
@@ -38,7 +40,7 @@ select option{background:#131726;}
 .sv{font-family:'Cinzel',serif;font-size:1.1rem;color:#7ab0ff;text-align:center;}
 .sl{font-size:.65rem;color:#4a6090;text-transform:uppercase;letter-spacing:.07em;text-align:center;}
 .vsep{width:1px;background:#2a3050;height:28px;}
-.layout{display:grid;grid-template-columns:220px 1fr;gap:.85rem;align-items:start;}
+.layout{display:grid;grid-template-columns:280px 1fr;gap:.85rem;align-items:start;}
 .pool{background:#131726;border:1px solid #2a3050;border-radius:8px;padding:.7rem;max-height:84vh;overflow-y:auto;position:sticky;top:0;will-change:transform;transform:translateZ(0);contain:layout style;}
 .pool::-webkit-scrollbar{width:3px;}
 .pool::-webkit-scrollbar-thumb{background:#2a3a70;}
@@ -153,6 +155,7 @@ textarea{width:100%;background:#0d1020;border:1px solid #2a3050;color:#e0d8f8;pa
     <button class="btn bgold" id="bDemo">Load Demo</button>
     <button class="btn bgold" id="bAdd">+ Add Player</button>
     <button class="btn bfire" id="bShare">&#128279; Share View</button>
+    <button class="btn bsecondary" id="bRealmDb" style="background:#1a2050;color:#9ab8ff;border-color:#2a3a80" title="Open the player realm database in a new tab">&#127760; Realm DB</button>
   </div>
   <div class="tip" id="tip"></div>
 </div>
@@ -218,12 +221,12 @@ textarea{width:100%;background:#0d1020;border:1px solid #2a3050;color:#e0d8f8;pa
 var TANK_ICON='<svg viewBox="0 0 20 20"><rect width="20" height="20" rx="3" fill="#1e3858"/><path d="M10 2L17 5V10C17 14 13.5 17.5 10 18.5C6.5 17.5 3 14 3 10V5Z" fill="#3a7ab0" stroke="#c8d8f8" stroke-width="1"/><path d="M7 10L9 12L13 8" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>';
 var ISVG={
   /* Warrior DPS: two crossed swords */
-  Warrior:'<svg viewBox="0 0 20 20"><rect width="20" height="20" rx="3" fill="#1a2535"/><line x1="3" y1="17" x2="17" y2="3" stroke="#c8d8f8" stroke-width="2" stroke-linecap="round"/><line x1="17" y1="17" x2="3" y2="3" stroke="#c8d8f8" stroke-width="2" stroke-linecap="round"/><rect x="8.5" y="8.5" width="3" height="3" rx="0.5" fill="#c8d8f8"/></svg>',
+  Warrior:'<svg viewBox="0 0 20 20"><rect width="20" height="20" rx="3" fill="#1a2535"/><!-- blade 1: top-left to bottom-right --><line x1="4" y1="4" x2="16" y2="16" stroke="#c8d8f8" stroke-width="1.8" stroke-linecap="round"/><!-- hilt 1 crossguard --><line x1="2" y1="7" x2="7" y2="2" stroke="#c8d8f8" stroke-width="1.4" stroke-linecap="round"/><!-- blade 2: top-right to bottom-left --><line x1="16" y1="4" x2="4" y2="16" stroke="#c8d8f8" stroke-width="1.8" stroke-linecap="round"/><!-- hilt 2 crossguard --><line x1="18" y1="7" x2="13" y2="2" stroke="#c8d8f8" stroke-width="1.4" stroke-linecap="round"/><!-- grip 1 --><line x1="15" y1="15" x2="18" y2="18" stroke="#8898b8" stroke-width="1.6" stroke-linecap="round"/><!-- grip 2 --><line x1="5" y1="15" x2="2" y2="18" stroke="#8898b8" stroke-width="1.6" stroke-linecap="round"/><!-- centre cross jewel --><circle cx="10" cy="10" r="1.2" fill="#c8d8f8"/></svg>',
   /* Druid: Triquetra */
   Druid:'<svg viewBox="0 0 20 20"><rect width="20" height="20" rx="3" fill="#2a1505"/><path d="M10 4 C10 4 7 4 5.5 6.5 C4 9 5.5 11.5 7.5 12.5 C5.5 12.5 3.5 13.5 3.5 15.5 L16.5 15.5 C16.5 13.5 14.5 12.5 12.5 12.5 C14.5 11.5 16 9 14.5 6.5 C13 4 10 4 10 4 Z" fill="none" stroke="#f8a040" stroke-width="1.4" stroke-linejoin="round"/><circle cx="10" cy="15.5" r="1" fill="#f8a040"/></svg>',
   /* Paladin: plate helmet */
   Paladin:'<svg viewBox="0 0 20 20"><rect width="20" height="20" rx="3" fill="#2a1530"/><path d="M5 9 C5 5 7.5 3 10 3 C12.5 3 15 5 15 9 L15 14 C15 15.5 13.5 17 10 17 C6.5 17 5 15.5 5 14 Z" fill="none" stroke="#f8b0d8" stroke-width="1.4"/><rect x="7" y="10" width="6" height="2.5" rx="0.5" fill="#f8b0d8"/><line x1="5" y1="9" x2="15" y2="9" stroke="#f8b0d8" stroke-width="1.2"/></svg>',
-  Rogue:'<svg viewBox="0 0 20 20"><rect width="20" height="20" rx="3" fill="#201e00"/><path d="M4 17L15 4L17 6L10 14L13 14L11 18L5 19Z" fill="#e8d040"/></svg>',
+  Rogue:'<svg viewBox="0 0 20 20"><rect width="20" height="20" rx="3" fill="#201e00"/><!-- blade --><path d="M11 3 L13 5 L8 14 L7 13 Z" fill="#e8d040"/><!-- tip gleam --><path d="M11 3 L12 4 L11.5 3.5 Z" fill="#fff8a0"/><!-- crossguard --><rect x="5.5" y="13" width="8" height="1.5" rx="0.5" fill="#c8b820"/><!-- grip --><rect x="7.5" y="14.5" width="4" height="3" rx="1" fill="#9a8818"/><!-- pommel --><circle cx="9.5" cy="18" r="1.2" fill="#c8b820"/></svg>',
   Hunter:'<svg viewBox="0 0 20 20"><rect width="20" height="20" rx="3" fill="#082008"/><path d="M3 10A7 7 0 0 1 17 10" stroke="#70d870" stroke-width="2" fill="none"/><path d="M10 3L10 17M6 7L14 13M14 7L6 13" stroke="#70d870" stroke-width="1.5" stroke-linecap="round"/></svg>',
   Priest:'<svg viewBox="0 0 20 20"><rect width="20" height="20" rx="3" fill="#2a2a2a"/><path d="M10 2L10 18M4 8L16 8" stroke="#e8e8e8" stroke-width="2.5" stroke-linecap="round"/></svg>',
   /* Mage: flame */
@@ -481,7 +484,24 @@ function sortPlayers(){
     return a.name.toLowerCase()<b.name.toLowerCase()?-1:1;
   });
 }
-function expandRealm(n){return n.replace(/-PV$/,'-PyrewoodVillage').replace(/-MR$/,'-MirageRaceway').replace(/-NK$/,'-NethergardeKeep');}
+function expandRealm(n){
+  /* First expand known abbreviations from Raid-Helper */
+  var expanded=n.replace(/-PV$/,'-PyrewoodVillage').replace(/-MR$/,'-MirageRaceway').replace(/-NK$/,'-NethergardeKeep');
+  /* If name still has no server suffix, look it up in the realm database */
+  if(expanded.indexOf('-')===-1){
+    try{
+      var raw=localStorage.getItem('mc_realm_db_v1');
+      if(raw){
+        var dbData=JSON.parse(raw);
+        /* Strip any realm suffix from the bare name before lookup */
+        var bareName=expanded.split('-')[0];
+        var entry=dbData[bareName.toLowerCase()];
+        if(entry&&entry.realm)expanded=bareName+'-'+entry.realm;
+      }
+    }catch(e){}
+  }
+  return expanded;
+}
 function mkG(){groups=[];for(var i=0;i<8;i++){var s=[];for(var j=0;j<5;j++)s.push({p:null});groups.push({id:i+1,slots:s});}}
 function mkMarks(){
   trashMarks=TRASH_MARKS.map(function(m){return{name:m.name,col:m.col,tank:null,healer:null};});
@@ -679,7 +699,16 @@ function rGroups(){
     h+='<div class="gc"><div class="gh"><span>Group '+g.id+'</span><span class="ghint">'+(GHINTS[gi]||'')+'</span><span class="gcnt">'+filled+'/5</span></div><div class="gs">';
     for(var si=0;si<g.slots.length;si++){
       var s=g.slots[si],pick=sel&&sel.t==='g'&&sel.gi===gi&&sel.si===si;
-      if(s.p){var c=cd(s.p.cls);h+='<div class="sf" style="border:2px solid '+c.bd+'"><div class="sb" style="background:'+c.bg+'">'+ihtml(s.p.cls,16,s.p.role)+'<span class="sname" style="color:#f8f8f8">'+he(s.p.name)+'</span><span class="smeta" style="color:rgba(248,248,248,0.55)">'+he(s.p.spec||'')+'</span><button class="bx" data-a="rmg" data-gi="'+gi+'" data-si="'+si+'">x</button></div></div>';}
+      if(s.p){
+        var c=cd(s.p.cls);
+        var isLate=lateList.some(function(x){return x.id===s.p.id;}) || (originalStatus[s.p.id]==='late');
+        h+='<div class="sf" style="border:2px solid '+c.bd+'"><div class="sb" style="background:'+c.bg+'">'+ihtml(s.p.cls,16,s.p.role)
+          +'<span class="sname" style="color:#f8f8f8">'+he(s.p.name)+'</span>'
+          +(isLate?'<span style="font-size:.58rem;background:#1a2a00;color:#e8c040;border:1px solid #4a5010;border-radius:3px;padding:1px 4px;white-space:nowrap;flex-shrink:0">Late</span>':'')
+          +'<span class="smeta" style="color:rgba(248,248,248,0.55)">'+he(s.p.spec||'')+'</span>'
+          +'<button class="bx" data-a="rmg" data-gi="'+gi+'" data-si="'+si+'">x</button>'
+          +'</div></div>';
+      }
       else h+='<div class="se'+(pick?' picking':'')+'" data-a="sg" data-gi="'+gi+'" data-si="'+si+'">+ click to assign</div>';
     }
     h+='</div></div>';
@@ -1205,6 +1234,9 @@ document.getElementById('bShare').addEventListener('click',function(){
   document.getElementById('shareUrl').value=url;
   document.getElementById('shareModal').className='modal-wrap on';
 });
+document.getElementById('bRealmDb').addEventListener('click',function(){
+  window.open('realm-db.html','mc-realm-db','width=1050,height=750,resizable=yes,scrollbars=yes');
+});
 document.getElementById('bShareClose').addEventListener('click',function(){document.getElementById('shareModal').className='modal-wrap';});
 document.getElementById('bCopyShareUrl').addEventListener('click',function(){
   var inp=document.getElementById('shareUrl');
@@ -1368,10 +1400,12 @@ function renderViewMode(data){
   var viewData=params.get('view');
   if(!viewData)return;
 
-  var data=decodePayload(viewData);
-  if(!data){document.body.innerHTML='<div style="color:#c04030;padding:2rem;font-family:sans-serif">Invalid view link.</div>';return;}
+  /* Hide the main app immediately so nothing flashes before document.write */
+  document.documentElement.style.visibility='hidden';
 
-  /* Inject ISVG/TANK_ICON/CLS/MARK_SYMS/MARK_COLS/TRASH_MARKS/BOSSES/ihtml/cd/he into the rendered page directly */
+  var data=decodePayload(viewData);
+  if(!data){document.body.innerHTML='<div style="color:#e06060;padding:2rem;font-family:sans-serif;background:#0a0d18;min-height:100vh">Invalid view link.</div>';return;}
+
   var html=renderViewMode(data);
   document.open();document.write(html);document.close();
 })();
