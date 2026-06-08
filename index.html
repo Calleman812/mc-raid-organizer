@@ -1584,14 +1584,35 @@ function renderViewMode(data){
   var viewData=params.get('view');
   if(!viewData)return;
 
-  /* Hide the main app immediately so nothing flashes before document.write */
+  /* Hide main UI immediately */
   document.documentElement.style.visibility='hidden';
 
-  var data=decodePayload(viewData);
-  if(!data){document.body.innerHTML='<div style="color:#e06060;padding:2rem;font-family:sans-serif;background:#0a0d18;min-height:100vh">Invalid view link.</div>';return;}
-
-  var html=renderViewMode(data);
-  document.open();document.write(html);document.close();
+  /* Defer so the script finishes executing before we replace the page */
+  setTimeout(function(){
+    var data=decodePayload(viewData);
+    if(!data){
+      document.documentElement.style.visibility='';
+      document.body.innerHTML='<div style="color:#e06060;padding:2rem;font-family:sans-serif;background:#0a0d18;min-height:100vh;font-size:1.2rem">Invalid or expired view link.</div>';
+      return;
+    }
+    var html=renderViewMode(data);
+    /* Use DOMParser to safely replace the whole document */
+    try{
+      var parser=new DOMParser();
+      var newDoc=parser.parseFromString(html,'text/html');
+      /* Replace head */
+      document.head.innerHTML=newDoc.head.innerHTML;
+      /* Replace body */
+      document.body.innerHTML=newDoc.body.innerHTML;
+      document.documentElement.style.visibility='';
+      document.title=newDoc.title||'Raid View';
+    }catch(e){
+      /* Fallback: blob URL redirect */
+      var blob=new Blob([html],{type:'text/html'});
+      var url=URL.createObjectURL(blob);
+      window.location.replace(url);
+    }
+  },0);
 })();
 
 mkG();mkMarks();
