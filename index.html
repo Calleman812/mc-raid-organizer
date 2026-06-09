@@ -1090,9 +1090,9 @@ function parseRHJson(data){
 
     /* Late — has a real class/spec */
     if(rawCls==='late'){
-      var lateCls=CLSMAP[(s.cClassName||'').toLowerCase()]||'Warrior';
-      var lateRealCls=CLSMAP[rawCls]||'Warrior';
       var lateSpec=rawSpec;
+      var LATE_SPEC_MAP={protection:'Warrior',arms:'Warrior',fury:'Warrior',restoration:'Druid',balance:'Druid',feral:'Druid',holy:'Priest',discipline:'Priest',shadow:'Priest',holy1:'Paladin',retribution:'Paladin',protection1:'Paladin',assassination:'Rogue',combat:'Rogue',subtlety:'Rogue',beastmastery:'Hunter',marksmanship:'Hunter',survival:'Hunter',arcane:'Mage',fire:'Mage',frost:'Mage',affliction:'Warlock',demonology:'Warlock',destruction:'Warlock',elemental:'Shaman',enhancement:'Shaman',restoration1:'Shaman'};
+      var lateRealCls=LATE_SPEC_MAP[lateSpec.toLowerCase().replace(/\d+$/,'')]||CLSMAP[(s.cRoleName||'').toLowerCase()]||'Warrior';
       var lateRole=deriveRole(lateRealCls,lateSpec);
       var lp={id:pid,name:pname,cls:lateRealCls,spec:lateSpec,role:lateRole,pos:pos};
       lateList.push(lp);
@@ -1103,12 +1103,31 @@ function parseRHJson(data){
     /* Bench */
     if(rawCls==='bench'){
       var bRole=(s.cRoleName||s.roleName||'').toLowerCase();
-      var bCls='Warrior';
-      if(bRole==='healers')bCls='Priest';
-      else if(bRole==='tanks')bCls='Warrior';
-      else if(bRole==='ranged')bCls='Mage';
-      else if(bRole==='melee')bCls='Warrior';
       var bSpec=rawSpec;
+      /* Try to infer class from specName first — more accurate than role alone */
+      var SPEC_TO_CLS={
+        'protection':'Warrior','arms':'Warrior','fury':'Warrior',
+        'restoration':'Druid',  /* could be Druid or Shaman — spec emote disambiguates but we don't have it; default Druid as more common */
+        'balance':'Druid','feral':'Druid',
+        'holy':'Priest','discipline':'Priest','shadow':'Priest',
+        'holy1':'Paladin','retribution':'Paladin','protection1':'Paladin',
+        'assassination':'Rogue','combat':'Rogue','subtlety':'Rogue',
+        'beastmastery':'Hunter','marksmanship':'Hunter','survival':'Hunter',
+        'arcane':'Mage','fire':'Mage','frost':'Mage',
+        'affliction':'Warlock','demonology':'Warlock','destruction':'Warlock',
+        'elemental':'Shaman','enhancement':'Shaman','restoration1':'Shaman'
+      };
+      var specKey=bSpec.toLowerCase().replace(/\d+$/,'');
+      var bCls=SPEC_TO_CLS[specKey]||null;
+      /* Cross-check: if spec says 'restoration' check roleName + specEmoteId for Druid vs Shaman */
+      if(!bCls){
+        /* Fall back to role */
+        if(bRole==='healers')bCls='Priest';
+        else if(bRole==='tanks')bCls='Warrior';
+        else if(bRole==='ranged')bCls='Mage';
+        else if(bRole==='melee')bCls='Warrior';
+        else bCls='Warrior';
+      }
       var bRoleDerived=deriveRole(bCls,bSpec);
       benched.push({id:pid,name:pname,cls:bCls,spec:bSpec,role:bRoleDerived,isBench:true,pos:pos});
       originalStatus[pid]='bench';
