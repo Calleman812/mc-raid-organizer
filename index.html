@@ -483,6 +483,53 @@ function mkMarks(){
   });
 }
 function aset(){var s={};for(var i=0;i<groups.length;i++)for(var j=0;j<groups[i].slots.length;j++)if(groups[i].slots[j].p)s[groups[i].slots[j].p.id]=1;return s;}
+
+/* Returns set of player IDs already assigned on the current boss tab,
+   excluding the slot currently selected (so you can re-assign it). */
+function bossBusySet(currentBid,currentKey){
+  var busy={};
+  if(!currentBid)return busy;
+  if(currentBid==='trash'){
+    /* Trash marks */
+    trashMarks.forEach(function(m){
+      if(m.tank)busy[m.tank.id]=1;
+      if(m.healer)busy[m.healer.id]=1;
+    });
+    if(puller)busy[puller.id]=1;
+    /* Extra trash marks */
+    for(var ek in extraTrashMarks){
+      if(extraTrashMarks[ek])busy[extraTrashMarks[ek].id]=1;
+    }
+    /* Remove the slot being edited */
+    if(currentKey){
+      var mIdx={'st':'tank','sh':'healer'};
+      trashMarks.forEach(function(m,mi){
+        /* We don't know which mark index easily here — just skip removal for trash
+           since the slot type is stored in sel.t */
+      });
+    }
+  } else {
+    /* Boss assignments */
+    var bd=bossData[currentBid]||{};
+    for(var k in bd){
+      if(k==='notes')continue;
+      var v=bd[k];
+      if(v&&typeof v==='object'&&v.id)busy[v.id]=1;
+    }
+  }
+  /* Remove the player in the currently selected slot from busy
+     so their slot shows as available to re-pick */
+  if(sel){
+    var slotPlayer=null;
+    if(sel.t==='bs')slotPlayer=(bossData[sel.bid]||{})[sel.key];
+    else if(sel.t==='tm')slotPlayer=trashMarks[sel.mi]&&trashMarks[sel.mi].tank;
+    else if(sel.t==='th')slotPlayer=trashMarks[sel.mi]&&trashMarks[sel.mi].healer;
+    else if(sel.t==='pu')slotPlayer=puller;
+    else if(sel.t==='etank'||sel.t==='ehealer')slotPlayer=extraTrashMarks[sel.ekey];
+    if(slotPlayer&&slotPlayer.id)delete busy[slotPlayer.id];
+  }
+  return busy;
+}
 function trashDups(){
   var a=[puller];trashMarks.forEach(function(m){a.push(m.tank);a.push(m.healer);});
   var c={};a.forEach(function(p){if(p)c[p.id]=(c[p.id]||0)+1;});
@@ -607,29 +654,38 @@ function rPool(){
 
   /* Active players — highlight matching role when an assignment slot is active */
   var selRole=sel?sel.role:null;
-  var selHlCls=sel?sel.hlCls:null; /* array of class names to highlight */
+  var selHlCls=sel?sel.hlCls:null;
+  /* Build set of players already used on the current boss tab */
+  var currentBid=null;
+  if(sel){
+    if(sel.bid)currentBid=sel.bid;
+    else if(sel.t==='tm'||sel.t==='th'||sel.t==='pu'||sel.t==='etank'||sel.t==='ehealer')currentBid='trash';
+  }
+  var bbusy=bossBusySet(currentBid,sel?sel.key:null);
   for(var i=0;i<list.length;i++){
     var p=list[i],c=cd(p.cls);
     var dim=sel&&sel.t==='g'&&as[p.id];
     var canPick=!!sel&&!dim;
     var roleMatch=false,roleMismatch=false;
     if(canPick){
+      /* First check if already assigned elsewhere on this boss */
+      var alreadyUsed=bbusy[p.id]?true:false;
       if(selHlCls){
-        /* Class-based highlight */
-        roleMatch=selHlCls.indexOf(p.cls)>=0;
-        roleMismatch=!roleMatch;
+        roleMatch=!alreadyUsed&&selHlCls.indexOf(p.cls)>=0;
+        roleMismatch=alreadyUsed||(selHlCls.indexOf(p.cls)<0);
       } else if(selRole){
-        /* Role-based highlight */
-        if(selRole==='hunter')       {roleMatch=p.cls==='Hunter';}
-        else if(selRole==='mage')    {roleMatch=p.cls==='Mage';}
-        else if(selRole==='warlock') {roleMatch=p.cls==='Warlock';}
-        else if(selRole==='priest')  {roleMatch=p.cls==='Priest';}
-        else if(selRole==='druid')   {roleMatch=p.cls==='Druid';}
-        else if(selRole==='paladin') {roleMatch=p.cls==='Paladin';}
-        else if(selRole==='warrior_dps'){roleMatch=p.cls==='Warrior'&&p.role==='dps';}
-        else if(selRole==='hunter_dps'){roleMatch=p.cls==='Hunter'&&p.role==='dps';}
-        else {roleMatch=p.role===selRole;}
-        roleMismatch=!roleMatch;
+        var baseMatch=false;
+        if(selRole==='hunter')       baseMatch=p.cls==='Hunter';
+        else if(selRole==='mage')    baseMatch=p.cls==='Mage';
+        else if(selRole==='warlock') baseMatch=p.cls==='Warlock';
+        else if(selRole==='priest')  baseMatch=p.cls==='Priest';
+        else if(selRole==='druid')   baseMatch=p.cls==='Druid';
+        else if(selRole==='paladin') baseMatch=p.cls==='Paladin';
+        else if(selRole==='warrior_dps') baseMatch=p.cls==='Warrior'&&p.role==='dps';
+        else if(selRole==='hunter_dps')  baseMatch=p.cls==='Hunter'&&p.role==='dps';
+        else baseMatch=p.role===selRole;
+        roleMatch=baseMatch&&!alreadyUsed;
+        roleMismatch=!baseMatch||alreadyUsed;
       }
     }
     var extraStyle=roleMatch?'outline:2px solid #60cc80;outline-offset:1px;':roleMismatch?'opacity:.4;':'';
