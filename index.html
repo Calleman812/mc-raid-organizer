@@ -604,57 +604,40 @@ function getTrashHealerForTank(tankPlayer){
 /* Build preview text for a boss */
 function buildBossPreview(boss,bd){
   var lines=[boss.name+' assignments'];
+  /* Track which healer keys have already been printed via healerKey reference
+     so standalone isHealRow segments don't repeat them */
+  var usedHealerKeys={};
+
   boss.segments.forEach(function(seg){
-    /* Collect tanks/roles and healers/interrupts from this segment separately */
-    var tankLines=[];
-    var healerNames=[];
-    var extraLines=[];
-
-    seg.slots.forEach(function(sl){
-      var p=bd[sl.key];
-      if(sl.isHealer){
-        /* Healer slot — collect names for this segment */
-        if(p)healerNames.push(p.name);
-        return;
-      }
-      if(!p)return; /* skip unassigned non-healers */
-      var mark=sl.markIdx!=null?'{'+MARK_NAMES[sl.markIdx]+'} ':'';
-      if(sl.isSheep){
-        tankLines.push(mark+sl.label+': [Sheep] '+p.name);
-      } else {
-        /* Tank/role slot — healer may be referenced by healerKey OR be inline in same segment */
-        var healerPart='';
-        if(sl.healerKey&&bd[sl.healerKey])healerPart=' / '+bd[sl.healerKey].name;
-        tankLines.push(mark+sl.label+': '+p.name+healerPart);
-      }
-    });
-
-    /* If segment has separate isHealRow collecting OR inline healers without healerKey */
-    /* Push any inline healer names that weren't already listed via healerKey */
-    if(healerNames.length&&tankLines.length){
-      /* Append healer names to the last tank line if only 1 tank, otherwise list after */
-      if(tankLines.length===1&&healerNames.length>0){
-        tankLines[0]+=' / '+healerNames.join(', ');
-      } else {
-        tankLines.push(seg.title+' Healers: '+healerNames.join(', '));
-      }
-    } else if(healerNames.length&&!tankLines.length){
-      /* Healer-only segment like Ragnaros "Tank Healers" */
-      lines.push(seg.title+': '+healerNames.join(', '));
+    if(seg.isHealRow){
+      /* Standalone healer row — only print healers not already referenced by a tank healerKey */
+      var names=[];
+      seg.slots.forEach(function(sl){
+        if(usedHealerKeys[sl.key])return; /* already printed inline with tank */
+        var p=bd[sl.key];
+        if(p)names.push(p.name);
+      });
+      if(names.length)lines.push(seg.title+': '+names.join(', '));
       return;
     }
 
-    tankLines.forEach(function(l){lines.push(l);});
-  });
-
-  /* Also include standalone isHealRow segments */
-  boss.segments.forEach(function(seg){
-    if(!seg.isHealRow)return;
-    var names=[];
     seg.slots.forEach(function(sl){
-      if(bd[sl.key])names.push(bd[sl.key].name);
+      if(sl.isHealer)return; /* inline healers handled via healerKey on the tank slot */
+      var p=bd[sl.key];
+      if(!p)return; /* skip unassigned */
+      var mark=sl.markIdx!=null?'{'+MARK_NAMES[sl.markIdx]+'} ':'';
+      if(sl.isSheep){
+        lines.push(mark+sl.label+': [Sheep] '+p.name);
+      } else {
+        /* Append healer if referenced — mark it used so isHealRow doesn't repeat */
+        var healerPart='';
+        if(sl.healerKey&&bd[sl.healerKey]){
+          healerPart=' / '+bd[sl.healerKey].name;
+          usedHealerKeys[sl.healerKey]=true;
+        }
+        lines.push(mark+he(sl.label)+': '+p.name+healerPart);
+      }
     });
-    if(names.length)lines.push(seg.title+': '+names.join(', '));
   });
 
   if(lines.length===1)return '';
@@ -1771,72 +1754,83 @@ function renderViewMode(data){
     if(!hasAny&&!bossLayouts[boss.id])return;
 
     h+='<div class="boss-sec">';
-    /* Boss name header with coloured bar */
-    h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:.6rem">';
+    h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:.7rem">';
     h+='<div style="width:4px;height:1.2rem;background:#7ab0ff;border-radius:2px;flex-shrink:0"></div>';
     h+='<div style="font-family:Cinzel,serif;font-size:.9rem;font-weight:600;color:#f8f8f8;letter-spacing:.04em">'+he(boss.name)+'</div>';
     h+='</div>';
 
-    /* Group segments visually — non-healer segments show as cards with their healers inline */
-    boss.segments.forEach(function(seg){
-      if(seg.isHealRow)return; /* handled inline */
+    /* Track healer keys already shown inline with a tank */
+    var shownHealerKeys={};
 
-      /* Check if any slot in this segment has an assignment */
-      var segHasAny=seg.slots.some(function(sl){
-        if(sl.isHealer)return bdata[sl.key]&&pmap[bdata[sl.key]];
+    boss.segments.forEach(function(seg){
+      if(seg.isHealRow)return; /* handled after main slots */
+
+      /* Filter to only assigned non-healer slots */
+      var assignedSlots=seg.slots.filter(function(sl){
+        if(sl.isHealer)return false;
         return bdata[sl.key]&&pmap[bdata[sl.key]];
       });
-      if(!segHasAny)return;
+      if(!assignedSlots.length)return;
 
-      var rowColor=seg.isSheepRow?'#8080e8':seg.isHealRow?'#60cc80':'#4a6090';
-      h+='<div style="margin-bottom:.6rem">';
+      var rowColor=seg.isSheepRow?'#8080e8':'#4a6090';
+      h+='<div style="margin-bottom:.65rem">';
       h+='<div style="font-size:.62rem;color:'+rowColor+';font-family:Cinzel,serif;text-transform:uppercase;letter-spacing:.07em;margin-bottom:.3rem">'+he(seg.title)+'</div>';
 
-      var cols=Math.min(seg.cols||seg.slots.length,6);
-      h+='<div style="display:grid;grid-template-columns:repeat('+cols+',1fr);gap:4px">';
-      seg.slots.forEach(function(sl){
-        var pid=bdata[sl.key];
-        var p=pid&&pmap[pid]?pmap[pid]:null;
-        var mHtml=sl.markIdx!=null?'<span style="font-size:1rem;margin-right:2px">'+vMS[sl.markIdx]+'</span>':'';
-        var hBg=seg.isSheepRow?'#181830':sl.isHealer?'#0a1a12':'#1a2040';
-        var hCol=seg.isSheepRow?'#8080e8':sl.isHealer?'#60cc80':(sl.markIdx!=null?vMC[sl.markIdx]:'#7ab0ff');
+      h+='<div style="display:flex;flex-direction:column;gap:5px">';
+      assignedSlots.forEach(function(sl){
+        var p=pmap[bdata[sl.key]];
+        var mHtml=sl.markIdx!=null?'<span style="font-size:1rem;min-width:18px;text-align:center">'+vMS[sl.markIdx]+'</span>':'<span style="min-width:18px"></span>';
+        var mCol=sl.markIdx!=null?vMC[sl.markIdx]:'#7ab0ff';
+        if(sl.isSheep)mCol='#8080e8';
 
-        h+='<div style="background:#0d1020;border:1px solid #2a3050;border-radius:5px;overflow:hidden">';
-        h+='<div style="background:'+hBg+';padding:4px 8px;display:flex;align-items:center;gap:4px;border-bottom:1px solid #2a3050">';
-        h+=mHtml;
-        h+='<span style="font-size:.65rem;font-family:Cinzel,serif;color:'+hCol+';font-weight:600;letter-spacing:.03em">'+he(sl.label)+'</span>';
+        h+='<div style="display:flex;align-items:flex-start;gap:6px">';
+        /* Mark symbol column */
+        h+='<div style="padding-top:3px">'+mHtml+'</div>';
+        h+='<div style="flex:1">';
+
+        /* Slot label */
+        h+='<div style="font-size:.6rem;color:'+mCol+';font-family:Cinzel,serif;font-weight:600;margin-bottom:3px">'+he(sl.label)+'</div>';
+
+        /* Tank nameplate */
+        var pc=cd(p.cls);
+        h+='<div style="display:flex;align-items:center;gap:5px;background:'+pc.bg+';border:1px solid '+pc.bd+';border-radius:4px;padding:3px 7px;margin-bottom:3px">';
+        h+=ihtml(p.cls,14,p.role);
+        h+='<span style="font-size:.9rem;font-weight:700;color:#f8f8f8">'+he(p.name)+'</span>';
+        if(p.spec)h+='<span style="font-size:.58rem;color:rgba(248,248,248,0.5)">'+he(p.spec)+'</span>';
         h+='</div>';
-        h+='<div style="padding:5px 7px">';
-        if(p){
-          var pc=cd(p.cls);
-          h+='<div style="display:flex;align-items:center;gap:5px;background:'+pc.bg+';border:1px solid '+pc.bd+';border-radius:4px;padding:3px 7px">';
-          h+=ihtml(p.cls,14,p.role);
-          h+='<span style="font-size:.88rem;font-weight:700;color:#f8f8f8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+he(p.name)+'</span>';
-          if(p.spec)h+='<span style="font-size:.58rem;color:rgba(248,248,248,0.5);white-space:nowrap">'+he(p.spec)+'</span>';
+
+        /* Inline healer via healerKey — show directly under the tank */
+        if(sl.healerKey&&bdata[sl.healerKey]&&pmap[bdata[sl.healerKey]]){
+          var hp=pmap[bdata[sl.healerKey]];
+          var hc=cd(hp.cls);
+          shownHealerKeys[sl.healerKey]=true;
+          h+='<div style="display:flex;align-items:center;gap:5px;background:'+hc.bg+';border:1px solid #1a5a3a;border-radius:4px;padding:3px 7px;margin-left:8px">';
+          h+=ihtml(hp.cls,13,hp.role);
+          h+='<span style="font-size:.82rem;font-weight:700;color:#60cc80">'+he(hp.name)+'</span>';
+          h+='<span style="font-size:.55rem;color:rgba(96,204,128,0.6)">(healer)</span>';
           h+='</div>';
-        } else {
-          h+='<span style="color:#3a5080;font-style:italic;font-size:.78rem">—</span>';
         }
-        h+='</div></div>';
+        h+='</div></div>'; /* end flex row */
       });
-      h+='</div></div>';
+      h+='</div></div>'; /* end segment */
     });
 
-    /* Standalone isHealRow segments */
+    /* Standalone isHealRow segments — only show healers not already shown inline */
     boss.segments.forEach(function(seg){
       if(!seg.isHealRow)return;
-      var healers=seg.slots.filter(function(sl){return bdata[sl.key]&&pmap[bdata[sl.key]];});
+      var healers=seg.slots.filter(function(sl){
+        return !shownHealerKeys[sl.key]&&bdata[sl.key]&&pmap[bdata[sl.key]];
+      });
       if(!healers.length)return;
-      h+='<div style="margin-bottom:.5rem">';
+      h+='<div style="margin-bottom:.55rem">';
       h+='<div style="font-size:.62rem;color:#60cc80;font-family:Cinzel,serif;text-transform:uppercase;letter-spacing:.07em;margin-bottom:.3rem">'+he(seg.title)+'</div>';
       h+='<div style="display:flex;flex-wrap:wrap;gap:4px">';
       healers.forEach(function(sl){
-        var p=pmap[bdata[sl.key]];
-        var pc=cd(p.cls);
-        h+='<div style="display:inline-flex;align-items:center;gap:4px;background:'+pc.bg+';border:1px solid '+pc.bd+';border-radius:4px;padding:3px 8px">';
-        h+=ihtml(p.cls,13,p.role);
-        h+='<span style="font-size:.82rem;font-weight:700;color:#f8f8f8">'+he(p.name)+'</span>';
-        h+='<span style="font-size:.55rem;color:rgba(248,248,248,0.4)">'+he(sl.label)+'</span>';
+        var hp=pmap[bdata[sl.key]];
+        var hc=cd(hp.cls);
+        h+='<div style="display:inline-flex;align-items:center;gap:4px;background:'+hc.bg+';border:1px solid '+hc.bd+';border-radius:4px;padding:3px 8px">';
+        h+=ihtml(hp.cls,13,hp.role);
+        h+='<span style="font-size:.82rem;font-weight:700;color:#f8f8f8">'+he(hp.name)+'</span>';
         h+='</div>';
       });
       h+='</div></div>';
@@ -1847,10 +1841,10 @@ function renderViewMode(data){
     /* Boss group layout */
     if(boss.hasGroupOrder&&bossLayouts[boss.id]){
       var bl=bossLayouts[boss.id];
-      h+='<div style="margin-top:.5rem">';
-      h+='<div style="font-size:.62rem;color:#7ab0ff;font-family:Cinzel,serif;text-transform:uppercase;letter-spacing:.07em;margin-bottom:.3rem">Group Setup</div>';
       var gc=boss.groupCount||8;
       var glCols=gc<=6?'repeat(3,1fr)':'repeat(4,1fr)';
+      h+='<div style="margin-top:.5rem">';
+      h+='<div style="font-size:.62rem;color:#7ab0ff;font-family:Cinzel,serif;text-transform:uppercase;letter-spacing:.07em;margin-bottom:.3rem">Group Setup</div>';
       h+='<div style="display:grid;grid-template-columns:'+glCols+';gap:4px">';
       for(var bgi=0;bgi<bl.length;bgi++){
         h+='<div style="background:#0d1020;border:1px solid #2a3050;border-radius:4px;overflow:hidden">';
@@ -1865,8 +1859,7 @@ function renderViewMode(data){
       }
       h+='</div></div>';
     }
-
-    h+='</div>'; /* end boss-sec */
+    h+='</div>';
   });
   h+='</div>';
   h+='</body></html>';
