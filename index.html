@@ -121,7 +121,7 @@ textarea{width:100%;background:#0d1020;border:1px solid #2a3050;color:#e0d8f8;pa
 <div class="app">
 <h1>WoW Classic Raid Organizer</h1>
 <div class="sub">Organize your 40-man raid &mdash; select a raid below</div>
-<div style="text-align:center;font-size:.6rem;color:#2a3a5a;font-family:Cinzel,serif;letter-spacing:.08em;margin-top:-.3rem;margin-bottom:.5rem">v1.0.0</div>
+<div style="text-align:center;font-size:.6rem;color:#2a3a5a;font-family:Cinzel,serif;letter-spacing:.08em;margin-top:-.3rem;margin-bottom:.5rem">v1.1.0</div>
 <div style="display:flex;gap:6px;justify-content:center;margin-bottom:.9rem;flex-wrap:wrap">
   <button class="btn raid-sel-btn" data-raid="mc"   id="rsMC"   style="font-family:Cinzel,serif;font-size:.74rem;padding:5px 14px;border-radius:4px;cursor:pointer;border:1px solid #3a6ae0;background:#1a3a80;color:#c8d8ff">&#128293; Molten Core</button>
   <button class="btn raid-sel-btn" data-raid="bwl"  id="rsBWL"  style="font-family:Cinzel,serif;font-size:.74rem;padding:5px 14px;border-radius:4px;cursor:pointer;border:1px solid #2a3050;background:#131726;color:#7ab0ff">&#128009; Blackwing Lair</button>
@@ -1628,16 +1628,6 @@ function renderViewMode(data){
   var pmap={};
   (data.players||[]).forEach(function(p){pmap[p.id]=p;});
 
-  function vprow(p){
-    if(!p)return '<span style="color:#3a5080;font-style:italic;font-size:.82rem">Unassigned</span>';
-    var c=cd(p.cls);
-    return '<div style="display:inline-flex;align-items:center;gap:5px;background:'+c.bg+';border:2px solid '+c.bd+';border-radius:5px;padding:4px 8px;min-width:0">'
-      +ihtml(p.cls,15,p.role)
-      +'<span style="font-size:1rem;font-weight:700;color:#f8f8f8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+he(p.name)+'</span>'
-      +'<span style="font-size:.6rem;color:rgba(248,248,248,0.5);white-space:nowrap">'+he(p.spec||'')+'</span>'
-      +'</div>';
-  }
-
   var viewGroups=[];
   (data.groups||[]).forEach(function(slotIds,gi){
     if(slotIds.some(function(id){return id&&pmap[id];}))viewGroups.push({idx:gi+1,slots:slotIds});
@@ -1654,182 +1644,256 @@ function renderViewMode(data){
   var vMS=['\u{1F480}','\u271a','\u25a0','\u263d','\u25b2','\u25c6','\u25cf','\u2605'];
   var vMC=['#f0f0f0','#e03030','#4080e0','#f0f0f0','#30b050','#c060e0','#e08020','#f0d030'];
 
+  /* Roster composition */
+  var clsCounts={};
+  var CLS_ORDER=['Warrior','Paladin','Priest','Druid','Rogue','Hunter','Mage','Warlock','Shaman'];
+  var CLS_COLS={Warrior:'#f0d0b0',Paladin:'#f0a0c0',Priest:'#e8e8e8',Druid:'#f0a050',Rogue:'#e0c840',Hunter:'#80d870',Mage:'#80c8f0',Warlock:'#b080e0',Shaman:'#60b0f0'};
+  var CLS_BG={Warrior:'#3d2218',Paladin:'#3a1228',Priest:'#2a2a2a',Druid:'#3a1e00',Rogue:'#2e2800',Hunter:'#102808',Mage:'#0a1e48',Warlock:'#220a3a',Shaman:'#0a1a38'};
+  (data.players||[]).forEach(function(p){if(p.cls)clsCounts[p.cls]=(clsCounts[p.cls]||0)+1;});
+
   var css=''
     +'*{box-sizing:border-box;margin:0;padding:0;}'
-    +'body{background:#0a0d18;color:#e0d8f8;font-family:"Crimson Pro",Georgia,serif;font-size:15px;padding:1.2rem 1.5rem;max-width:1200px;margin:0 auto;}'
-    +'h1{font-family:"Cinzel",serif;font-size:1.4rem;color:#7ab0ff;text-align:center;margin-bottom:.15rem;letter-spacing:.05em;}'
-    +'.sub{text-align:center;color:#4a6090;font-size:.8rem;margin-bottom:1.2rem;font-family:"Cinzel",serif;}'
-    +'.section{background:#131726;border:1px solid #2a3050;border-radius:8px;padding:.85rem 1.1rem;margin-bottom:1rem;}'
-    +'.sh{font-family:"Cinzel",serif;font-size:.88rem;color:#7ab0ff;margin-bottom:.65rem;border-bottom:1px solid #2a3050;padding-bottom:.4rem;letter-spacing:.06em;}'
+    +'body{background:#0a0d18;color:#e0d8f8;font-family:"Crimson Pro",Georgia,serif;font-size:15px;padding:1.4rem 1.6rem;max-width:1100px;margin:0 auto;}'
+    +'h1{font-family:"Cinzel",serif;font-size:1.5rem;color:#7ab0ff;text-align:center;margin-bottom:.15rem;letter-spacing:.07em;font-weight:700;}'
+    +'.sub{text-align:center;color:#3a5080;font-size:.72rem;margin-bottom:.25rem;font-family:"Cinzel",serif;letter-spacing:.1em;}'
+    +'.ver{text-align:center;font-size:.58rem;color:#1e2a4a;font-family:"Cinzel",serif;letter-spacing:.12em;margin-bottom:1.2rem;}'
+    +'.comp-bar{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;background:#0d1020;border:1px solid #1a2240;border-radius:8px;padding:.6rem 1rem;margin-bottom:1.2rem;}'
+    +'.comp-pill{display:flex;align-items:center;gap:5px;border-radius:20px;padding:3px 10px 3px 6px;}'
+    +'.comp-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}'
+    +'.comp-count{font-family:"Cinzel",serif;font-size:.78rem;font-weight:700;}'
+    +'.comp-cls{font-family:"Cinzel",serif;font-size:.65rem;opacity:.7;}'
+    +'.section{background:#131726;border:1px solid #2a3050;border-radius:8px;padding:.9rem 1.1rem;margin-bottom:1.1rem;}'
+    +'.sh{font-family:"Cinzel",serif;font-size:.85rem;color:#7ab0ff;margin-bottom:.7rem;border-bottom:1px solid #2a3050;padding-bottom:.4rem;letter-spacing:.07em;}'
     +'.ggrid{display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem;}'
     +'.gc{background:#0f1322;border:1px solid #2a3050;border-radius:6px;overflow:hidden;}'
-    +'.gh{background:#0d1020;padding:4px 9px;font-family:"Cinzel",serif;font-size:.72rem;color:#7ab0ff;border-bottom:1px solid #2a3050;}'
+    +'.gh{background:#0d1020;padding:4px 9px;font-family:"Cinzel",serif;font-size:.7rem;color:#7ab0ff;border-bottom:1px solid #2a3050;}'
     +'.gs{padding:5px 7px;}'
-    +'.sf{border-radius:5px;margin-bottom:4px;overflow:hidden;}'
-    +'.sb{padding:4px 8px;display:flex;align-items:center;gap:6px;}'
-    +'.asgrid{display:grid;gap:.4rem;margin-bottom:.5rem;}'
-    +'.asgrid-1{grid-template-columns:1fr;}.asgrid-2{grid-template-columns:repeat(2,1fr);}.asgrid-3{grid-template-columns:repeat(3,1fr);}.asgrid-4{grid-template-columns:repeat(4,1fr);}.asgrid-5{grid-template-columns:repeat(5,1fr);}.asgrid-6{grid-template-columns:repeat(6,1fr);}'
-    +'.mc{background:#0f1322;border:1px solid #2a3050;border-radius:6px;overflow:hidden;}'
-    +'.mh{padding:5px 9px;font-family:"Cinzel",serif;font-size:.7rem;font-weight:600;border-bottom:1px solid #2a3050;display:flex;align-items:center;gap:4px;}'
-    +'.mv{padding:5px 7px;}'
-    +'.mark-row{display:grid;grid-template-columns:repeat(5,1fr);gap:.4rem;margin-bottom:.5rem;}'
-    +'.prow{display:flex;align-items:center;gap:.6rem;padding:.45rem .65rem;background:#0f1322;border:1px solid #2a3050;border-radius:6px;margin-bottom:.45rem;}'
-    +'.plbl{font-family:"Cinzel",serif;font-size:.72rem;color:#7ab0ff;white-space:nowrap;}'
-    +'.blbl{font-family:"Cinzel",serif;font-size:.72rem;font-weight:600;color:#7ab0ff;margin:.4rem 0 .3rem;text-transform:uppercase;letter-spacing:.06em;}'
-    +'.rlbl{font-size:.62rem;color:#4a6090;text-transform:uppercase;font-family:"Cinzel",serif;letter-spacing:.05em;margin:.3rem 0 .2rem;}'
-    +'.note-box{font-size:.72rem;color:#60cc80;background:#0a1a12;border:1px solid #1a5a3a;border-radius:5px;padding:.4rem .65rem;margin:.35rem 0;line-height:1.6;}'
-    +'.empty{color:#3a5080;font-style:italic;font-size:.82rem;}'
-    +'.boss-sec{margin-bottom:1.6rem;padding-bottom:1.4rem;border-bottom:2px solid #1e2840;}'
-    +'.boss-sec:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0;}';
+    +'.sf{border-radius:4px;margin-bottom:3px;overflow:hidden;}'
+    +'.sb{padding:3px 7px;display:flex;align-items:center;gap:5px;}'
+    +'.np-name{font-size:.88rem;font-weight:700;color:#f8f8f8;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}'
+    +'.np-spec{font-size:.55rem;color:rgba(248,248,248,.45);white-space:nowrap;}'
+    /* Boss section */
+    +'.boss-sec{margin-bottom:1.5rem;}'
+    +'.boss-divider{height:1px;background:linear-gradient(to right,transparent,#2a3a6a 30%,#2a3a6a 70%,transparent);margin:1.3rem 0 1rem;}'
+    +'.boss-title-row{display:flex;align-items:center;gap:10px;margin-bottom:.85rem;}'
+    +'.boss-title-bar{width:4px;border-radius:2px;background:#7ab0ff;flex-shrink:0;align-self:stretch;}'
+    +'.boss-name{font-family:"Cinzel",serif;font-size:1rem;font-weight:700;color:#f8f8f8;letter-spacing:.05em;}'
+    +'.boss-marks{display:flex;gap:4px;margin-left:auto;}'
+    +'.boss-mark-sym{font-size:1.1rem;opacity:.8;}'
+    /* Mark cards */
+    +'.mark-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:7px;margin-bottom:.6rem;}'
+    +'.mark-card{border-radius:7px;overflow:hidden;position:relative;}'
+    +'.mark-card-wm{position:absolute;top:4px;right:8px;font-size:2rem;opacity:.12;line-height:1;pointer-events:none;}'
+    +'.mark-card-hdr{padding:5px 9px 4px;font-family:"Cinzel",serif;font-size:.6rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.05);}'
+    +'.mark-card-body{padding:5px 8px 7px;display:flex;flex-direction:column;gap:3px;}'
+    +'.mark-np{display:flex;align-items:center;gap:5px;border-radius:4px;padding:3px 7px;overflow:hidden;}'
+    +'.mark-np-label{font-size:.52rem;font-family:"Cinzel",serif;opacity:.6;white-space:nowrap;margin-left:auto;}'
+    +'.mark-np-name{font-size:.85rem;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;}'
+    /* Healer chips */
+    +'.healer-group{margin-bottom:.55rem;}'
+    +'.healer-group-lbl{font-family:"Cinzel",serif;font-size:.58rem;color:#60cc80;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.3rem;}'
+    +'.healer-chips{display:flex;flex-wrap:wrap;gap:4px;}'
+    +'.healer-chip{display:inline-flex;align-items:center;gap:4px;border-radius:4px;padding:3px 8px;}'
+    /* Trash */
+    +'.trash-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:6px;margin-bottom:.5rem;}'
+    +'.trash-card{border-radius:6px;overflow:hidden;}'
+    +'.trash-card-hdr{padding:4px 8px;font-family:"Cinzel",serif;font-size:.62rem;font-weight:600;border-bottom:1px solid rgba(255,255,255,.06);}'
+    +'.trash-card-body{padding:5px 7px;display:flex;flex-direction:column;gap:3px;}'
+    +'.trash-lbl{font-size:.52rem;font-family:"Cinzel",serif;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.08em;margin-bottom:1px;}'
+    /* Group setup */
+    +'.grp-grid{display:grid;gap:5px;}'
+    +'.grp-card{background:#0d1020;border:1px solid #2a3050;border-radius:5px;overflow:hidden;}'
+    +'.grp-hdr{background:#131726;padding:2px 7px;font-family:"Cinzel",serif;font-size:.62rem;color:#7ab0ff;border-bottom:1px solid #2a3050;}'
+    +'.grp-slot{display:flex;align-items:center;gap:3px;padding:2px 6px;border-bottom:1px solid #1a2040;}'
+    +'.grp-slot:last-child{border-bottom:none;}'
+    +'.note-box{font-size:.72rem;color:#60cc80;background:#0a1a12;border:1px solid #1a5a3a;border-radius:5px;padding:.4rem .65rem;margin:.4rem 0;line-height:1.6;}';
 
   var h='<!DOCTYPE html><html lang="en"><head>'
     +'<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
-    +'<title>Raid View \u2014 '+raidTitle+'</title>'
+    +'<title>'+he(raidTitle)+' \u2014 Raid View</title>'
     +'<link rel="preconnect" href="https://fonts.googleapis.com">'
     +'<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:wght@400;500&display=swap" rel="stylesheet">'
     +'<style>'+css+'</style></head><body>';
 
-  h+='<h1>'+he(raidTitle)+' Raid</h1><div class="sub">Read-only raid view</div>';
+  /* ── Page header ── */
+  h+='<h1>'+he(raidTitle)+'</h1>';
+  h+='<div class="sub">Raid Assignments &mdash; Read-only view</div>';
 
-  h+='<div class="section"><div class="sh">Raid Groups</div><div class="ggrid">';
-  viewGroups.forEach(function(g){
-    h+='<div class="gc"><div class="gh">Group '+g.idx+'</div><div class="gs">';
-    g.slots.forEach(function(pid){
-      if(!pid||!pmap[pid])return;
-      var p=pmap[pid],c=cd(p.cls);
-      h+='<div class="sf" style="border:2px solid '+c.bd+'"><div class="sb" style="background:'+c.bg+'">'+ihtml(p.cls,15,p.role)
-        +'<span style="font-size:1rem;font-weight:700;color:#f8f8f8;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+he(p.name)+'</span>'
-        +'<span style="font-size:.58rem;color:rgba(248,248,248,0.5)">'+he(p.spec||'')+'</span></div></div>';
-    });
-    h+='</div></div>';
+  /* ── Composition banner ── */
+  h+='<div class="comp-bar">';
+  CLS_ORDER.forEach(function(cls){
+    var n=clsCounts[cls];if(!n)return;
+    var col=CLS_COLS[cls]||'#f8f8f8';
+    var bg=CLS_BG[cls]||'#1a2040';
+    h+='<div class="comp-pill" style="background:'+bg+'20;border:1px solid '+bg+'">';
+    h+='<div class="comp-dot" style="background:'+col+'"></div>';
+    h+='<span class="comp-count" style="color:'+col+'">'+n+'</span>';
+    h+='<span class="comp-cls" style="color:'+col+'">'+cls+'s</span>';
+    h+='</div>';
   });
-  h+='</div></div>';
+  h+='</div>';
 
-  var benchedV=data.benched||[];
-  if(benchedV.length){
-    h+='<div class="section"><div class="sh">Roster Status</div><div class="blbl" style="color:#60cc80">&#128196; Benched ('+benchedV.length+')</div>';
-    h+='<div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:.5rem">';
-    benchedV.forEach(function(p){var c=p.cls?cd(p.cls):{c:'#f8f8f8',bg:'#0a1a12',bd:'#1a5a3a'};h+='<div style="display:inline-flex;align-items:center;gap:5px;background:'+c.bg+';border:2px solid '+c.bd+';border-radius:5px;padding:4px 8px">'+(p.cls?ihtml(p.cls,14,p.role):'')+' <span style="font-size:.95rem;font-weight:700;color:#f8f8f8">'+he(p.name)+'</span></div>';});
+  /* ── Raid Groups ── */
+  if(viewGroups.length){
+    h+='<div class="section"><div class="sh">Raid Groups</div><div class="ggrid">';
+    viewGroups.forEach(function(g){
+      h+='<div class="gc"><div class="gh">Group '+g.idx+'</div><div class="gs">';
+      g.slots.forEach(function(pid){
+        if(!pid||!pmap[pid])return;
+        var p=pmap[pid],c=cd(p.cls);
+        h+='<div class="sf" style="border:1.5px solid '+c.bd+'"><div class="sb" style="background:'+c.bg+'">'+ihtml(p.cls,14,p.role)
+          +'<span class="np-name">'+he(p.name)+'</span>'
+          +'<span class="np-spec">'+he(p.spec||'')+'</span></div></div>';
+      });
+      h+='</div></div>';
+    });
     h+='</div></div>';
   }
 
+  /* ── Benched ── */
+  var benchedV=data.benched||[];
+  if(benchedV.length){
+    h+='<div class="section"><div class="sh">Bench</div><div style="display:flex;flex-wrap:wrap;gap:4px">';
+    benchedV.forEach(function(p){
+      var c=p.cls?cd(p.cls):{bg:'#0a1a12',bd:'#1a5a3a'};
+      h+='<div style="display:inline-flex;align-items:center;gap:4px;background:'+c.bg+';border:1.5px solid '+c.bd+';border-radius:4px;padding:3px 8px">'
+        +(p.cls?ihtml(p.cls,13,p.role):'')
+        +'<span style="font-size:.85rem;font-weight:700;color:#f8f8f8">'+he(p.name)+'</span>'
+        +'</div>';
+    });
+    h+='</div></div>';
+  }
+
+  /* ── Trash marks ── */
   if(trashDefs.length){
-    h+='<div class="section"><div class="sh">Trash \u2014 Tank Marks &amp; Healing</div><div class="mark-row">';
+    h+='<div class="section"><div class="sh">Trash \u2014 Tank Marks &amp; Healing</div>';
+    h+='<div class="trash-grid">';
     trashDefs.forEach(function(m,i){
       var tankP=trash[i]&&trash[i].tank?pmap[trash[i].tank]:null;
       var healP=trash[i]&&trash[i].healer?pmap[trash[i].healer]:null;
-      h+='<div class="mc"><div class="mh" style="background:'+m.col+'33;color:'+m.col+'">'+vMS[i]+' '+m.name+'</div><div class="mv">';
-      h+='<div class="rlbl">Tank</div>'+vprow(tankP);
-      h+='<div class="rlbl" style="margin-top:.3rem">Healer</div>'+vprow(healP);
+      if(!tankP&&!healP)return;
+      h+='<div class="trash-card" style="background:#0f1322;border:1px solid '+m.col+'30">';
+      h+='<div class="trash-card-hdr" style="background:'+m.col+'18;color:'+m.col+'">'+vMS[i]+' '+m.name+'</div>';
+      h+='<div class="trash-card-body">';
+      if(tankP){var tc=cd(tankP.cls);h+='<div class="trash-lbl">Tank</div><div class="mark-np" style="background:'+tc.bg+';border:1px solid '+tc.bd+'">'+ihtml(tankP.cls,13,tankP.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(tankP.name)+'</span></div>';}
+      if(healP){var hc2=cd(healP.cls);h+='<div class="trash-lbl" style="margin-top:3px">Healer</div><div class="mark-np" style="background:'+hc2.bg+';border:1px solid #1e5a32">'+ihtml(healP.cls,13,healP.role)+'<span class="mark-np-name" style="color:#60cc80">'+he(healP.name)+'</span></div>';}
+      h+='</div></div>';
+    });
+    /* Extra marks */
+    [[extraTrash.aq_t,extraTrash.aq_h,vMS[5],'#c060e0','Diamond'],[extraTrash.nx_t,extraTrash.nx_h,vMS[5],'#c060e0','Diamond']].forEach(function(ex){
+      if(!ex[0]&&!ex[1])return;
+      h+='<div class="trash-card" style="background:#0f1322;border:1px solid '+ex[3]+'30">';
+      h+='<div class="trash-card-hdr" style="background:'+ex[3]+'18;color:'+ex[3]+'">'+ex[2]+' '+ex[4]+'</div>';
+      h+='<div class="trash-card-body">';
+      if(ex[0]){var tc2=cd(ex[0].cls);h+='<div class="trash-lbl">Tank</div><div class="mark-np" style="background:'+tc2.bg+';border:1px solid '+tc2.bd+'">'+ihtml(ex[0].cls,13,ex[0].role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(ex[0].name)+'</span></div>';}
+      if(ex[1]){var hc3=cd(ex[1].cls);h+='<div class="trash-lbl" style="margin-top:3px">Healer</div><div class="mark-np" style="background:'+hc3.bg+';border:1px solid #1e5a32">'+ihtml(ex[1].cls,13,ex[1].role)+'<span class="mark-np-name" style="color:#60cc80">'+he(ex[1].name)+'</span></div>';}
       h+='</div></div>';
     });
     h+='</div>';
-    if(pullerP){h+='<div class="prow"><span class="plbl">Puller</span>'+vprow(pullerP)+'</div>';}
-    /* Extra raid-specific marks */
-    var vMSlocal=['\u{1F480}','\u271a','\u25a0','\u263d','\u25b2','\u25c6','\u25cf','\u2605'];
-    var vMClocal=['#f0f0f0','#e03030','#4080e0','#f0f0f0','#30b050','#c060e0','#e08020','#f0d030'];
-    if(extraTrash.aq_t||extraTrash.aq_h){
-      h+='<div class="mc" style="margin-top:.4rem"><div class="mh" style="background:#c060e033;color:#c060e0">'+vMSlocal[5]+' Diamond</div><div class="mv">';
-      h+='<div class="rlbl">Tank</div>'+vprow(extraTrash.aq_t);
-      h+='<div class="rlbl" style="margin-top:.3rem">Healer</div>'+vprow(extraTrash.aq_h);
-      h+='</div></div>';
-    }
-    if(extraTrash.nx_t||extraTrash.nx_h){
-      h+='<div class="mc" style="margin-top:.4rem"><div class="mh" style="background:#c060e033;color:#c060e0">'+vMSlocal[5]+' Diamond</div><div class="mv">';
-      h+='<div class="rlbl">Tank</div>'+vprow(extraTrash.nx_t);
-      h+='<div class="rlbl" style="margin-top:.3rem">Healer</div>'+vprow(extraTrash.nx_h);
-      h+='</div></div>';
+    if(pullerP){
+      var pc2=cd(pullerP.cls);
+      h+='<div style="display:flex;align-items:center;gap:8px;margin-top:.5rem;padding:.4rem .7rem;background:#0d1020;border-radius:5px;border:1px solid #2a3050">';
+      h+='<span style="font-family:Cinzel,serif;font-size:.62rem;color:#4a6090;text-transform:uppercase;letter-spacing:.1em">Puller</span>';
+      h+='<div class="mark-np" style="background:'+pc2.bg+';border:1px solid '+pc2.bd+'">'+ihtml(pullerP.cls,13,pullerP.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(pullerP.name)+'</span></div>';
+      h+='</div>';
     }
     h+='</div>';
   }
 
+  /* ── Boss Assignments ── */
   h+='<div class="section"><div class="sh">Boss Assignments</div>';
+  var firstBoss=true;
   viewBosses.forEach(function(boss){
     if(boss.isTrash)return;
     var bdata=bd[boss.id]||{};
-
     var hasAny=boss.segments.some(function(seg){
       return seg.slots.some(function(sl){return bdata[sl.key]&&pmap[bdata[sl.key]];});
     });
     if(!hasAny&&!bossLayouts[boss.id])return;
 
-    h+='<div class="boss-sec">';
-    h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:.65rem">';
-    h+='<div style="width:4px;height:1.1rem;background:#7ab0ff;border-radius:2px;flex-shrink:0"></div>';
-    h+='<div style="font-family:Cinzel,serif;font-size:.88rem;font-weight:600;color:#f8f8f8;letter-spacing:.04em">'+he(boss.name)+'</div>';
+    if(!firstBoss)h+='<div class="boss-divider"></div>';
+    firstBoss=false;
+
+    /* Boss title row with mark symbols */
+    var bossMarks=[];
+    boss.segments.forEach(function(seg){
+      seg.slots.forEach(function(sl){
+        if(sl.markIdx!=null&&bossMarks.indexOf(sl.markIdx)<0)bossMarks.push(sl.markIdx);
+      });
+    });
+    h+='<div class="boss-sec"><div class="boss-title-row">';
+    h+='<div class="boss-title-bar"></div>';
+    h+='<div class="boss-name">'+he(boss.name)+'</div>';
+    if(bossMarks.length){
+      h+='<div class="boss-marks">';
+      bossMarks.slice(0,8).forEach(function(mi){
+        h+='<span class="boss-mark-sym" style="color:'+vMC[mi]+'">'+vMS[mi]+'</span>';
+      });
+      h+='</div>';
+    }
     h+='</div>';
 
     var shownHealerKeys={};
 
+    /* Non-healer segments → mark cards */
     boss.segments.forEach(function(seg){
       if(seg.isHealRow)return;
-
       var assignedSlots=seg.slots.filter(function(sl){
-        if(sl.isHealer)return false;
-        return bdata[sl.key]&&pmap[bdata[sl.key]];
+        return !sl.isHealer&&bdata[sl.key]&&pmap[bdata[sl.key]];
       });
       if(!assignedSlots.length)return;
 
-      var rowColor=seg.isSheepRow?'#8080e8':'#4a6090';
-      h+='<div style="margin-bottom:.6rem">';
-      h+='<div style="font-size:.58rem;color:'+rowColor+';font-family:Cinzel,serif;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.35rem;padding-left:2px">'+he(seg.title)+'</div>';
-
-      /* Detect if any slot in this segment has a healer pair */
-      var segHasHealers=assignedSlots.some(function(sl){
-        return sl.healerKey&&bdata[sl.healerKey]&&pmap[bdata[sl.healerKey]];
-      });
+      var segColor=seg.isSheepRow?'#8080e8':'#4a6090';
+      h+='<div style="font-family:Cinzel,serif;font-size:.58rem;color:'+segColor+';text-transform:uppercase;letter-spacing:.1em;margin-bottom:.35rem">'+he(seg.title)+'</div>';
+      h+='<div class="mark-cards" style="margin-bottom:.65rem">';
 
       assignedSlots.forEach(function(sl){
         var p=pmap[bdata[sl.key]];
         var mCol=sl.markIdx!=null?vMC[sl.markIdx]:(sl.isSheep?'#8080e8':'#5a7ab0');
         var mSym=sl.markIdx!=null?vMS[sl.markIdx]:'';
-
         var healer=sl.healerKey&&bdata[sl.healerKey]&&pmap[bdata[sl.healerKey]]?pmap[bdata[sl.healerKey]]:null;
         if(healer)shownHealerKeys[sl.healerKey]=true;
 
-        /* One row per slot. Columns: [24px mark] [tank nameplate] [healer nameplate if present] */
-        var gridCols=healer?'24px 1fr 1fr':'24px 1fr';
-        h+='<div style="display:grid;grid-template-columns:'+gridCols+';gap:5px;align-items:stretch;margin-bottom:4px">';
-
-        /* Mark symbol */
-        h+='<div style="display:flex;align-items:center;justify-content:center;font-size:1.1rem;color:'+mCol+';padding-top:1px">'+mSym+'</div>';
-
-        /* Tank nameplate — label as small header strip */
         var pc=cd(p.cls);
-        h+='<div style="background:'+pc.bg+';border:1.5px solid '+pc.bd+';border-radius:5px;overflow:hidden;min-width:0">';
-        h+='<div style="background:rgba(0,0,0,0.25);padding:1px 6px;font-size:.55rem;font-family:Cinzel,serif;color:'+mCol+';font-weight:600;letter-spacing:.05em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+he(sl.label)+'</div>';
-        h+='<div style="display:flex;align-items:center;gap:5px;padding:3px 7px">'+ihtml(p.cls,14,p.role)+'<span style="font-size:.9rem;font-weight:700;color:#f8f8f8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0">'+he(p.name)+'</span></div>';
+        h+='<div class="mark-card" style="background:#0f1322;border:1px solid '+mCol+'35">';
+        h+='<div class="mark-card-wm" style="color:'+mCol+'">'+mSym+'</div>';
+        h+='<div class="mark-card-hdr" style="background:'+mCol+'14;color:'+mCol+'">'+mSym+(mSym?' ':'')+he(sl.label)+'</div>';
+        h+='<div class="mark-card-body">';
+        /* Tank */
+        h+='<div class="mark-np" style="background:'+pc.bg+';border:1px solid '+pc.bd+'">';
+        h+=ihtml(p.cls,14,p.role);
+        h+='<span class="mark-np-name" style="color:#f8f8f8">'+he(p.name)+'</span>';
+        h+='<span class="mark-np-label">'+he(p.spec||'')+'</span>';
         h+='</div>';
-
-        /* Healer nameplate */
+        /* Paired healer */
         if(healer){
           var hc=cd(healer.cls);
-          h+='<div style="background:'+hc.bg+';border:1.5px solid #1e5a32;border-radius:5px;overflow:hidden;min-width:0">';
-          h+='<div style="background:rgba(0,0,0,0.25);padding:1px 6px;font-size:.55rem;font-family:Cinzel,serif;color:#60cc80;font-weight:600;letter-spacing:.05em">Healer</div>';
-          h+='<div style="display:flex;align-items:center;gap:5px;padding:3px 7px">'+ihtml(healer.cls,14,healer.role)+'<span style="font-size:.9rem;font-weight:700;color:#60cc80;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0">'+he(healer.name)+'</span></div>';
+          h+='<div class="mark-np" style="background:'+hc.bg+';border:1px solid #1e5a32">';
+          h+=ihtml(healer.cls,14,healer.role);
+          h+='<span class="mark-np-name" style="color:#60cc80">'+he(healer.name)+'</span>';
+          h+='<span class="mark-np-label" style="color:#60cc8066">heal</span>';
           h+='</div>';
         }
-
-        h+='</div>';
+        h+='</div></div>';
       });
-      h+='</div>'; /* end segment */
+      h+='</div>';
     });
 
-    /* Standalone isHealRow segments — only healers not already shown inline */
+    /* Standalone isHealRow segments */
     boss.segments.forEach(function(seg){
       if(!seg.isHealRow)return;
       var healers=seg.slots.filter(function(sl){
         return !shownHealerKeys[sl.key]&&bdata[sl.key]&&pmap[bdata[sl.key]];
       });
       if(!healers.length)return;
-      h+='<div style="margin-bottom:.5rem">';
-      h+='<div style="font-size:.58rem;color:#60cc80;font-family:Cinzel,serif;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.3rem;padding-left:2px">'+he(seg.title)+'</div>';
-      h+='<div style="display:flex;flex-wrap:wrap;gap:4px;padding-left:26px">';
+      h+='<div class="healer-group">';
+      h+='<div class="healer-group-lbl">'+he(seg.title)+'</div>';
+      h+='<div class="healer-chips">';
       healers.forEach(function(sl){
         var hp=pmap[bdata[sl.key]];var hc=cd(hp.cls);
-        h+='<div style="display:inline-flex;align-items:center;gap:4px;background:'+hc.bg+';border:1px solid '+hc.bd+';border-radius:4px;padding:3px 8px">';
+        h+='<div class="healer-chip" style="background:'+hc.bg+';border:1px solid #1e5a32">';
         h+=ihtml(hp.cls,13,hp.role);
-        h+='<span style="font-size:.85rem;font-weight:700;color:#f8f8f8">'+he(hp.name)+'</span>';
+        h+='<span style="font-size:.85rem;font-weight:700;color:#60cc80">'+he(hp.name)+'</span>';
         h+='</div>';
       });
       h+='</div></div>';
@@ -1837,29 +1901,28 @@ function renderViewMode(data){
 
     if(bdata.notes)h+='<div class="note-box">'+he(bdata.notes)+'</div>';
 
+    /* Group layout */
     if(boss.hasGroupOrder&&bossLayouts[boss.id]){
       var bl=bossLayouts[boss.id];
       var gc=boss.groupCount||8;
-      var glCols=gc<=6?'repeat(3,1fr)':'repeat(4,1fr)';
-      h+='<div style="margin-top:.5rem">';
-      h+='<div style="font-size:.58rem;color:#7ab0ff;font-family:Cinzel,serif;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.3rem">Group Setup</div>';
-      h+='<div style="display:grid;grid-template-columns:'+glCols+';gap:4px">';
+      var glCols='repeat('+(gc<=6?3:4)+',1fr)';
+      h+='<div style="margin-top:.6rem">';
+      h+='<div style="font-family:Cinzel,serif;font-size:.58rem;color:#7ab0ff;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.35rem">Group Setup</div>';
+      h+='<div class="grp-grid" style="grid-template-columns:'+glCols+'">';
       for(var bgi=0;bgi<bl.length;bgi++){
-        h+='<div style="background:#0d1020;border:1px solid #2a3050;border-radius:4px;overflow:hidden">';
-        h+='<div style="background:#131726;padding:2px 6px;font-size:.6rem;font-family:Cinzel,serif;color:#7ab0ff">Group '+(bgi+1)+'</div>';
-        var bslots=bl[bgi];
-        for(var bsi=0;bsi<bslots.length;bsi++){
-          var bp=bslots[bsi];
-          if(bp){var bc=cd(bp.cls);h+='<div style="display:flex;align-items:center;gap:3px;padding:2px 5px;background:'+bc.bg+';border-bottom:1px solid #1a2040">'+ihtml(bp.cls,12,bp.role)+'<span style="font-size:.78rem;font-weight:700;color:#f8f8f8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+he(bp.name)+'</span></div>';}
-          else h+='<div style="padding:2px 5px;font-size:.6rem;color:#3a5080;border-bottom:1px solid #1a2040">—</div>';
-        }
+        h+='<div class="grp-card"><div class="grp-hdr">Group '+(bgi+1)+'</div>';
+        bl[bgi].forEach(function(bp){
+          if(bp){var bc=cd(bp.cls);h+='<div class="grp-slot" style="background:'+bc.bg+'">'+ihtml(bp.cls,12,bp.role)+'<span style="font-size:.78rem;font-weight:700;color:#f8f8f8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+he(bp.name)+'</span></div>';}
+          else h+='<div class="grp-slot"><span style="font-size:.6rem;color:#3a5080">—</span></div>';
+        });
         h+='</div>';
       }
       h+='</div></div>';
     }
-    h+='</div>';
+    h+='</div>'; /* end boss-sec */
   });
-  h+='</div>';
+  h+='</div>'; /* end section */
+
   h+='</body></html>';
   return h;
 }
