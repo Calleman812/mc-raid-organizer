@@ -121,7 +121,7 @@ textarea{width:100%;background:#0d1020;border:1px solid #2a3050;color:#e0d8f8;pa
 <div class="app">
 <h1>WoW Classic Raid Organizer</h1>
 <div class="sub">Organize your 40-man raid &mdash; select a raid below</div>
-<div style="text-align:center;font-size:.6rem;color:#4a6890;font-family:Cinzel,serif;letter-spacing:.08em;margin-top:-.3rem;margin-bottom:.5rem">v1.2.0</div>
+<div style="text-align:center;font-size:.6rem;color:#4a6890;font-family:Cinzel,serif;letter-spacing:.08em;margin-top:-.3rem;margin-bottom:.5rem">v1.3.0</div>
 <div style="display:flex;gap:6px;justify-content:center;margin-bottom:.9rem;flex-wrap:wrap">
   <button class="btn raid-sel-btn" data-raid="mc"   id="rsMC"   style="font-family:Cinzel,serif;font-size:.74rem;padding:5px 14px;border-radius:4px;cursor:pointer;border:1px solid #3a6ae0;background:#1a3a80;color:#c8d8ff">&#128293; Molten Core</button>
   <button class="btn raid-sel-btn" data-raid="bwl"  id="rsBWL"  style="font-family:Cinzel,serif;font-size:.74rem;padding:5px 14px;border-radius:4px;cursor:pointer;border:1px solid #2a3050;background:#131726;color:#7ab0ff">&#128009; Blackwing Lair</button>
@@ -335,8 +335,8 @@ naxx:[
   /* Abomination Quarter */
   {id:'patchwerk',name:'Patchwerk',hint:'2-3 MTs rotating Hateful Strike. 4 healers per tank.',note:'Hateful Strike hits highest HP non-tank player in melee — keep 2 tanks in melee. Hard DPS check: 6 min enrage.',segments:[{title:'MT 1',cols:1,slots:[{key:'mt1',label:'MT 1',markIdx:null}]},{title:'MT 1 Healers',cols:4,isHealRow:true,slots:[{key:'h1a',label:'Heal MT1 — 1',isHealer:true},{key:'h1b',label:'Heal MT1 — 2',isHealer:true},{key:'h1c',label:'Heal MT1 — 3',isHealer:true},{key:'h1d',label:'Heal MT1 — 4',isHealer:true}]},{title:'Hateful Tank 1',cols:1,slots:[{key:'mt2',label:'Hateful Tank 1',markIdx:null}]},{title:'HT1 Healers',cols:4,isHealRow:true,slots:[{key:'h2a',label:'Heal HT1 — 1',isHealer:true},{key:'h2b',label:'Heal HT1 — 2',isHealer:true},{key:'h2c',label:'Heal HT1 — 3',isHealer:true},{key:'h2d',label:'Heal HT1 — 4',isHealer:true}]},{title:'Hateful Tank 2',cols:1,slots:[{key:'mt3',label:'Hateful Tank 2',markIdx:null}]},{title:'HT2 Healers',cols:4,isHealRow:true,slots:[{key:'h3a',label:'Heal HT2 — 1',isHealer:true},{key:'h3b',label:'Heal HT2 — 2',isHealer:true},{key:'h3c',label:'Heal HT2 — 3',isHealer:true},{key:'h3d',label:'Heal HT2 — 4',isHealer:true}]}]},
   {id:'grobbulus',name:'Grobbulus',hint:'1 MT kiting. 1 Slime Tank OT. Dispeller (Priest/Paladin).',note:'MT kites boss slowly. Mutating Injection: run to wall. Slime Spray: move out.',segments:[{title:'Tanks',cols:2,slots:[{key:'mt',label:'Grobbulus',markIdx:0,healerKey:'mth'},{key:'slimet',label:'Slime Tank',markIdx:null,healerKey:'slimeh'}]},{title:'Healers',cols:2,isHealRow:true,slots:[{key:'mth',label:'Healer — MT',isHealer:true},{key:'slimeh',label:'Healer — Slime',isHealer:true}]},{title:'Dispeller',cols:1,slots:[{key:'disp',label:'Dispeller',markIdx:null,highlightCls:['Priest','Paladin']}]}]},
-  {id:'gluth',name:'Gluth',hint:'1 MT + 1 OT. Zombie Kiter (Paladin). Piercing Howl (Warrior). Kiter has 2 healers.',note:'Decimate: drops all to 5% HP — top off BEFORE. Zombie Chow kiter runs in circles. Freeze traps help.',segments:[{title:'Tanks',cols:2,slots:[{key:'mt',label:'Gluth',markIdx:0,healerKey:'mth'},{key:'ot',label:'OT',markIdx:null,healerKey:'oth'}]},{title:'MT/OT Healers',cols:2,isHealRow:true,slots:[{key:'mth',label:'Healer — MT',isHealer:true},{key:'oth',label:'Healer — OT',isHealer:true}]},{title:'Zombie Kiter',cols:1,slots:[{key:'kite',label:'Zombie Kiter',markIdx:null,highlightCls:['Paladin']}]},{title:'Kiter Healers',cols:2,isHealRow:true,slots:[{key:'kh1',label:'Kiter Healer 1',isHealer:true},{key:'kh2',label:'Kiter Healer 2',isHealer:true}]},{title:'Piercing Howl',cols:1,slots:[{key:'howl',label:'Piercing Howl',markIdx:null,highlightCls:['Warrior']}]}]},
-  {id:'thaddius',name:'Thaddius',hint:'2 tanks on Stalagg, 2 tanks on Feugen. P2: Polarity Shift.',note:'P1: Kill both simultaneously — must die within 5s. P2: Positive right, negative left.',segments:[{title:'Stalagg Tanks',cols:2,slots:[{key:'ts1',label:'Stalagg Tank 1',markIdx:null,healerKey:'sh1'},{key:'ts2',label:'Stalagg Tank 2',markIdx:null,healerKey:'sh2'}]},{title:'Stalagg Healers',cols:2,isHealRow:true,slots:[{key:'sh1',label:'Heal Stalagg T1',isHealer:true},{key:'sh2',label:'Heal Stalagg T2',isHealer:true}]},{title:'Feugen Tanks',cols:2,slots:[{key:'tf1',label:'Feugen Tank 1',markIdx:null,healerKey:'fh1'},{key:'tf2',label:'Feugen Tank 2',markIdx:null,healerKey:'fh2'}]},{title:'Feugen Healers',cols:2,isHealRow:true,slots:[{key:'fh1',label:'Heal Feugen T1',isHealer:true},{key:'fh2',label:'Heal Feugen T2',isHealer:true}]},{title:'Thaddius Tank',cols:1,slots:[{key:'mt',label:'Thaddius MT',markIdx:null,healerKey:'th1'}]},{title:'Thaddius Healer',cols:1,isHealRow:true,slots:[{key:'th1',label:'Healer — Thaddius',isHealer:true}]}]},
+  {id:'gluth',name:'Gluth',hint:'1 MT + 1 OT. Zombie Kiter (Paladin). Piercing Howl (Warrior). Kiter has 2 healers.',note:'Decimate: drops all to 5% HP — top off BEFORE. Zombie Chow kiter runs in circles. Freeze traps help.',segments:[{title:'Tanks',cols:2,slots:[{key:'mt',label:'Gluth',markIdx:0,healerKey:'mth'},{key:'ot',label:'OT',markIdx:null,healerKey:'oth'}]},{title:'MT/OT Healers',cols:2,isHealRow:true,slots:[{key:'mth',label:'Healer — MT',isHealer:true},{key:'oth',label:'Healer — OT',isHealer:true}]},{title:'Zombie Kiter',cols:1,slots:[{key:'kite',label:'Zombie Kiter',markIdx:5,highlightCls:['Paladin']}]},{title:'Kiter Healers',cols:2,isHealRow:true,slots:[{key:'kh1',label:'Kiter Healer 1',isHealer:true},{key:'kh2',label:'Kiter Healer 2',isHealer:true}]},{title:'Piercing Howl',cols:1,slots:[{key:'howl',label:'Piercing Howl',markIdx:null,highlightCls:['Warrior']}]}]},
+  {id:'thaddius',name:'Thaddius',hint:'2 tanks on Stalagg, 2 tanks on Feugen. P2: Polarity Shift.',note:'P1: Kill both simultaneously — must die within 5s. P2: Positive right, negative left.',segments:[{title:'Stalagg Tanks',cols:2,slots:[{key:'ts1',label:'Stalagg Tank 1',markIdx:null,healerKey:'sh1'},{key:'ts2',label:'Stalagg Tank 2',markIdx:null,healerKey:'sh2'}]},{title:'Stalagg Healers',cols:2,isHealRow:true,slots:[{key:'sh1',label:'Heal Stalagg T1',isHealer:true},{key:'sh2',label:'Heal Stalagg T2',isHealer:true}]},{title:'Feugen Tanks',cols:2,slots:[{key:'tf1',label:'Feugen Tank 1',markIdx:null,healerKey:'fh1'},{key:'tf2',label:'Feugen Tank 2',markIdx:null,healerKey:'fh2'}]},{title:'Feugen Healers',cols:2,isHealRow:true,slots:[{key:'fh1',label:'Heal Feugen T1',isHealer:true},{key:'fh2',label:'Heal Feugen T2',isHealer:true}]},{title:'Thaddius Tank',cols:1,slots:[{key:'mt',label:'Thaddius MT',markIdx:null}]}]},
   /* Frostwyrm Lair */
   {id:'sapphiron',name:'Sapphiron',hint:'1 MT. High Frost Resistance required. Hide behind Ice Blocks during Blizzard.',note:'Frost Aura hits whole raid constantly \u2014 FR gear required (150+ all, 200+ tanks). Air phase: Blizzard \u2014 hide behind Ice Block corpses. Land phase: burn. Drain Life: interrupt.',segments:[{title:'Tank',cols:1,slots:[{key:'mt',label:'Sapphiron',markIdx:0}]},{title:'Healers',cols:4,isHealRow:true,slots:[{key:'mth',label:'Healer 1',isHealer:true},{key:'h2',label:'Healer 2',isHealer:true},{key:'h3',label:'Healer 3',isHealer:true},{key:'h4',label:'Healer 4',isHealer:true}]}],hasGroupOrder:true},
   {id:'kelthuzad',name:"Kel'Thuzad",hint:"P1: kill adds. P2: MT on KT, OT on MCd players. Set group order below.",note:"P1 (4 min): Kill Cultists, Abominations, Banshees \u2014 do not touch KT. P2: Tank KT, interrupt Frostbolt Volley. MC: OT picks up mind-controlled player. Chains of Kel'Thuzad at low HP \u2014 assign OTs in advance.",segments:[{title:'P1 Add Tanks',cols:2,slots:[{key:'at1',label:'Add Tank 1',markIdx:0},{key:'at2',label:'Add Tank 2',markIdx:1}]},{title:'P2 Boss Tank',cols:1,slots:[{key:'mt',label:"Kel'Thuzad MT",markIdx:2}]},{title:'MC OT',cols:1,slots:[{key:'mct',label:'MC OT',markIdx:3}]},{title:'Healers',cols:4,isHealRow:true,slots:[{key:'mth',label:'Heal \u2014 MT',isHealer:true},{key:'mcth',label:'Heal \u2014 MC OT',isHealer:true},{key:'h3',label:'Healer 3',isHealer:true},{key:'h4',label:'Healer 4',isHealer:true}]}],hasGroupOrder:true}
@@ -384,6 +384,16 @@ function initBossGroups(bossId){
   var bossRef=null;
   for(var i=0;i<BOSSES.length;i++)if(BOSSES[i].id===bossId){bossRef=BOSSES[i];break;}
   var gc=bossRef&&bossRef.groupCount?bossRef.groupCount:8;
+
+  if(bossId==='loatheb'){
+    initLoathebGroups(bossRef,gc);
+    return;
+  }
+  if(bossId==='gothik'){
+    initGothikGroups(gc);
+    return;
+  }
+
   var bg=[];
   for(var i=0;i<gc;i++){
     var slots=[];
@@ -394,6 +404,147 @@ function initBossGroups(bossId){
     bg.push({slots:slots});
   }
   bossGroups[bossId]=bg;
+}
+
+function initGothikGroups(gc){
+  /* Groups 1-4 = Undead Side (Paladins, Druids, Hunters preferred)
+     Groups 5-8 = Living Side (Mages, Warlocks, Priests preferred) */
+  var allPlayers=[];
+  for(var gi=0;gi<groups.length;gi++)
+    for(var si=0;si<groups[gi].slots.length;si++)
+      if(groups[gi].slots[si].p)allPlayers.push(groups[gi].slots[si].p);
+
+  var undeadCls={Paladin:1,Druid:1,Hunter:1};
+  var livingCls={Mage:1,Warlock:1,Priest:1};
+
+  var undeadPref=allPlayers.filter(function(p){return undeadCls[p.cls];});
+  var livingPref=allPlayers.filter(function(p){return livingCls[p.cls];});
+  var neutral=allPlayers.filter(function(p){return !undeadCls[p.cls]&&!livingCls[p.cls];});
+
+  var half=gc/2; /* 4 groups each side for gc=8 */
+  var undeadGroups=[],livingGroups=[];
+  for(var i=0;i<half;i++){undeadGroups.push([]);livingGroups.push([]);}
+
+  /* Fill undead side (groups 1-4) round-robin with preferred classes first */
+  var ui=0;
+  while(ui<undeadPref.length){
+    var placed=false;
+    for(var g=0;g<half;g++){
+      if(undeadGroups[g].length<5){undeadGroups[g].push(undeadPref[ui++]);placed=true;break;}
+    }
+    if(!placed)break;
+  }
+  /* Fill living side (groups 5-8) round-robin with preferred classes first */
+  var li=0;
+  while(li<livingPref.length){
+    var placed=false;
+    for(var g=0;g<half;g++){
+      if(livingGroups[g].length<5){livingGroups[g].push(livingPref[li++]);placed=true;break;}
+    }
+    if(!placed)break;
+  }
+
+  /* Remaining preferred overflow + neutral classes fill whichever side has room,
+     alternating to keep balance */
+  var leftover=undeadPref.slice(ui).concat(livingPref.slice(li),neutral);
+  var side=0; /* 0=undead,1=living */
+  var lo=0;
+  var attempts=0;
+  while(lo<leftover.length&&attempts<gc*10){
+    var targetGroups=side===0?undeadGroups:livingGroups;
+    var placedAny=false;
+    for(var g=0;g<half;g++){
+      if(targetGroups[g].length<5){targetGroups[g].push(leftover[lo++]);placedAny=true;break;}
+    }
+    side=1-side;
+    attempts++;
+    if(!placedAny&&attempts>gc*2)break;
+  }
+
+  var combined=undeadGroups.concat(livingGroups);
+  var finalBg=combined.map(function(arr){
+    var slots=[];
+    for(var s=0;s<5;s++){
+      var p=arr[s]||null;
+      slots.push({p:p?{id:p.id,name:p.name,cls:p.cls,spec:p.spec,role:p.role}:null});
+    }
+    return {slots:slots};
+  });
+  bossGroups['gothik']=finalBg;
+}
+
+function initLoathebGroups(bossRef,gc){
+  /* Exclude: the assigned MT and anyone currently assigned as a healer on Loatheb,
+     and exclude healers in general (role==='healer'). Mages lead group 1 (spill to 2),
+     Hunters all go to group gc (last group, index gc-1). */
+  var bd=bossData['loatheb']||{};
+  var tankId=bd.mt?bd.mt.id:null;
+  var healerIds={};
+  for(var k in bd){if(k!=='notes'&&k!=='mt'&&bd[k]&&bd[k].id)healerIds[bd[k].id]=true;}
+
+  /* Gather all players currently in the main raid groups */
+  var allPlayers=[];
+  for(var gi=0;gi<groups.length;gi++)
+    for(var si=0;si<groups[gi].slots.length;si++)
+      if(groups[gi].slots[si].p)allPlayers.push(groups[gi].slots[si].p);
+
+  /* Filter out tank + healers + actual healer-role players */
+  var pool=allPlayers.filter(function(p){
+    if(tankId&&p.id===tankId)return false;
+    if(healerIds[p.id])return false;
+    if(p.role==='healer')return false;
+    return true;
+  });
+
+  var mages=pool.filter(function(p){return p.cls==='Mage';});
+  var warlocks=pool.filter(function(p){return p.cls==='Warlock';});
+  var hunters=pool.filter(function(p){return p.cls==='Hunter';});
+  var rest=pool.filter(function(p){return p.cls!=='Mage'&&p.cls!=='Warlock'&&p.cls!=='Hunter';});
+
+  var bg=[];
+  for(var i=0;i<gc;i++)bg.push([]);
+
+  /* Mages fill group 1 first (up to 5), spill into group 2 */
+  var mi=0;
+  while(mi<mages.length&&bg[0].length<5)bg[0].push(mages[mi++]);
+  while(mi<mages.length&&gc>1&&bg[1].length<5)bg[1].push(mages[mi++]);
+  /* Any further mage overflow goes to rest pool to be placed normally */
+  var leftoverMages=mages.slice(mi);
+
+  /* Warlocks fill remaining space in group 1, then group 2 */
+  var wi=0;
+  while(wi<warlocks.length&&bg[0].length<5)bg[0].push(warlocks[wi++]);
+  while(wi<warlocks.length&&gc>1&&bg[1].length<5)bg[1].push(warlocks[wi++]);
+  var leftoverWarlocks=warlocks.slice(wi);
+
+  /* Hunters → last group (index gc-1) */
+  var hi=0;
+  var lastIdx=gc-1;
+  while(hi<hunters.length&&bg[lastIdx].length<5)bg[lastIdx].push(hunters[hi++]);
+  var leftoverHunters=hunters.slice(hi);
+
+  /* Remaining pool (rest + leftovers) fill groups round-robin, skipping full groups,
+     preferring earlier groups first but not forcing into group 1/2/last unless space */
+  var remaining=rest.concat(leftoverMages,leftoverWarlocks,leftoverHunters);
+  var gIdx=0;
+  var attempts=0;
+  while(remaining.length&&attempts<gc*10){
+    if(bg[gIdx].length<5){
+      bg[gIdx].push(remaining.shift());
+    }
+    gIdx=(gIdx+1)%gc;
+    attempts++;
+  }
+
+  var finalBg=bg.map(function(arr){
+    var slots=[];
+    for(var s=0;s<5;s++){
+      var p=arr[s]||null;
+      slots.push({p:p?{id:p.id,name:p.name,cls:p.cls,spec:p.spec,role:p.role}:null});
+    }
+    return {slots:slots};
+  });
+  bossGroups['loatheb']=finalBg;
 }
 
 function getBossGroups(bossId){
@@ -617,6 +768,11 @@ function getTrashHealerForTank(tankPlayer){
 
 /* Build preview text for a boss */
 function buildBossPreview(boss,bd){
+  /* Boss-specific custom preview overrides */
+  if(boss.id==='maexxna')return buildMaexxnaPreview(boss,bd);
+  if(boss.id==='loatheb')return buildLoathebPreview(boss,bd);
+  if(boss.id==='horsemen')return buildHorsemenPreview(boss,bd);
+
   var lines=[boss.name+' assignments'];
   /* Track which healer keys have already been printed via healerKey reference
      so standalone isHealRow segments don't repeat them */
@@ -654,6 +810,71 @@ function buildBossPreview(boss,bd){
     });
   });
 
+  if(lines.length===1)return '';
+  return lines.join('\n');
+}
+
+function buildMaexxnaPreview(boss,bd){
+  var lines=[boss.name+' assignments'];
+  if(bd.mt){
+    var mark=bd.mt?'{Skull} ':'';
+    lines.push(mark+'Maexxna: '+bd.mt.name);
+  }
+  var mh=[];
+  if(bd.mth)mh.push(bd.mth.name);
+  if(bd.h2)mh.push(bd.h2.name);
+  if(bd.h3)mh.push(bd.h3.name);
+  if(mh.length)lines.push('Healers: '+mh.join(', '));
+
+  /* Combine left/middle/right web DPS pairs and their healer */
+  [['lw1','lw2','lwh','Left Web'],['mw1','mw2','mwh','Middle Web'],['rw1','rw2','rwh','Right Web']].forEach(function(w){
+    var dps=[];
+    if(bd[w[0]])dps.push(bd[w[0]].name);
+    if(bd[w[1]])dps.push(bd[w[1]].name);
+    if(dps.length)lines.push(w[3]+' DPS: '+dps.join(' + '));
+    if(bd[w[2]])lines.push(w[3]+' Healer: '+bd[w[2]].name);
+  });
+
+  if(bd.t2h)lines.push('T2 Heal: '+bd.t2h.name);
+  if(bd.ap)lines.push('Abolish Poison: '+bd.ap.name);
+
+  if(lines.length===1)return '';
+  return lines.join('\n');
+}
+
+function buildLoathebPreview(boss,bd){
+  var lines=[boss.name+' assignments'];
+  if(bd.mt)lines.push('{Skull} Tank: '+bd.mt.name);
+  var healerNames=[];
+  for(var i=1;i<=12;i++){
+    var k='h'+i;
+    if(bd[k])healerNames.push('['+i+'] '+bd[k].name);
+  }
+  if(healerNames.length)lines.push('Healers: '+healerNames.join(', '));
+  if(lines.length===1)return '';
+  return lines.join('\n');
+}
+
+function buildHorsemenPreview(boss,bd){
+  var lines=[boss.name+' assignments'];
+  var corners=[
+    {pfx:'th',label:'Thane'},
+    {pfx:'bl',label:'Blaumeux'},
+    {pfx:'ze',label:'Zeliek'},
+    {pfx:'mo',label:'Mograine'}
+  ];
+  corners.forEach(function(c){
+    var tanks=[];
+    if(bd[c.pfx+'1'])tanks.push(bd[c.pfx+'1'].name);
+    if(bd[c.pfx+'2'])tanks.push(bd[c.pfx+'2'].name);
+    if(tanks.length)lines.push(c.label+' Tanks: '+tanks.join(', '));
+    var heals=[];
+    for(var m=1;m<=3;m++){
+      var hk=c.pfx+'h'+m;
+      if(bd[hk])heals.push('[M'+m+'] '+bd[hk].name);
+    }
+    if(heals.length)lines.push(c.label+': '+heals.join(', '));
+  });
   if(lines.length===1)return '';
   return lines.join('\n');
 }
@@ -995,9 +1216,17 @@ function renderBossTab(boss){
     h+='<span>Group Setup \u2014 '+he(boss.name)+'</span>';
     h+='<button class="btn bsm" data-a="bgReset" data-bid="'+boss.id+'" style="font-size:.6rem">Reset from main groups</button>';
     if(boss.id==='cthun')h+='<button class="btn bsm" data-a="bgAutoAssign" data-bid="'+boss.id+'" style="font-size:.6rem;background:#1a3a20;border-color:#2a6a3a;color:#80d870;margin-left:4px">&#9881; Auto-assign</button>';
+    if(boss.id==='gothik')h+='<button class="btn bsm" data-a="bgAutoAssign" data-bid="'+boss.id+'" style="font-size:.6rem;background:#1a3a20;border-color:#2a6a3a;color:#80d870;margin-left:4px">&#9881; Auto-assign</button>';
+    if(boss.id==='loatheb')h+='<button class="btn bsm" data-a="bgAutoAssign" data-bid="'+boss.id+'" style="font-size:.6rem;background:#1a3a20;border-color:#2a6a3a;color:#80d870;margin-left:4px">&#9881; Auto-assign</button>';
     h+='</div>';
     var isSelecting=_goActiveBid===boss.id&&_goActiveGi>=0;
     h+='<div style="font-size:.68rem;color:#4a6090;margin-bottom:.5rem">'+(isSelecting?'<span style="color:#60cc80">&#10003; Player selected \u2014 click another slot to swap</span>':'Click a player to select, then click another slot to swap positions.')+'</div>';
+    if(boss.id==='gothik'){
+      h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:.4rem">';
+      h+='<div style="text-align:center;font-family:Cinzel,serif;font-size:.65rem;color:#a070d0;background:#1a0a2a;border-radius:4px;padding:3px">Undead Side (Groups 1\u20134)</div>';
+      h+='<div style="text-align:center;font-family:Cinzel,serif;font-size:.65rem;color:#70a0d0;background:#0a1a2a;border-radius:4px;padding:3px">Living Side (Groups 5\u20138)</div>';
+      h+='</div>';
+    }
     h+='<div style="display:grid;grid-template-columns:'+gridCols+';gap:5px">';
     for(var gi4=0;gi4<gc;gi4++){
       var grp4=bg[gi4];
@@ -1078,6 +1307,9 @@ function doAssign(pid){
         });
       });
     }
+    /* Loatheb: re-seed group setup whenever tank/healers change, so excluded
+       players are kept out of the group layout automatically */
+    if(s.bid==='loatheb'&&bossGroups['loatheb'])initBossGroups('loatheb');
   }
   rAll();
 }
@@ -1369,6 +1601,11 @@ document.addEventListener('click',function(e){
   }
   if(a==='bgAutoAssign'){
     var bid4=el.dataset.bid;
+    if(bid4==='gothik'){initGothikGroups(8);rBossTabs();return;}
+    if(bid4==='loatheb'){
+      var bossRef4=null;for(var bi6=0;bi6<BOSSES.length;bi6++)if(BOSSES[bi6].id==='loatheb'){bossRef4=BOSSES[bi6];break;}
+      initLoathebGroups(bossRef4,6);rBossTabs();return;
+    }
     var bg4=getBossGroups(bid4);
     var gc4=bg4.length;
 
