@@ -121,7 +121,7 @@ textarea{width:100%;background:#0d1020;border:1px solid #2a3050;color:#e0d8f8;pa
 <div class="app">
 <h1>WoW Classic Raid Organizer</h1>
 <div class="sub">Organize your 40-man raid &mdash; select a raid below</div>
-<div style="text-align:center;font-size:.6rem;color:#4a6890;font-family:Cinzel,serif;letter-spacing:.08em;margin-top:-.3rem;margin-bottom:.5rem">v1.1.0</div>
+<div style="text-align:center;font-size:.6rem;color:#4a6890;font-family:Cinzel,serif;letter-spacing:.08em;margin-top:-.3rem;margin-bottom:.5rem">v1.2.0</div>
 <div style="display:flex;gap:6px;justify-content:center;margin-bottom:.9rem;flex-wrap:wrap">
   <button class="btn raid-sel-btn" data-raid="mc"   id="rsMC"   style="font-family:Cinzel,serif;font-size:.74rem;padding:5px 14px;border-radius:4px;cursor:pointer;border:1px solid #3a6ae0;background:#1a3a80;color:#c8d8ff">&#128293; Molten Core</button>
   <button class="btn raid-sel-btn" data-raid="bwl"  id="rsBWL"  style="font-family:Cinzel,serif;font-size:.74rem;padding:5px 14px;border-radius:4px;cursor:pointer;border:1px solid #2a3050;background:#131726;color:#7ab0ff">&#128009; Blackwing Lair</button>
@@ -1378,6 +1378,8 @@ document.addEventListener('click',function(e){
       for(var si6=0;si6<5;si6++)
         if(bg4[gi6].slots[si6].p)allBgPlayers.push(bg4[gi6].slots[si6].p);
 
+    var total=allBgPlayers.length; /* may be less than gc4*5 */
+
     /* Categorise */
     var healers4=[],melee4=[],ranged4=[];
     allBgPlayers.forEach(function(p){
@@ -1390,22 +1392,34 @@ document.addEventListener('click',function(e){
     function shuffle4(arr){for(var i=arr.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=arr[i];arr[i]=arr[j];arr[j]=t;}return arr;}
     shuffle4(healers4);shuffle4(melee4);shuffle4(ranged4);
 
-    /* Build gc4 groups with 1 healer, 2 melee, rest ranged per group */
+    /* Build gc4 buckets — start empty */
     var ng4=[];
     for(var g4=0;g4<gc4;g4++)ng4.push([]);
 
-    /* 1 healer per group (overflow → ranged bucket) */
+    /* --- Distribute with round-robin to spread empty slots evenly ---
+       Strategy: for each "position" within a group (slot 0..4), fill across
+       all groups before moving to the next position. This way if we run short
+       of players the gaps appear one-per-group rather than entire empty groups. */
+
+    /* Step 1: 1 healer per group, round-robin */
     for(var g4=0;g4<gc4;g4++){
       if(healers4.length)ng4[g4].push(healers4.shift());
     }
+    /* Overflow healers → ranged */
     while(healers4.length)ranged4.push(healers4.shift());
 
-    /* 2 melee per group, max 3 */
+    /* Step 2: melee — target 2 per group, distribute round-robin
+       First pass gives 1 melee to each group, second pass gives the 2nd */
     var meleePerGroup=[];
     for(var g4=0;g4<gc4;g4++)meleePerGroup.push(0);
-    for(var g4=0;g4<gc4;g4++){
-      for(var m4=0;m4<2&&melee4.length;m4++){ng4[g4].push(melee4.shift());meleePerGroup[g4]++;}
+
+    /* Two passes of round-robin melee */
+    for(var pass=0;pass<2;pass++){
+      for(var g4=0;g4<gc4;g4++){
+        if(melee4.length){ng4[g4].push(melee4.shift());meleePerGroup[g4]++;}
+      }
     }
+    /* Remaining melee: 3rd slot round-robin (max 3 per group) */
     var gi4=0;
     while(melee4.length&&gi4<gc4*4){
       var idx4=gi4%gc4;
@@ -1414,13 +1428,20 @@ document.addEventListener('click',function(e){
     }
     while(melee4.length)ranged4.push(melee4.shift());
 
-    /* Fill rest with ranged */
-    var ri4=0;
-    for(var g4=0;g4<gc4;g4++){
-      while(ng4[g4].length<5&&ri4<ranged4.length)ng4[g4].push(ranged4[ri4++]);
+    /* Step 3: fill remaining slots with ranged, round-robin across positions
+       so each group gets 1 ranged before any group gets a 2nd, etc. */
+    var slotsLeft=[];
+    for(var g4=0;g4<gc4;g4++)slotsLeft.push(5-ng4[g4].length);
+    var maxExtra=Math.max.apply(null,slotsLeft);
+    for(var pass=0;pass<maxExtra;pass++){
+      for(var g4=0;g4<gc4;g4++){
+        if(slotsLeft[g4]>pass&&ranged4.length){
+          ng4[g4].push(ranged4.shift());
+        }
+      }
     }
 
-    /* Write back */
+    /* Write back — pad with null to always fill 5 slots */
     for(var g4=0;g4<gc4;g4++){
       for(var s4=0;s4<5;s4++)bg4[g4].slots[s4].p=ng4[g4][s4]||null;
     }
@@ -2022,19 +2043,129 @@ function renderViewMode(data){
     if(boss.hasGroupOrder&&bossLayouts[boss.id]){
       var bl=bossLayouts[boss.id];
       var gc=boss.groupCount||8;
-      var glCols='repeat('+(gc<=6?3:4)+',1fr)';
-      h+='<div style="margin-top:.6rem">';
-      h+='<div style="font-family:Cinzel,serif;font-size:.58rem;color:#7ab0ff;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.35rem">Group Setup</div>';
-      h+='<div class="grp-grid" style="grid-template-columns:'+glCols+'">';
-      for(var bgi=0;bgi<bl.length;bgi++){
-        h+='<div class="grp-card"><div class="grp-hdr">Group '+(bgi+1)+'</div>';
-        bl[bgi].forEach(function(bp){
-          if(bp){var bc=cd(bp.cls);h+='<div class="grp-slot" style="background:'+bc.bg+'">'+ihtml(bp.cls,12,bp.role)+'<span style="font-size:.78rem;font-weight:700;color:#f8f8f8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+he(bp.name)+'</span></div>';}
-          else h+='<div class="grp-slot"><span style="font-size:.6rem;color:#3a5080">—</span></div>';
+
+      if(boss.id==='cthun'){
+        /* ── C'Thun Phase 1 room diagram ── */
+        var vMSct=['💀','✚','■','☽','▲','◆','●','★'];
+        var vMCct=['#f0f0f0','#e03030','#4080e0','#d0d0d0','#30b050','#c060e0','#e08020','#f0d030'];
+        /* Mark order around ring: idx→group assignment
+           Group 1=Skull(0), 2=Cross(1), 3=Square(2), 4=Moon(3),
+           5=Triangle(4), 6=Diamond(5), 7=Circle(6), 8=Star(7) */
+        var ctGroups=bl; /* array of 8 groups */
+
+        function ctNp(bp){
+          if(!bp)return '<span style="font-size:.6rem;color:#253045;font-style:italic">—</span>';
+          var cc=cd(bp.cls);
+          return '<div style="display:flex;align-items:center;gap:3px;padding:2px 5px;background:'+cc.bg+';border-bottom:1px solid #1a2040;overflow:hidden">'
+            +ihtml(bp.cls,12,bp.role)
+            +'<span style="font-size:.72rem;font-weight:700;color:#f8f8f8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+he(bp.name)+'</span>'
+            +'</div>';
+        }
+
+        function ctCard(gi,mIdx){
+          var grp=ctGroups[gi]||[];
+          var mc=vMCct[mIdx];
+          var ms=vMSct[mIdx];
+          var h2='<div style="background:#0f1322;border:1px solid '+mc+'28;border-radius:6px;overflow:hidden;width:116px">';
+          h2+='<div style="background:'+mc+'18;padding:3px 7px;display:flex;align-items:center;gap:4px;border-bottom:1px solid '+mc+'25">';
+          h2+='<span style="font-family:Cinzel,serif;font-size:.95rem;font-weight:700;color:'+mc+';line-height:1">'+(gi+1)+'</span>';
+          h2+='<span style="font-size:.75rem;color:'+mc+';opacity:.65">'+ms+'</span>';
+          h2+='</div>';
+          for(var si=0;si<5;si++)h2+=ctNp(grp[si]||null);
+          h2+='</div>';
+          return h2;
+        }
+
+        h+='<div style="margin-top:.8rem">';
+        h+='<div style="font-family:Cinzel,serif;font-size:.58rem;color:#7ab0ff;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.6rem">Group Setup — Phase 1 Positions</div>';
+
+        /* Wrap everything in a relative container matching the SVG */
+        h+='<div style="position:relative;width:680px;height:740px;font-family:Crimson Pro,Georgia,serif">';
+
+        /* SVG: shield + rings + marks + guide lines */
+        h+='<svg width="680" height="740" style="position:absolute;top:0;left:0" viewBox="0 0 680 740">';
+
+        /* Shield */
+        h+='<path d="M340,18 L600,100 L612,340 Q605,490 470,585 Q420,615 380,632 L380,740 L300,740 L300,632 Q260,615 210,585 Q75,490 68,340 L80,100 Z" fill="#0d1228" stroke="#2a3a6a" stroke-width="2"/>';
+
+        /* Staircase — straight parallel lines, no choke */
+        h+='<g fill="none" stroke="#243858" stroke-width="1">';
+        for(var si2=0;si2<6;si2++)h+='<line x1="300" y1="'+(640+si2*15)+'" x2="380" y2="'+(640+si2*15)+'"/>';
+        h+='</g>';
+        h+='<text x="340" y="734" text-anchor="middle" font-family="Cinzel,serif" font-size="7.5" fill="#3a5070" letter-spacing="3">ENTRANCE</text>';
+
+        /* Rings */
+        h+='<circle cx="340" cy="320" r="175" fill="none" stroke="#1e2a50" stroke-width="1" stroke-dasharray="2,5"/>';
+        h+='<circle cx="340" cy="320" r="105" fill="#0c0a22" stroke="#4a2880" stroke-width="1.5"/>';
+        h+='<circle cx="340" cy="320" r="50" fill="#180a38" stroke="#7040c0" stroke-width="2"/>';
+        h+='<text x="340" y="316" text-anchor="middle" font-family="Cinzel,serif" font-size="8" fill="#a070d0">C\'THUN</text>';
+        h+='<text x="340" y="328" text-anchor="middle" font-family="Cinzel,serif" font-size="7" fill="#6040a0">STOMACH</text>';
+
+        /* Marks: equal 45° at r=105, cx=340 cy=320
+           Skull=337.5°→(300,223), Cross=22.5°→(380,223),
+           Square=292.5°→(243,280), Moon=67.5°→(437,280),
+           Triangle=247.5°→(243,360), Diamond=112.5°→(437,360),
+           Circle=202.5°→(300,417), Star=157.5°→(380,417) */
+        var mxs=[300,380,243,437,243,437,300,380];
+        var mys=[223,223,280,280,360,360,417,417];
+        h+='<g font-size="15" text-anchor="middle" dominant-baseline="central">';
+        for(var mi=0;mi<8;mi++)h+='<text x="'+mxs[mi]+'" y="'+mys[mi]+'" fill="'+vMCct[mi]+'">'+vMSct[mi]+'</text>';
+        h+='</g>';
+
+        /* Guide lines */
+        var gx1=[293,387,233,447,233,447,294,386];
+        var gy1=[216,216,278,278,362,362,424,424];
+        /* panel anchor points matching card positions below */
+        var gx2=[272,408,132,548,132,548,272,408];
+        var gy2=[110,110,245,245,378,378,528,528];
+        h+='<g stroke="#1a2848" stroke-width=".75" fill="none" opacity=".6">';
+        for(var li2=0;li2<8;li2++)h+='<line x1="'+gx1[li2]+'" y1="'+gy1[li2]+'" x2="'+gx2[li2]+'" y2="'+gy2[li2]+'"/>';
+        h+='</g>';
+        h+='</svg>';
+
+        /* Group cards positioned over the SVG */
+        /* Groups 1 & 2 — NORTH tight together */
+        h+='<div style="position:absolute;top:58px;left:214px">'+ctCard(0,0)+'</div>';
+        h+='<div style="position:absolute;top:58px;left:350px">'+ctCard(1,1)+'</div>';
+        /* Groups 3 & 4 — sides upper */
+        h+='<div style="position:absolute;top:218px;left:8px">'+ctCard(2,2)+'</div>';
+        h+='<div style="position:absolute;top:218px;right:8px">'+ctCard(3,3)+'</div>';
+        /* Groups 5 & 6 — sides lower */
+        h+='<div style="position:absolute;top:358px;left:8px">'+ctCard(4,4)+'</div>';
+        h+='<div style="position:absolute;top:358px;right:8px">'+ctCard(5,5)+'</div>';
+        /* Groups 7 & 8 — SOUTH tight together */
+        h+='<div style="position:absolute;top:508px;left:214px">'+ctCard(6,6)+'</div>';
+        h+='<div style="position:absolute;top:508px;left:350px">'+ctCard(7,7)+'</div>';
+
+        /* Legend */
+        var legCls=[['Warrior','#b06828'],['Rogue','#e0c840'],['Priest','#e8e8e8'],['Druid','#f0a050'],['Paladin','#f0a0c0'],['Mage','#80c8f0'],['Warlock','#b080e0'],['Hunter','#80d870'],['Shaman','#60b0f0']];
+        h+='<div style="position:absolute;bottom:2px;left:0;right:0;display:flex;flex-wrap:wrap;gap:8px;justify-content:center">';
+        legCls.forEach(function(lc){
+          h+='<div style="display:flex;align-items:center;gap:3px;font-size:.62rem">'
+            +'<div style="width:7px;height:7px;border-radius:50%;background:'+lc[1]+';flex-shrink:0"></div>'
+            +'<span style="color:'+lc[1]+'">'+lc[0]+'</span></div>';
         });
         h+='</div>';
+
+        h+='</div>'; /* end relative container */
+        h+='</div>'; /* end margin wrapper */
+
+      } else {
+        /* Standard grid for Gothik, Sapphiron, KT, Loatheb */
+        var glCols='repeat('+(gc<=6?3:4)+',1fr)';
+        h+='<div style="margin-top:.6rem">';
+        h+='<div style="font-family:Cinzel,serif;font-size:.58rem;color:#7ab0ff;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.35rem">Group Setup</div>';
+        h+='<div class="grp-grid" style="grid-template-columns:'+glCols+'">';
+        for(var bgi=0;bgi<bl.length;bgi++){
+          h+='<div class="grp-card"><div class="grp-hdr">Group '+(bgi+1)+'</div>';
+          bl[bgi].forEach(function(bp){
+            if(bp){var bc=cd(bp.cls);h+='<div class="grp-slot" style="background:'+bc.bg+'">'+ihtml(bp.cls,12,bp.role)+'<span style="font-size:.78rem;font-weight:700;color:#f8f8f8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+he(bp.name)+'</span></div>';}
+            else h+='<div class="grp-slot"><span style="font-size:.6rem;color:#3a5080">—</span></div>';
+          });
+          h+='</div>';
+        }
+        h+='</div></div>';
       }
-      h+='</div></div>';
     }
     h+='</div>'; /* end boss-sec */
   });
