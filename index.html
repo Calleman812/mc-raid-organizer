@@ -468,6 +468,19 @@ function expandRealm(n){
   }
   return expanded;
 }
+
+function loadRealmDb(){
+  try{var raw=localStorage.getItem('mc_realm_db_v1');return raw?JSON.parse(raw):{};}catch(e){return {};}
+}
+
+function isInRealmDb(name){
+  /* Check if bare name (before any '-') is registered in realm DB */
+  try{
+    var db=loadRealmDb();
+    var bare=name.split('-')[0].toLowerCase();
+    return !!db[bare];
+  }catch(e){return false;}
+}
 function mkG(){groups=[];for(var i=0;i<8;i++){var s=[];for(var j=0;j<5;j++)s.push({p:null});groups.push({id:i+1,slots:s});}}
 function mkMarks(){
   trashMarks=TRASH_MARKS.map(function(m){return{name:m.name,col:m.col,tank:null,healer:null};});
@@ -721,10 +734,14 @@ function rPool(){
       }
     }
     var extraStyle=roleMatch?'outline:2px solid #60cc80;outline-offset:1px;':roleMismatch?'opacity:.4;':'';
+    var inDb=isInRealmDb(p.name);
+    var dbBadge=inDb?'<span title="Found in Realm DB" style="font-size:.6rem;color:#60cc80;flex-shrink:0;margin-right:1px">&#10003;</span>':'<span title="Not in Realm DB" style="font-size:.6rem;color:#3a5080;flex-shrink:0;margin-right:1px">&#63;</span>';
     h+='<div class="pc'+(dim?' dim':canPick?' pick':'')+'" data-pid="'+he(p.id)+'" style="background:'+c.bg+';border-color:'+c.bd+';'+extraStyle+'">'
       +'<div class="pc-inner">'+ihtml(p.cls,18,p.role)
-      +'<span style="font-size:1rem;font-weight:700;color:#f8f8f8;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+he(p.name)+'</span>'
+      +dbBadge
+      +'<span class="pc-name" style="font-size:1rem;font-weight:700;color:#f8f8f8;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" data-pid="'+he(p.id)+'">'+he(p.name)+'</span>'
       +'<span style="font-size:.62rem;color:rgba(248,248,248,0.55);white-space:nowrap">'+he(p.spec||'')+'</span>'
+      +'<button class="bx" data-a="editname" data-pid="'+he(p.id)+'" title="Edit name" style="font-size:.6rem;padding:1px 5px;color:#7ab0ff;border-color:#1a3a70">&#9998;</button>'
       +(p.cls==='Warrior'?'<button class="bx" data-a="totank" data-pid="'+he(p.id)+'" title="'+(p.role==='tank'?'Convert to DPS':'Convert to Tank')+'" style="font-size:.55rem;padding:1px 4px;color:'+(p.role==='tank'?'#7ab0ff':'#e07020')+';border-color:'+(p.role==='tank'?'#2a4a90':'#804010')+'">'+(p.role==='tank'?'D':'T')+'</button>':'')
       +'<button class="bx" data-a="tobench" data-pid="'+he(p.id)+'" title="Move to bench" style="font-size:.55rem;padding:1px 4px">B</button>'
       +'<button class="bx" data-a="rmp" data-pid="'+he(p.id)+'" title="Remove">x</button>'
@@ -1311,6 +1328,38 @@ document.addEventListener('click',function(e){
       _goActiveBid=bid;_goActiveGi=gi;_goActiveSi=si;
     }
     rBossTabs();return;
+  }
+  if(a==='editname'){
+    var pid=el.dataset.pid;
+    /* Find the name span and replace with an input inline */
+    var card=el.closest('.pc');
+    if(!card)return;
+    var nameSpan=card.querySelector('.pc-name');
+    if(!nameSpan||nameSpan.tagName==='INPUT')return;
+    var curName=nameSpan.textContent;
+    var inp=document.createElement('input');
+    inp.value=curName;
+    inp.dataset.pid=pid;
+    inp.dataset.a='commitname';
+    inp.style.cssText='flex:1;background:rgba(0,0,0,.4);border:1px solid #4a7ab0;border-radius:3px;color:#f8f8f8;font-size:.9rem;font-weight:700;padding:1px 5px;min-width:0;font-family:inherit';
+    nameSpan.replaceWith(inp);
+    inp.focus();inp.select();
+    /* Commit on Enter or blur */
+    function commitName(){
+      var newName=inp.value.trim();
+      if(!newName)newName=curName;
+      /* Update player object */
+      var p=null;
+      for(var i=0;i<players.length;i++)if(players[i].id===pid){p=players[i];break;}
+      if(p){p.name=newName;}
+      /* Also update in all assigned slots so MRT export picks it up */
+      for(var bid in bossData){for(var k in bossData[bid]){if(bossData[bid][k]&&bossData[bid][k].id===pid)bossData[bid][k].name=newName;}}
+      for(var gi2=0;gi2<groups.length;gi2++)for(var si2=0;si2<groups[gi2].slots.length;si2++)if(groups[gi2].slots[si2].p&&groups[gi2].slots[si2].p.id===pid)groups[gi2].slots[si2].p.name=newName;
+      rAll();
+    }
+    inp.addEventListener('blur',commitName,{once:true});
+    inp.addEventListener('keydown',function(e){if(e.key==='Enter'){inp.blur();}if(e.key==='Escape'){inp.value=curName;inp.blur();}});
+    return;
   }
   if(a==='bgReset'){
     /* Re-seed boss groups from current main groups */
