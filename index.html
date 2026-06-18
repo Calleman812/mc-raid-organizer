@@ -121,7 +121,7 @@ textarea{width:100%;background:#0d1020;border:1px solid #2a3050;color:#e0d8f8;pa
 <div class="app">
 <h1>WoW Classic Raid Organizer</h1>
 <div class="sub">Organize your 40-man raid &mdash; select a raid below</div>
-<div style="text-align:center;font-size:.6rem;color:#2a3a5a;font-family:Cinzel,serif;letter-spacing:.08em;margin-top:-.3rem;margin-bottom:.5rem">v1.1.0</div>
+<div style="text-align:center;font-size:.6rem;color:#4a6890;font-family:Cinzel,serif;letter-spacing:.08em;margin-top:-.3rem;margin-bottom:.5rem">v1.1.0</div>
 <div style="display:flex;gap:6px;justify-content:center;margin-bottom:.9rem;flex-wrap:wrap">
   <button class="btn raid-sel-btn" data-raid="mc"   id="rsMC"   style="font-family:Cinzel,serif;font-size:.74rem;padding:5px 14px;border-radius:4px;cursor:pointer;border:1px solid #3a6ae0;background:#1a3a80;color:#c8d8ff">&#128293; Molten Core</button>
   <button class="btn raid-sel-btn" data-raid="bwl"  id="rsBWL"  style="font-family:Cinzel,serif;font-size:.74rem;padding:5px 14px;border-radius:4px;cursor:pointer;border:1px solid #2a3050;background:#131726;color:#7ab0ff">&#128009; Blackwing Lair</button>
@@ -655,6 +655,13 @@ function rAll(){
   });
 }
 function rAllNow(){rPool();rGroups();rBossTabs();rStats();}
+/* Re-render only the pool (for highlight updates when sel changes without data change) */
+var _poolRafPending=false;
+function rPoolOnly(){
+  if(_poolRafPending)return;
+  _poolRafPending=true;
+  requestAnimationFrame(function(){_poolRafPending=false;rPool();});
+}
 
 function rStats(){
   var as=aset(),ac=0;for(var k in as)ac++;
@@ -970,6 +977,7 @@ function renderBossTab(boss){
     h+='<div style="font-family:Cinzel,serif;font-size:.72rem;color:#7ab0ff;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.4rem;display:flex;justify-content:space-between;align-items:center">';
     h+='<span>Group Setup \u2014 '+he(boss.name)+'</span>';
     h+='<button class="btn bsm" data-a="bgReset" data-bid="'+boss.id+'" style="font-size:.6rem">Reset from main groups</button>';
+    if(boss.id==='cthun')h+='<button class="btn bsm" data-a="bgAutoAssign" data-bid="'+boss.id+'" style="font-size:.6rem;background:#1a3a20;border-color:#2a6a3a;color:#80d870;margin-left:4px">&#9881; Auto-assign</button>';
     h+='</div>';
     var isSelecting=_goActiveBid===boss.id&&_goActiveGi>=0;
     h+='<div style="font-size:.68rem;color:#4a6090;margin-bottom:.5rem">'+(isSelecting?'<span style="color:#60cc80">&#10003; Player selected \u2014 click another slot to swap</span>':'Click a player to select, then click another slot to swap positions.')+'</div>';
@@ -1011,8 +1019,9 @@ function renderBossTab(boss){
     h+='</div>';
   }
 
-  /* Preview */
+  /* Preview — append extra notes if present */
   var prevText=buildBossPreview(boss,bd);
+  if(bd.notes)prevText+=(prevText?'\n':'')+bd.notes;
   h+='<div class="prev-row"><span class="prev-lbl">Preview</span><button class="btn bsm" data-a="copyBoss" data-bid="'+boss.id+'">Copy</button></div>';
   h+='<div class="expbox" id="bossExpBox_'+boss.id+'">'+he(prevText)+'</div>';
 
@@ -1268,18 +1277,18 @@ document.addEventListener('click',function(e){
   if(a==='topool'){moveToPool(el.dataset.pid);return;}
   if(a==='tobench'){moveToBench(el.dataset.pid);return;}
   if(a==='totank'){convertToTank(el.dataset.pid);return;}
-  if(a==='sg'){sel={t:'g',gi:+el.dataset.gi,si:+el.dataset.si,role:null};setBan('Group '+(+el.dataset.gi+1)+' slot '+(+el.dataset.si+1));rAll();return;}
+  if(a==='sg'){sel={t:'g',gi:+el.dataset.gi,si:+el.dataset.si,role:null};setBan('Group '+(+el.dataset.gi+1)+' slot '+(+el.dataset.si+1));rPoolOnly();return;}
   if(a==='rmg'){groups[+el.dataset.gi].slots[+el.dataset.si].p=null;rAll();return;}
-  if(a==='etank'){sel={t:'etank',ekey:el.dataset.ekey,role:'tank'};setBan('Assign extra tank');rAll();return;}
-  if(a==='ehealer'){sel={t:'ehealer',ekey:el.dataset.ekey,role:'healer'};setBan('Assign extra healer');rAll();return;}
+  if(a==='etank'){sel={t:'etank',ekey:el.dataset.ekey,role:'tank'};setBan('Assign extra tank');rPoolOnly();return;}
+  if(a==='ehealer'){sel={t:'ehealer',ekey:el.dataset.ekey,role:'healer'};setBan('Assign extra healer');rPoolOnly();return;}
   if(a==='rextra'){extraTrashMarks[el.dataset.ekey]=null;rAll();return;}
-  if(a==='st'){sel={t:'tm',mi:+el.dataset.mi,role:'tank'};setBan(trashMarks[+el.dataset.mi].name+' — Tank');rAll();return;}
-  if(a==='sh'){sel={t:'th',mi:+el.dataset.mi,role:'healer'};setBan(trashMarks[+el.dataset.mi].name+' — Healer');rAll();return;}
+  if(a==='st'){sel={t:'tm',mi:+el.dataset.mi,role:'tank'};setBan(trashMarks[+el.dataset.mi].name+' — Tank');rPoolOnly();return;}
+  if(a==='sh'){sel={t:'th',mi:+el.dataset.mi,role:'healer'};setBan(trashMarks[+el.dataset.mi].name+' — Healer');rPoolOnly();return;}
   if(a==='rmt'){trashMarks[+el.dataset.mi].tank=null;rAll();return;}
   if(a==='rmh'){trashMarks[+el.dataset.mi].healer=null;rAll();return;}
-  if(a==='spu'){sel={t:'pu',role:'hunter'};setBan('Puller');rAll();return;}
+  if(a==='spu'){sel={t:'pu',role:'hunter'};setBan('Puller');rPoolOnly();return;}
   if(a==='rpu'){puller=null;rAll();return;}
-  if(a==='sbs'){var bossRef=null;for(var bi2=0;bi2<BOSSES.length;bi2++)if(BOSSES[bi2].id===el.dataset.bid){bossRef=BOSSES[bi2];break;}var slotRole=null,slotHlCls=null;if(bossRef){bossRef.segments.forEach(function(seg){seg.slots.forEach(function(sl){if(sl.key===el.dataset.key){slotRole=sl.isHealer?'healer':sl.isSheep?'mage':sl.highlightCls?sl.highlightCls[0]:sl.isOrb?null:'tank';slotHlCls=sl.highlightCls||null;}});});}sel={t:'bs',bid:el.dataset.bid,key:el.dataset.key,role:slotRole,hlCls:slotHlCls};setBan(el.dataset.bid+' — '+el.dataset.key);rAll();return;}
+  if(a==='sbs'){var bossRef=null;for(var bi2=0;bi2<BOSSES.length;bi2++)if(BOSSES[bi2].id===el.dataset.bid){bossRef=BOSSES[bi2];break;}var slotRole=null,slotHlCls=null;if(bossRef){bossRef.segments.forEach(function(seg){seg.slots.forEach(function(sl){if(sl.key===el.dataset.key){slotRole=sl.isHealer?'healer':sl.isSheep?'mage':sl.highlightCls?sl.highlightCls[0]:sl.isOrb?null:'tank';slotHlCls=sl.highlightCls||null;}});});}sel={t:'bs',bid:el.dataset.bid,key:el.dataset.key,role:slotRole,hlCls:slotHlCls};setBan(el.dataset.bid+' — '+el.dataset.key);rPoolOnly();return;}
   if(a==='rbs'){if(bossData[el.dataset.bid])bossData[el.dataset.bid][el.dataset.key]=null;rAll();return;}
   if(a==='copyTrash'){var box=document.getElementById('trashExpBox');if(box)navigator.clipboard.writeText(box.textContent.replace(/ !/g,'')).catch(function(){});return;}
   if(a==='copyBoss'){var box2=document.getElementById('bossExpBox_'+el.dataset.bid);if(box2)navigator.clipboard.writeText(box2.textContent).catch(function(){});return;}
@@ -1309,6 +1318,65 @@ document.addEventListener('click',function(e){
     initBossGroups(bid3);
     rBossTabs();return;
   }
+  if(a==='bgAutoAssign'){
+    var bid4=el.dataset.bid;
+    var bg4=getBossGroups(bid4);
+    var gc4=bg4.length;
+
+    /* Collect all players currently in the boss groups */
+    var allBgPlayers=[];
+    for(var gi6=0;gi6<gc4;gi6++)
+      for(var si6=0;si6<5;si6++)
+        if(bg4[gi6].slots[si6].p)allBgPlayers.push(bg4[gi6].slots[si6].p);
+
+    /* Categorise */
+    var healers4=[],melee4=[],ranged4=[];
+    allBgPlayers.forEach(function(p){
+      if(p.role==='healer')healers4.push(p);
+      else if(p.cls==='Warrior'||p.cls==='Rogue')melee4.push(p);
+      else ranged4.push(p);
+    });
+
+    /* Shuffle each bucket */
+    function shuffle4(arr){for(var i=arr.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=arr[i];arr[i]=arr[j];arr[j]=t;}return arr;}
+    shuffle4(healers4);shuffle4(melee4);shuffle4(ranged4);
+
+    /* Build gc4 groups with 1 healer, 2 melee, rest ranged per group */
+    var ng4=[];
+    for(var g4=0;g4<gc4;g4++)ng4.push([]);
+
+    /* 1 healer per group (overflow → ranged bucket) */
+    for(var g4=0;g4<gc4;g4++){
+      if(healers4.length)ng4[g4].push(healers4.shift());
+    }
+    while(healers4.length)ranged4.push(healers4.shift());
+
+    /* 2 melee per group, max 3 */
+    var meleePerGroup=[];
+    for(var g4=0;g4<gc4;g4++)meleePerGroup.push(0);
+    for(var g4=0;g4<gc4;g4++){
+      for(var m4=0;m4<2&&melee4.length;m4++){ng4[g4].push(melee4.shift());meleePerGroup[g4]++;}
+    }
+    var gi4=0;
+    while(melee4.length&&gi4<gc4*4){
+      var idx4=gi4%gc4;
+      if(meleePerGroup[idx4]<3){ng4[idx4].push(melee4.shift());meleePerGroup[idx4]++;}
+      gi4++;
+    }
+    while(melee4.length)ranged4.push(melee4.shift());
+
+    /* Fill rest with ranged */
+    var ri4=0;
+    for(var g4=0;g4<gc4;g4++){
+      while(ng4[g4].length<5&&ri4<ranged4.length)ng4[g4].push(ranged4[ri4++]);
+    }
+
+    /* Write back */
+    for(var g4=0;g4<gc4;g4++){
+      for(var s4=0;s4<5;s4++)bg4[g4].slots[s4].p=ng4[g4][s4]||null;
+    }
+    rBossTabs();return;
+  }
 });
 
 document.addEventListener('input',function(e){
@@ -1323,7 +1391,7 @@ document.getElementById('fAll').addEventListener('click',function(){filt='all';d
 document.getElementById('fTank').addEventListener('click',function(){filt='tank';document.getElementById('fAll').className='fbtn';document.getElementById('fTank').className='fbtn on';document.getElementById('fHeal').className='fbtn';document.getElementById('fDps').className='fbtn';rPool();});
 document.getElementById('fHeal').addEventListener('click',function(){filt='healer';document.getElementById('fAll').className='fbtn';document.getElementById('fTank').className='fbtn';document.getElementById('fHeal').className='fbtn on';document.getElementById('fDps').className='fbtn';rPool();});
 document.getElementById('fDps').addEventListener('click',function(){filt='dps';document.getElementById('fAll').className='fbtn';document.getElementById('fTank').className='fbtn';document.getElementById('fHeal').className='fbtn';document.getElementById('fDps').className='fbtn on';rPool();});
-document.getElementById('bCancel').addEventListener('click',function(){sel=null;hideBan();rAll();});
+document.getElementById('bCancel').addEventListener('click',function(){sel=null;hideBan();rPoolOnly();});
 
 document.getElementById('bDemo').addEventListener('click',function(){
   players=[];DEMO.forEach(function(d){players.push({id:d.id,name:d.name,cls:d.cls,spec:d.spec,role:d.role});});
@@ -1776,7 +1844,7 @@ function renderViewMode(data){
       h+='<div class="trash-card-hdr" style="background:'+m.col+'18;color:'+m.col+'">'+vMS[i]+' '+m.name+'</div>';
       h+='<div class="trash-card-body">';
       if(tankP){var tc=cd(tankP.cls);h+='<div class="trash-lbl">Tank</div><div class="mark-np" style="background:'+tc.bg+';border:1px solid '+tc.bd+'">'+ihtml(tankP.cls,13,tankP.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(tankP.name)+'</span></div>';}
-      if(healP){var hc2=cd(healP.cls);h+='<div class="trash-lbl" style="margin-top:3px">Healer</div><div class="mark-np" style="background:'+hc2.bg+';border:1px solid #1e5a32">'+ihtml(healP.cls,13,healP.role)+'<span class="mark-np-name" style="color:#60cc80">'+he(healP.name)+'</span></div>';}
+      if(healP){var hc2=cd(healP.cls);h+='<div class="trash-lbl" style="margin-top:3px">Healer</div><div class="mark-np" style="background:'+hc2.bg+';border:1px solid '+hc2.bd+';border-left:3px solid #2a8a4a">'+ihtml(healP.cls,13,healP.role)+'<span class="mark-np-name" style="color:#60cc80">'+he(healP.name)+'</span></div>';}
       h+='</div></div>';
     });
     /* Extra marks */
@@ -1786,7 +1854,7 @@ function renderViewMode(data){
       h+='<div class="trash-card-hdr" style="background:'+ex[3]+'18;color:'+ex[3]+'">'+ex[2]+' '+ex[4]+'</div>';
       h+='<div class="trash-card-body">';
       if(ex[0]){var tc2=cd(ex[0].cls);h+='<div class="trash-lbl">Tank</div><div class="mark-np" style="background:'+tc2.bg+';border:1px solid '+tc2.bd+'">'+ihtml(ex[0].cls,13,ex[0].role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(ex[0].name)+'</span></div>';}
-      if(ex[1]){var hc3=cd(ex[1].cls);h+='<div class="trash-lbl" style="margin-top:3px">Healer</div><div class="mark-np" style="background:'+hc3.bg+';border:1px solid #1e5a32">'+ihtml(ex[1].cls,13,ex[1].role)+'<span class="mark-np-name" style="color:#60cc80">'+he(ex[1].name)+'</span></div>';}
+      if(ex[1]){var hc3=cd(ex[1].cls);h+='<div class="trash-lbl" style="margin-top:3px">Healer</div><div class="mark-np" style="background:'+hc3.bg+';border:1px solid '+hc3.bd+';border-left:3px solid #2a8a4a">'+ihtml(ex[1].cls,13,ex[1].role)+'<span class="mark-np-name" style="color:#60cc80">'+he(ex[1].name)+'</span></div>';}
       h+='</div></div>';
     });
     h+='</div>';
@@ -1891,7 +1959,7 @@ function renderViewMode(data){
       h+='<div class="healer-chips">';
       healers.forEach(function(sl){
         var hp=pmap[bdata[sl.key]];var hc=cd(hp.cls);
-        h+='<div class="healer-chip" style="background:'+hc.bg+';border:1px solid #1e5a32">';
+        h+='<div class="healer-chip" style="background:'+hc.bg+';border:1px solid '+hc.bd+';border-left:3px solid #2a8a4a">';
         h+=ihtml(hp.cls,13,hp.role);
         h+='<span style="font-size:.85rem;font-weight:700;color:#60cc80">'+he(hp.name)+'</span>';
         h+='</div>';
