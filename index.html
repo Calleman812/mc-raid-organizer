@@ -121,7 +121,7 @@ textarea{width:100%;background:#0d1020;border:1px solid #2a3050;color:#e0d8f8;pa
 <div class="app">
 <h1>WoW Classic Raid Organizer</h1>
 <div class="sub">Organize your 40-man raid &mdash; select a raid below</div>
-<div style="text-align:center;font-size:.6rem;color:#4a6890;font-family:Cinzel,serif;letter-spacing:.08em;margin-top:-.3rem;margin-bottom:.5rem">v1.4.3</div>
+<div style="text-align:center;font-size:.6rem;color:#4a6890;font-family:Cinzel,serif;letter-spacing:.08em;margin-top:-.3rem;margin-bottom:.5rem">v1.4.4</div>
 <div style="display:flex;gap:6px;justify-content:center;margin-bottom:.9rem;flex-wrap:wrap">
   <button class="btn raid-sel-btn" data-raid="mc"   id="rsMC"   style="font-family:Cinzel,serif;font-size:.74rem;padding:5px 14px;border-radius:4px;cursor:pointer;border:1px solid #3a6ae0;background:#1a3a80;color:#c8d8ff">&#128293; Molten Core</button>
   <button class="btn raid-sel-btn" data-raid="bwl"  id="rsBWL"  style="font-family:Cinzel,serif;font-size:.74rem;padding:5px 14px;border-radius:4px;cursor:pointer;border:1px solid #2a3050;background:#131726;color:#7ab0ff">&#128009; Blackwing Lair</button>
@@ -2478,8 +2478,15 @@ function renderViewMode(data){
           [['mark 1',h1k],['mark 2',h2k],['mark 3',h3k]].forEach(function(row,idx){
             var p=fhP(row[1]);
             c+='<div style="display:flex;align-items:center'+(idx<2?';border-bottom:1px solid #1a2030':'')+'">';
-            c+='<div style="width:48px;font-size:.58rem;font-family:Cinzel,serif;color:#7090c0;text-align:center;background:#0d1020;padding:4px 0;border-right:1px solid #1a2030;flex-shrink:0">'+row[0]+'</div>';
-            c+='<div style="flex:1;padding:4px 7px;font-size:.74rem;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#f8f8f8">'+(p?he(p.name):'<span style="color:#3a5080;font-style:italic;font-weight:400">empty</span>')+'</div>';
+            c+='<div style="width:48px;font-size:.58rem;font-family:Cinzel,serif;color:#7090c0;text-align:center;background:#0d1020;padding:4px 0;border-right:1px solid #1a2030;flex-shrink:0;align-self:stretch;display:flex;align-items:center;justify-content:center">'+row[0]+'</div>';
+            if(p){
+              var hc=cd(p.cls);
+              c+='<div style="flex:1;display:flex;align-items:center;gap:5px;padding:4px 7px;background:'+hc.bg+';overflow:hidden">'
+                +ihtml(p.cls,14,p.role)
+                +'<span style="font-size:.78rem;font-weight:700;color:#f8f8f8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+he(p.name)+'</span></div>';
+            } else {
+              c+='<div style="flex:1;padding:4px 7px;font-size:.74rem;color:#3a5080;font-style:italic">empty</div>';
+            }
             c+='</div>';
           });
           c+='</div>';
