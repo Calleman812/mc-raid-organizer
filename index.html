@@ -121,7 +121,7 @@ textarea{width:100%;background:#0d1020;border:1px solid #2a3050;color:#e0d8f8;pa
 <div class="app">
 <h1>WoW Classic Raid Organizer</h1>
 <div class="sub">Organize your 40-man raid &mdash; select a raid below</div>
-<div style="text-align:center;font-size:.6rem;color:#4a6890;font-family:Cinzel,serif;letter-spacing:.08em;margin-top:-.3rem;margin-bottom:.5rem">v1.4.0</div>
+<div style="text-align:center;font-size:.6rem;color:#4a6890;font-family:Cinzel,serif;letter-spacing:.08em;margin-top:-.3rem;margin-bottom:.5rem">v1.4.1</div>
 <div style="display:flex;gap:6px;justify-content:center;margin-bottom:.9rem;flex-wrap:wrap">
   <button class="btn raid-sel-btn" data-raid="mc"   id="rsMC"   style="font-family:Cinzel,serif;font-size:.74rem;padding:5px 14px;border-radius:4px;cursor:pointer;border:1px solid #3a6ae0;background:#1a3a80;color:#c8d8ff">&#128293; Molten Core</button>
   <button class="btn raid-sel-btn" data-raid="bwl"  id="rsBWL"  style="font-family:Cinzel,serif;font-size:.74rem;padding:5px 14px;border-radius:4px;cursor:pointer;border:1px solid #2a3050;background:#131726;color:#7ab0ff">&#128009; Blackwing Lair</button>
@@ -2271,7 +2271,8 @@ function renderViewMode(data){
 
     var shownHealerKeys={};
 
-    /* Non-healer segments → mark cards */
+    /* Non-healer segments → mark cards (skipped for Four Horsemen — shown in room diagram instead) */
+    if(boss.id!=='horsemen'){
     boss.segments.forEach(function(seg){
       if(seg.isHealRow)return;
       var assignedSlots=seg.slots.filter(function(sl){
@@ -2334,6 +2335,7 @@ function renderViewMode(data){
       });
       h+='</div></div>';
     });
+    } /* end skip for horsemen */
 
     if(bdata.notes)h+='<div class="note-box">'+he(bdata.notes)+'</div>';
 
