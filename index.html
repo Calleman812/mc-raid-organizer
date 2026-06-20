@@ -121,7 +121,7 @@ textarea{width:100%;background:#0d1020;border:1px solid #2a3050;color:#e0d8f8;pa
 <div class="app">
 <h1>WoW Classic Raid Organizer</h1>
 <div class="sub">Organize your 40-man raid &mdash; select a raid below</div>
-<div style="text-align:center;font-size:.6rem;color:#4a6890;font-family:Cinzel,serif;letter-spacing:.08em;margin-top:-.3rem;margin-bottom:.5rem">v1.8.0</div>
+<div style="text-align:center;font-size:.6rem;color:#4a6890;font-family:Cinzel,serif;letter-spacing:.08em;margin-top:-.3rem;margin-bottom:.5rem">v1.8.1</div>
 <div style="display:flex;gap:6px;justify-content:center;margin-bottom:.9rem;flex-wrap:wrap">
   <button class="btn raid-sel-btn" data-raid="mc"   id="rsMC"   style="font-family:Cinzel,serif;font-size:.74rem;padding:5px 14px;border-radius:4px;cursor:pointer;border:1px solid #3a6ae0;background:#1a3a80;color:#c8d8ff">&#128293; Molten Core</button>
   <button class="btn raid-sel-btn" data-raid="bwl"  id="rsBWL"  style="font-family:Cinzel,serif;font-size:.74rem;padding:5px 14px;border-radius:4px;cursor:pointer;border:1px solid #2a3050;background:#131726;color:#7ab0ff">&#128009; Blackwing Lair</button>
@@ -2707,20 +2707,24 @@ function renderViewMode(data){
     /* ── Patchwerk custom layout: each tank grouped with its 4 healers ── */
     if(boss.id==='patchwerk'){
       var pwGroups=[['MT 1','mt1',['h1a','h1b','h1c','h1d']],['Hateful Tank 1','mt2',['h2a','h2b','h2c','h2d']],['Hateful Tank 2','mt3',['h3a','h3b','h3c','h3d']]];
+      h+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">';
       pwGroups.forEach(function(pg){
         var pwTank=bdata[pg[1]]&&pmap[bdata[pg[1]]]?pmap[bdata[pg[1]]]:null;
         var pwHealers=pg[2].map(function(k){return bdata[k]&&pmap[bdata[k]]?pmap[bdata[k]]:null;}).filter(Boolean);
-        if(!pwTank&&!pwHealers.length)return;
-        h+='<div style="font-family:Cinzel,serif;font-size:.58rem;color:#4a6090;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.35rem">'+he(pg[0])+'</div>';
-        h+='<div class="mark-cards" style="margin-bottom:.65rem">';
-        h+='<div class="mark-card" style="background:#0f1322;border:1px solid #5a7ab035;width:100%;grid-column:1/-1">';
-        h+='<div class="mark-card-hdr" style="background:#5a7ab014;color:#5a7ab0">'+he(pg[0])+'</div>';
-        h+='<div class="mark-card-body" style="display:flex;flex-wrap:wrap;gap:5px;align-items:center">';
-        if(pwTank){var pwtc=cd(pwTank.cls);h+='<div class="mark-np" style="background:'+pwtc.bg+';border:1px solid '+pwtc.bd+'">'+ihtml(pwTank.cls,14,pwTank.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(pwTank.name)+'</span><span class="mark-np-label">tank</span></div>';}
-        if(pwTank&&pwHealers.length)h+='<div style="width:1px;align-self:stretch;background:#2a3050;margin:0 4px"></div>';
-        pwHealers.forEach(function(hp){var phc=cd(hp.cls);h+='<div class="mark-np" style="background:'+phc.bg+';border:1px solid '+phc.bd+'">'+ihtml(hp.cls,14,hp.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(hp.name)+'</span></div>';});
-        h+='</div></div></div>';
+        h+='<div>';
+        if(pwTank||pwHealers.length){
+          h+='<div style="font-family:Cinzel,serif;font-size:.58rem;color:#4a6090;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.35rem">'+he(pg[0])+'</div>';
+          h+='<div class="mark-card" style="background:#0f1322;border:1px solid #5a7ab035">';
+          h+='<div class="mark-card-hdr" style="background:#5a7ab014;color:#5a7ab0">'+he(pg[0])+' Tank &amp; Healers</div>';
+          h+='<div class="mark-card-body" style="display:flex;flex-direction:column;gap:4px">';
+          if(pwTank){var pwtc=cd(pwTank.cls);h+='<div class="mark-np" style="background:'+pwtc.bg+';border:1px solid '+pwtc.bd+'">'+ihtml(pwTank.cls,14,pwTank.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(pwTank.name)+'</span><span class="mark-np-label">tank</span></div>';}
+          if(pwTank&&pwHealers.length)h+='<div style="height:1px;background:#2a3050;margin:2px 0"></div>';
+          pwHealers.forEach(function(hp){var phc=cd(hp.cls);h+='<div class="mark-np" style="background:'+phc.bg+';border:1px solid '+phc.bd+'">'+ihtml(hp.cls,14,hp.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(hp.name)+'</span></div>';});
+          h+='</div></div>';
+        }
+        h+='</div>';
       });
+      h+='</div>';
     }
 
     /* ── Thaddius custom layout: Thaddius MT first, then Stalagg tanks/healers (left), Feugen tanks/healers (right) ── */
@@ -3091,12 +3095,6 @@ function renderViewMode(data){
         h+='<text x="354" y="328" text-anchor="middle" font-family="Cinzel,serif" font-size="7.5" fill="#d0d0d0">Moon</text>';
         h+='<text x="310" y="366" text-anchor="middle" font-family="Cinzel,serif" font-size="7.5" fill="#4080e0">Square</text>';
         h+='</svg>';
-
-        /* MT nameplate under the shield icon, if assigned */
-        if(ktMt){
-          var ktMtC=cd(ktMt.cls);
-          h+='<div style="position:absolute;top:286px;left:310px;transform:translate(-50%,0);display:flex;align-items:center;gap:4px;background:'+ktMtC.bg+';border:1px solid '+ktMtC.bd+';border-radius:3px;padding:2px 6px;white-space:nowrap">'+ihtml(ktMt.cls,13,ktMt.role)+'<span style="font-size:.68rem;font-weight:700;color:#f8f8f8">'+he(ktMt.name)+'</span></div>';
-        }
 
         /* 12 healers — number badge centered exactly on r=165, name directly below */
         var ktBadgeCoords=[
