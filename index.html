@@ -120,7 +120,7 @@ textarea{width:100%;background:#0c0e13;border:1px solid #262a36;color:#e4e6ea;pa
 <div class="app">
 <h1>WoW Classic Raid Organizer</h1>
 <div class="sub">Organize your 40-man raid &mdash; select a raid below</div>
-<div style="text-align:center;font-size:.6rem;color:#525a6a;font-family:Inter,sans-serif;letter-spacing:.08em;margin-top:-.3rem;margin-bottom:.5rem">v2.1.0</div>
+<div style="text-align:center;font-size:.6rem;color:#525a6a;font-family:Inter,sans-serif;letter-spacing:.08em;margin-top:-.3rem;margin-bottom:.5rem">v2.1.1</div>
 <div style="display:flex;gap:6px;justify-content:center;margin-bottom:.9rem;flex-wrap:wrap">
   <button class="btn raid-sel-btn" data-raid="mc"   id="rsMC"   style="font-family:Inter,sans-serif;font-size:.74rem;padding:5px 14px;border-radius:6px;cursor:pointer;border:1px solid #378ade;background:#1a2433;color:#9fc4f4">&#128293; Molten Core</button>
   <button class="btn raid-sel-btn" data-raid="bwl"  id="rsBWL"  style="font-family:Inter,sans-serif;font-size:.74rem;padding:5px 14px;border-radius:4px;cursor:pointer;border:1px solid #262a36;background:#15171e;color:#9fc4f4">&#128009; Blackwing Lair</button>
@@ -769,7 +769,7 @@ function getBossGroups(bossId){
   return bossGroups[bossId];
 }
 
-function switchRaid(raidId){
+function switchRaid(raidId,skipRender){
   if(!BOSSES_BY_RAID[raidId])return;
   activeRaid=raidId;
   BOSSES=BOSSES_BY_RAID[raidId];
@@ -796,7 +796,7 @@ function switchRaid(raidId){
   var subtitles={mc:'Ragnaros awaits \u2014 organize your 40-man raid',bwl:'Nefarian awaits \u2014 Blackwing Lair',aq40:"C'Thun awaits \u2014 Temple of Ahn'Qiraj",naxx:"Kel'Thuzad awaits \u2014 Naxxramas"};
   var subEl=document.querySelector('.sub');
   if(subEl)subEl.textContent=subtitles[raidId]||'';
-  rAll();
+  if(!skipRender)rAll();
 }
 
 function deriveRole(cls,spec){
@@ -2205,8 +2205,10 @@ function loadFullSaveData(data){
   function rebuildP(p){return p?{id:p.id,name:p.name,cls:p.cls,spec:p.spec,role:p.role,pos:p.pos}:null;}
 
   /* Switch to the saved raid first so BOSSES/BOSSES_BY_RAID line up,
-     then overwrite the freshly-reset state with the saved data */
-  if(data.raid&&BOSSES_BY_RAID[data.raid])switchRaid(data.raid);
+     then overwrite the freshly-reset state with the saved data.
+     skipRender=true avoids a wasted intermediate render of the empty
+     just-reset state before we immediately fill it back in below. */
+  if(data.raid&&BOSSES_BY_RAID[data.raid])switchRaid(data.raid,true);
 
   players=(data.players||[]).map(rebuildP).filter(Boolean);
   benched=(data.benched||[]).map(rebuildP).filter(Boolean);
@@ -2250,7 +2252,7 @@ function loadFullSaveData(data){
   }
 
   activeTab='trash';sel=null;
-  rAll();
+  rAllNow();
   return true;
 }
 
