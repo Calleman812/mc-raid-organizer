@@ -121,7 +121,7 @@ textarea{width:100%;background:#0d1020;border:1px solid #2a3050;color:#e0d8f8;pa
 <div class="app">
 <h1>WoW Classic Raid Organizer</h1>
 <div class="sub">Organize your 40-man raid &mdash; select a raid below</div>
-<div style="text-align:center;font-size:.6rem;color:#4a6890;font-family:Cinzel,serif;letter-spacing:.08em;margin-top:-.3rem;margin-bottom:.5rem">v1.7.0</div>
+<div style="text-align:center;font-size:.6rem;color:#4a6890;font-family:Cinzel,serif;letter-spacing:.08em;margin-top:-.3rem;margin-bottom:.5rem">v1.7.1</div>
 <div style="display:flex;gap:6px;justify-content:center;margin-bottom:.9rem;flex-wrap:wrap">
   <button class="btn raid-sel-btn" data-raid="mc"   id="rsMC"   style="font-family:Cinzel,serif;font-size:.74rem;padding:5px 14px;border-radius:4px;cursor:pointer;border:1px solid #3a6ae0;background:#1a3a80;color:#c8d8ff">&#128293; Molten Core</button>
   <button class="btn raid-sel-btn" data-raid="bwl"  id="rsBWL"  style="font-family:Cinzel,serif;font-size:.74rem;padding:5px 14px;border-radius:4px;cursor:pointer;border:1px solid #2a3050;background:#131726;color:#7ab0ff">&#128009; Blackwing Lair</button>
@@ -2992,6 +2992,73 @@ function renderViewMode(data){
           });
           h+='</div></div>';
         }
+
+      } else if(boss.id==='kelthuzad'){
+        /* ── Kel'Thuzad Phase 2 clock diagram ── */
+        var ktMt=bdata.mt&&pmap[bdata.mt]?pmap[bdata.mt]:null;
+        var ktHealers=[];
+        for(var khi=1;khi<=12;khi++){
+          var khKey='h'+khi;
+          ktHealers.push(bdata[khKey]&&pmap[bdata[khKey]]?pmap[bdata[khKey]]:null);
+        }
+
+        h+='<div style="margin-top:.8rem">';
+        h+='<div style="font-family:Cinzel,serif;font-size:.58rem;color:#7ab0ff;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.6rem">Kel\'Thuzad - Phase 2 Positions</div>';
+        h+='<div style="position:relative;width:620px;height:620px;font-family:Crimson Pro,Georgia,serif">';
+
+        h+='<svg width="620" height="620" style="position:absolute;top:0;left:0" viewBox="0 0 620 620">';
+        h+='<circle cx="310" cy="310" r="290" fill="#0d1525" stroke="#1a2a50" stroke-width="1"/>';
+        h+='<circle cx="310" cy="310" r="265" fill="none" stroke="#3a2a10" stroke-width="1" stroke-dasharray="2,5"/>';
+        h+='<circle cx="310" cy="310" r="165" fill="none" stroke="#2a3a6a" stroke-width="1" stroke-dasharray="2,5"/>';
+        h+='<circle cx="310" cy="310" r="80" fill="#0c0a22" stroke="#4a2880" stroke-width="1.5"/>';
+        h+='<text x="310" y="314" text-anchor="middle" font-family="Cinzel,serif" font-size="10" fill="#a070d0">KEL\'THUZAD</text>';
+        h+='<g font-size="18" text-anchor="middle" dominant-baseline="central"><text x="310" y="254" fill="#4080e0">&#128737;</text></g>';
+        h+='<text x="310" y="274" text-anchor="middle" font-family="Cinzel,serif" font-size="8" fill="#4080e0">MT</text>';
+        h+='<g font-size="16" text-anchor="middle" dominant-baseline="central">';
+        h+='<text x="266" y="310" fill="#e03030">&#10006;</text>';
+        h+='<text x="354" y="310" fill="#d0d0d0">&#9789;</text>';
+        h+='<text x="310" y="348" fill="#4080e0">&#9632;</text>';
+        h+='</g>';
+        h+='<text x="266" y="328" text-anchor="middle" font-family="Cinzel,serif" font-size="7.5" fill="#e03030">Cross</text>';
+        h+='<text x="354" y="328" text-anchor="middle" font-family="Cinzel,serif" font-size="7.5" fill="#d0d0d0">Moon</text>';
+        h+='<text x="310" y="366" text-anchor="middle" font-family="Cinzel,serif" font-size="7.5" fill="#4080e0">Square</text>';
+        h+='</svg>';
+
+        /* MT nameplate under the shield icon, if assigned */
+        if(ktMt){
+          var ktMtC=cd(ktMt.cls);
+          h+='<div style="position:absolute;top:286px;left:310px;transform:translate(-50%,0);display:flex;align-items:center;gap:4px;background:'+ktMtC.bg+';border:1px solid '+ktMtC.bd+';border-radius:3px;padding:2px 6px;white-space:nowrap">'+ihtml(ktMt.cls,13,ktMt.role)+'<span style="font-size:.68rem;font-weight:700;color:#f8f8f8">'+he(ktMt.name)+'</span></div>';
+        }
+
+        /* 12 healers — number badge centered exactly on r=165, name directly below */
+        var ktBadgeCoords=[
+          [310.0,145.0],[392.5,167.7],[452.9,228.1],[475.0,310.0],[452.9,391.9],[392.5,452.3],
+          [310.0,475.0],[227.5,452.3],[167.1,391.9],[145.0,310.0],[167.1,228.1],[227.5,167.7]
+        ];
+        for(var khn=0;khn<12;khn++){
+          var khNum=khn+1;
+          var khCoord=ktBadgeCoords[khn];
+          var khP=ktHealers[khn];
+          h+='<div style="position:absolute;top:'+khCoord[1]+'px;left:'+khCoord[0]+'px;transform:translate(-50%,-50%);width:26px;height:26px;border-radius:50%;background:#1a3a20;border:1.5px solid #30b050;display:flex;align-items:center;justify-content:center;color:#80d870;font-weight:700;font-size:.7rem;font-family:Cinzel,serif">'+khNum+'</div>';
+          if(khP){
+            var khC=cd(khP.cls);
+            h+='<div style="position:absolute;top:'+(khCoord[1]+20)+'px;left:'+khCoord[0]+'px;transform:translate(-50%,0);font-size:.6rem;font-weight:700;color:#f8f8f8;background:'+khC.bg+';border-radius:3px;padding:2px 5px;white-space:nowrap">'+he(khP.name)+'</div>';
+          }
+        }
+
+        /* Ranged DPS ring — 12 evenly-spaced icons, first one moved to true north */
+        var ktDpsCoords=[
+          [310.0,45.0],[478.0,116.4],[543.0,203.6],[565.0,310.0],[543.0,416.4],[478.0,503.6],
+          [310.0,565.6],[142.0,503.6],[77.0,416.4],[55.0,310.0],[77.0,203.6],[142.0,116.4]
+        ];
+        ktDpsCoords.forEach(function(c,idx){
+          h+='<div style="position:absolute;top:'+c[1]+'px;left:'+c[0]+'px;transform:translate(-50%,-50%);font-size:.95rem;color:#e08020">&#127993;</div>';
+          if(idx===0){
+            h+='<div style="position:absolute;top:'+(c[1]+15)+'px;left:'+c[0]+'px;transform:translate(-50%,0);font-size:.5rem;color:#e08020;font-family:Cinzel,serif">Throne</div>';
+          }
+        });
+
+        h+='</div></div>';
 
       } else {
         /* Standard grid for Gothik, Sapphiron, KT, Loatheb */
