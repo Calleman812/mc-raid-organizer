@@ -121,7 +121,7 @@ textarea{width:100%;background:#0d1020;border:1px solid #2a3050;color:#e0d8f8;pa
 <div class="app">
 <h1>WoW Classic Raid Organizer</h1>
 <div class="sub">Organize your 40-man raid &mdash; select a raid below</div>
-<div style="text-align:center;font-size:.6rem;color:#4a6890;font-family:Cinzel,serif;letter-spacing:.08em;margin-top:-.3rem;margin-bottom:.5rem">v1.7.1</div>
+<div style="text-align:center;font-size:.6rem;color:#4a6890;font-family:Cinzel,serif;letter-spacing:.08em;margin-top:-.3rem;margin-bottom:.5rem">v1.8.0</div>
 <div style="display:flex;gap:6px;justify-content:center;margin-bottom:.9rem;flex-wrap:wrap">
   <button class="btn raid-sel-btn" data-raid="mc"   id="rsMC"   style="font-family:Cinzel,serif;font-size:.74rem;padding:5px 14px;border-radius:4px;cursor:pointer;border:1px solid #3a6ae0;background:#1a3a80;color:#c8d8ff">&#128293; Molten Core</button>
   <button class="btn raid-sel-btn" data-raid="bwl"  id="rsBWL"  style="font-family:Cinzel,serif;font-size:.74rem;padding:5px 14px;border-radius:4px;cursor:pointer;border:1px solid #2a3050;background:#131726;color:#7ab0ff">&#128009; Blackwing Lair</button>
@@ -2139,17 +2139,19 @@ function decodePayload(str){
 }
 
 function buildSlimPayload(){
-  /* Build a minimal payload — omit null/unassigned slots to save space.
-     Use array INDEX references into the combined players+benched list instead of
-     full ID strings — IDs can be long (e.g. manually-added players use 'm'+timestamp)
-     and get repeated dozens of times across boss groups, which was blowing out the
-     share URL length. Index refs are 1-3 chars regardless of ID length. */
+  /* v4: maximally compact format.
+     - Players stored as plain arrays [name,cls,spec,role] — no key names, no id field
+       (the array INDEX is the only reference needed everywhere else in the payload).
+     - td (trash mark definitions) dropped entirely — TRASH_MARKS is a static constant
+       already present in both the encoding and decoding context, so re-sending it
+       in every share link was pure redundancy.
+     - Empty/all-null boss group layouts are skipped so unused boss group setups
+       don't bloat the URL. */
   var allRoster=players.concat(benched);
   var idToIdx={};
   allRoster.forEach(function(p,i){idToIdx[p.id]=i;});
   function idxOf(p){return p&&idToIdx.hasOwnProperty(p.id)?idToIdx[p.id]:-1;}
-
-  function slimP(p){return p?{id:p.id,name:p.name,cls:p.cls,spec:p.spec,role:p.role}:null;}
+  function arrP(p){return p?[p.name,p.cls,p.spec||'',p.role||'']:null;}
 
   var slimBosses={};
   for(var bid in bossData){
@@ -2166,13 +2168,16 @@ function buildSlimPayload(){
 
   var slimBossGroups={};
   for(var bid2 in bossGroups){
-    slimBossGroups[bid2]=bossGroups[bid2].map(function(grp){
+    var grpArr=bossGroups[bid2].map(function(grp){
       return grp.slots.map(function(sl){
         if(!sl.p)return null;
         var idx=idxOf(sl.p);
         return idx>=0?idx:null;
       });
     });
+    /* Skip entirely if every slot in every group is null — nothing to share */
+    var hasAny=grpArr.some(function(g){return g.some(function(s){return s!=null;});});
+    if(hasAny)slimBossGroups[bid2]=grpArr;
   }
 
   var slimTrash=trashMarks.map(function(m){
@@ -2180,13 +2185,12 @@ function buildSlimPayload(){
   });
 
   return {
-    v:3, /* version 3 = index-based refs */
+    v:4,
     raid:activeRaid,
-    p:players.map(slimP),
-    b:benched.map(slimP),
+    p:players.map(arrP),
+    b:benched.map(arrP),
     g:groups.map(function(g){return g.slots.map(function(s){var idx=idxOf(s.p);return idx>=0?idx:null;});}),
     t:slimTrash,
-    td:TRASH_MARKS.map(function(m){return{name:m.name,col:m.col};}),
     pu:idxOf(puller)>=0?idxOf(puller):null,
     bs:slimBosses,
     bg:slimBossGroups,
@@ -2200,40 +2204,96 @@ function buildSlimPayload(){
 }
 
 function expandSlimPayload(data){
-  /* v3 format: index-based refs into a combined players+benched roster array.
-     v2 format: id-string refs (kept for backward compatibility with old share links). */
+  /* v4 format: array-format players, index-based refs everywhere, no td field
+     (TRASH_MARKS constant used directly). v3/v2 kept for backward compatibility
+     with older share links already sent out. */
   if(!data)return data;
 
-  if(data.v===3){
-    var roster=(data.p||[]).concat(data.b||[]);
+  if(data.v===4){
+    function expandArrP(arr,fallbackIdx){
+      if(!arr)return null;
+      return {id:'r'+fallbackIdx,name:arr[0],cls:arr[1],spec:arr[2],role:arr[3]};
+    }
+    var pFull=(data.p||[]).map(function(arr,i){return expandArrP(arr,i);});
+    var bFull=(data.b||[]).map(function(arr,i){return expandArrP(arr,(data.p||[]).length+i);});
+    var roster=pFull.concat(bFull);
     function byIdx(i){return (i!=null&&i>=0&&roster[i])?roster[i]:null;}
 
-    var bosses3={};
+    var bosses4={};
     for(var bid in (data.bs||{})){
-      var sb=data.bs[bid];bosses3[bid]={};
+      var sb=data.bs[bid];bosses4[bid]={};
       for(var k in sb){
-        if(k==='notes'){bosses3[bid][k]=sb[k];}
+        if(k==='notes'){bosses4[bid][k]=sb[k];}
         else{
-          var p3=byIdx(sb[k]);
-          bosses3[bid][k]=p3?p3.id:null; /* renderViewMode expects id strings + pmap lookup */
+          var p4=byIdx(sb[k]);
+          bosses4[bid][k]=p4?p4.id:null;
+        }
+      }
+    }
+    var bossLayouts4={};
+    for(var bid2 in (data.bg||{})){
+      bossLayouts4[bid2]=data.bg[bid2].map(function(slotIdxs){
+        return slotIdxs.map(function(i){return byIdx(i);});
+      });
+    }
+    var ex4=data.ex||{};
+    var trash4=(data.t||[]).map(function(m){
+      var tp=byIdx(m.tank),hp=byIdx(m.healer);
+      return {tank:tp?tp.id:null,healer:hp?hp.id:null};
+    });
+    var groups4=(data.g||[]).map(function(slotIdxs){
+      return slotIdxs.map(function(i){var p=byIdx(i);return p?p.id:null;});
+    });
+    var pullerP4=byIdx(data.pu);
+
+    return {
+      raid:data.raid,
+      players:pFull,
+      benched:bFull,
+      groups:groups4,
+      trash:trash4,
+      trashDefs:TRASH_MARKS.map(function(m){return{name:m.name,col:m.col};}),
+      puller:pullerP4?pullerP4.id:null,
+      bosses:bosses4,
+      bossGroupLayouts:bossLayouts4,
+      extraTrash:{
+        aq_t:byIdx(ex4.aq_t),aq_h:byIdx(ex4.aq_h),
+        nx_t:byIdx(ex4.nx_t),nx_h:byIdx(ex4.nx_h)
+      }
+    };
+  }
+
+  /* v3 format: index-based refs, object-format players (kept for backward compatibility) */
+  if(data.v===3){
+    var roster3=(data.p||[]).concat(data.b||[]);
+    function byIdx3(i){return (i!=null&&i>=0&&roster3[i])?roster3[i]:null;}
+
+    var bosses3={};
+    for(var bid3 in (data.bs||{})){
+      var sb3=data.bs[bid3];bosses3[bid3]={};
+      for(var k3 in sb3){
+        if(k3==='notes'){bosses3[bid3][k3]=sb3[k3];}
+        else{
+          var pp3=byIdx3(sb3[k3]);
+          bosses3[bid3][k3]=pp3?pp3.id:null;
         }
       }
     }
     var bossLayouts3={};
-    for(var bid2 in (data.bg||{})){
-      bossLayouts3[bid2]=data.bg[bid2].map(function(slotIdxs){
-        return slotIdxs.map(function(i){return byIdx(i);});
+    for(var bid2b in (data.bg||{})){
+      bossLayouts3[bid2b]=data.bg[bid2b].map(function(slotIdxs){
+        return slotIdxs.map(function(i){return byIdx3(i);});
       });
     }
     var ex3=data.ex||{};
     var trash3=(data.t||[]).map(function(m){
-      var tp=byIdx(m.tank),hp=byIdx(m.healer);
+      var tp=byIdx3(m.tank),hp=byIdx3(m.healer);
       return {tank:tp?tp.id:null,healer:hp?hp.id:null};
     });
     var groups3=(data.g||[]).map(function(slotIdxs){
-      return slotIdxs.map(function(i){var p=byIdx(i);return p?p.id:null;});
+      return slotIdxs.map(function(i){var p=byIdx3(i);return p?p.id:null;});
     });
-    var pullerP3=byIdx(data.pu);
+    var pullerP3=byIdx3(data.pu);
 
     return {
       raid:data.raid,
@@ -2246,8 +2306,8 @@ function expandSlimPayload(data){
       bosses:bosses3,
       bossGroupLayouts:bossLayouts3,
       extraTrash:{
-        aq_t:byIdx(ex3.aq_t),aq_h:byIdx(ex3.aq_h),
-        nx_t:byIdx(ex3.nx_t),nx_h:byIdx(ex3.nx_h)
+        aq_t:byIdx3(ex3.aq_t),aq_h:byIdx3(ex3.aq_h),
+        nx_t:byIdx3(ex3.nx_t),nx_h:byIdx3(ex3.nx_h)
       }
     };
   }
@@ -2567,9 +2627,11 @@ function renderViewMode(data){
       h+='</div>';
     });
 
-    /* Standalone isHealRow segments */
+    /* Standalone isHealRow segments — skip the 12-healer list for Kel'Thuzad since the
+       Phase 2 diagram already shows every healer's number and name */
     boss.segments.forEach(function(seg){
       if(!seg.isHealRow)return;
+      if(boss.id==='kelthuzad'&&seg.title.indexOf('Healers (12')>=0)return;
       var healers=seg.slots.filter(function(sl){
         return !shownHealerKeys[sl.key]&&bdata[sl.key]&&pmap[bdata[sl.key]];
       });
@@ -2653,8 +2715,9 @@ function renderViewMode(data){
         h+='<div class="mark-cards" style="margin-bottom:.65rem">';
         h+='<div class="mark-card" style="background:#0f1322;border:1px solid #5a7ab035;width:100%;grid-column:1/-1">';
         h+='<div class="mark-card-hdr" style="background:#5a7ab014;color:#5a7ab0">'+he(pg[0])+'</div>';
-        h+='<div class="mark-card-body" style="display:flex;flex-wrap:wrap;gap:5px">';
+        h+='<div class="mark-card-body" style="display:flex;flex-wrap:wrap;gap:5px;align-items:center">';
         if(pwTank){var pwtc=cd(pwTank.cls);h+='<div class="mark-np" style="background:'+pwtc.bg+';border:1px solid '+pwtc.bd+'">'+ihtml(pwTank.cls,14,pwTank.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(pwTank.name)+'</span><span class="mark-np-label">tank</span></div>';}
+        if(pwTank&&pwHealers.length)h+='<div style="width:1px;align-self:stretch;background:#2a3050;margin:0 4px"></div>';
         pwHealers.forEach(function(hp){var phc=cd(hp.cls);h+='<div class="mark-np" style="background:'+phc.bg+';border:1px solid '+phc.bd+'">'+ihtml(hp.cls,14,hp.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(hp.name)+'</span></div>';});
         h+='</div></div></div>';
       });
@@ -2678,11 +2741,12 @@ function renderViewMode(data){
       var stHealers=['sh1','sh2'].map(function(k){return bdata[k]&&pmap[bdata[k]]?pmap[bdata[k]]:null;}).filter(Boolean);
       h+='<div>';
       if(stTanks.length||stHealers.length){
-        h+='<div style="font-family:Cinzel,serif;font-size:.58rem;color:#4a6090;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.35rem">Stalagg</div>';
+        h+='<div style="font-family:Cinzel,serif;font-size:.58rem;color:#4a6090;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.35rem">Stalagg \u2014 Left</div>';
         h+='<div class="mark-card" style="background:#0f1322;border:1px solid #5a7ab035">';
         h+='<div class="mark-card-hdr" style="background:#5a7ab014;color:#5a7ab0">Stalagg Tanks &amp; Healers</div>';
         h+='<div class="mark-card-body" style="display:flex;flex-direction:column;gap:4px">';
         stTanks.forEach(function(tp){var tc=cd(tp.cls);h+='<div class="mark-np" style="background:'+tc.bg+';border:1px solid '+tc.bd+'">'+ihtml(tp.cls,14,tp.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(tp.name)+'</span><span class="mark-np-label">tank</span></div>';});
+        if(stTanks.length&&stHealers.length)h+='<div style="height:1px;background:#2a3050;margin:2px 0"></div>';
         stHealers.forEach(function(hp){var hc5=cd(hp.cls);h+='<div class="mark-np" style="background:'+hc5.bg+';border:1px solid '+hc5.bd+'">'+ihtml(hp.cls,14,hp.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(hp.name)+'</span></div>';});
         h+='</div></div>';
       }
@@ -2692,11 +2756,12 @@ function renderViewMode(data){
       var fgHealers=['fh1','fh2'].map(function(k){return bdata[k]&&pmap[bdata[k]]?pmap[bdata[k]]:null;}).filter(Boolean);
       h+='<div>';
       if(fgTanks.length||fgHealers.length){
-        h+='<div style="font-family:Cinzel,serif;font-size:.58rem;color:#4a6090;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.35rem">Feugen</div>';
+        h+='<div style="font-family:Cinzel,serif;font-size:.58rem;color:#4a6090;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.35rem">Feugen \u2014 Right</div>';
         h+='<div class="mark-card" style="background:#0f1322;border:1px solid #5a7ab035">';
         h+='<div class="mark-card-hdr" style="background:#5a7ab014;color:#5a7ab0">Feugen Tanks &amp; Healers</div>';
         h+='<div class="mark-card-body" style="display:flex;flex-direction:column;gap:4px">';
         fgTanks.forEach(function(tp){var tc=cd(tp.cls);h+='<div class="mark-np" style="background:'+tc.bg+';border:1px solid '+tc.bd+'">'+ihtml(tp.cls,14,tp.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(tp.name)+'</span><span class="mark-np-label">tank</span></div>';});
+        if(fgTanks.length&&fgHealers.length)h+='<div style="height:1px;background:#2a3050;margin:2px 0"></div>';
         fgHealers.forEach(function(hp){var hc6=cd(hp.cls);h+='<div class="mark-np" style="background:'+hc6.bg+';border:1px solid '+hc6.bd+'">'+ihtml(hp.cls,14,hp.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(hp.name)+'</span></div>';});
         h+='</div></div>';
       }
@@ -2941,18 +3006,21 @@ function renderViewMode(data){
           gthUndeadTanks.forEach(function(tp){var tc=cd(tp.cls);h+='<div style="display:flex;align-items:center;gap:5px;background:'+tc.bg+';border-radius:3px;padding:3px 6px;margin-bottom:3px">'+ihtml(tp.cls,13,tp.role)+'<span style="font-size:.8rem;font-weight:700;color:#f8f8f8">'+he(tp.name)+'</span></div>';});
         } else { h+='<div style="font-size:.68rem;color:#3a5080;font-style:italic">No tanks assigned</div>'; }
         h+='</div>';
-        h+='<div style="background:#0a1a2a;border:1px solid #2860a0;border-radius:6px;padding:5px 8px">';
-        h+='<div style="font-family:Cinzel,serif;font-size:.6rem;color:#70a0d0;margin-bottom:4px">Living Side Tanks</div>';
+        h+='<div style="background:#0a1a18;border:1px solid #0f6e56;border-radius:6px;padding:5px 8px">';
+        h+='<div style="font-family:Cinzel,serif;font-size:.6rem;color:#3da888;margin-bottom:4px">Living Side Tanks</div>';
         if(gthLivingTanks.length){
           gthLivingTanks.forEach(function(tp){var tc=cd(tp.cls);h+='<div style="display:flex;align-items:center;gap:5px;background:'+tc.bg+';border-radius:3px;padding:3px 6px;margin-bottom:3px">'+ihtml(tp.cls,13,tp.role)+'<span style="font-size:.8rem;font-weight:700;color:#f8f8f8">'+he(tp.name)+'</span></div>';});
         } else { h+='<div style="font-size:.68rem;color:#3a5080;font-style:italic">No tanks assigned</div>'; }
         h+='</div></div>';
 
-        /* 8 group cards, odd left / even right (already pre-interleaved in bl) */
+        /* 8 group cards, odd left / even right (already pre-interleaved in bl) —
+           odd groups (Undead Side) get a purple border, even groups (Living Side) get a teal border */
         h+='<div class="grp-grid" style="grid-template-columns:repeat(2,1fr)">';
         for(var gthGi=0;gthGi<8;gthGi++){
           var gthLabel=(boss.customGroupLabels&&boss.customGroupLabels[gthGi])?boss.customGroupLabels[gthGi]:('Group '+(gthGi+1));
-          h+='<div class="grp-card"><div class="grp-hdr">'+he(gthLabel)+'</div>';
+          var gthIsOdd=(gthGi%2===0); /* index 0,2,4,6 = groups 1,3,5,7 = Undead/odd */
+          var gthBorderCol=gthIsOdd?'#4a2880':'#0f6e56';
+          h+='<div class="grp-card" style="border:1px solid '+gthBorderCol+'"><div class="grp-hdr">'+he(gthLabel)+'</div>';
           (bl[gthGi]||[]).forEach(function(bp){
             if(bp){var bc=cd(bp.cls);h+='<div class="grp-slot" style="background:'+bc.bg+'">'+ihtml(bp.cls,12,bp.role)+'<span style="font-size:.78rem;font-weight:700;color:#f8f8f8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+he(bp.name)+'</span></div>';}
             else h+='<div class="grp-slot"><span style="font-size:.6rem;color:#3a5080">\u2014</span></div>';
@@ -3058,6 +3126,28 @@ function renderViewMode(data){
           }
         });
 
+        h+='</div></div>';
+
+        /* 3 melee groups below the diagram: Cross / Square / Moon */
+        h+='<div style="margin-top:.7rem">';
+        h+='<div style="font-family:Cinzel,serif;font-size:.58rem;color:#7ab0ff;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.4rem">Melee Sub-Groups</div>';
+        h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">';
+        var ktGroupInfo=[['Cross Group','\u2716','#e03030'],['Square Group','\u25a0','#4080e0'],['Moon Group','\u263d','#d0d0d0']];
+        for(var ktgi=0;ktgi<3;ktgi++){
+          var ktgMembers=bl[ktgi]||[];
+          h+='<div style="background:#0f1322;border:1px solid '+ktGroupInfo[ktgi][2]+'30;border-radius:6px;overflow:hidden">';
+          h+='<div style="background:'+ktGroupInfo[ktgi][2]+'18;padding:5px 9px;display:flex;align-items:center;gap:6px;border-bottom:1px solid '+ktGroupInfo[ktgi][2]+'25">';
+          h+='<span style="font-size:1rem;color:'+ktGroupInfo[ktgi][2]+'">'+ktGroupInfo[ktgi][1]+'</span>';
+          h+='<span style="font-family:Cinzel,serif;font-size:.74rem;font-weight:700;color:'+ktGroupInfo[ktgi][2]+'">'+ktGroupInfo[ktgi][0]+'</span>';
+          h+='</div>';
+          h+='<div style="padding:4px 0">';
+          ktgMembers.forEach(function(bp){
+            if(!bp)return;
+            var ktbc=cd(bp.cls);
+            h+='<div style="display:flex;align-items:center;gap:5px;padding:3px 9px;background:'+ktbc.bg+';border-bottom:1px solid #1a2040">'+ihtml(bp.cls,13,bp.role)+'<span style="font-size:.8rem;font-weight:700;color:#f8f8f8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+he(bp.name)+'</span></div>';
+          });
+          h+='</div></div>';
+        }
         h+='</div></div>';
 
       } else {
