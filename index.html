@@ -39,7 +39,7 @@ select option{background:#15171e;}
 .sv{font-family:'Inter',sans-serif;font-size:1.05rem;font-weight:700;color:#ffffff;text-align:center;}
 .sl{font-size:.62rem;color:#666c7a;text-transform:uppercase;letter-spacing:.05em;text-align:center;}
 .vsep{width:1px;background:#262a36;height:28px;}
-.layout{display:grid;grid-template-columns:280px 1fr;gap:.85rem;align-items:start;}
+.layout{display:grid;grid-template-columns:320px 1fr;gap:.85rem;align-items:start;}
 .pool{background:#15171e;border:1px solid #262a36;border-radius:10px;padding:.7rem;max-height:84vh;overflow-y:auto;position:sticky;top:0;will-change:transform;transform:translateZ(0);contain:layout style;}
 .pool::-webkit-scrollbar{width:3px;}
 .pool::-webkit-scrollbar-thumb{background:#2a2e3a;}
@@ -120,7 +120,7 @@ textarea{width:100%;background:#0c0e13;border:1px solid #262a36;color:#e4e6ea;pa
 <div class="app">
 <h1>WoW Classic Raid Organizer</h1>
 <div class="sub">Organize your 40-man raid &mdash; select a raid below</div>
-<div style="text-align:center;font-size:.6rem;color:#525a6a;font-family:Inter,sans-serif;letter-spacing:.08em;margin-top:-.3rem;margin-bottom:.5rem">v2.0.0</div>
+<div style="text-align:center;font-size:.6rem;color:#525a6a;font-family:Inter,sans-serif;letter-spacing:.08em;margin-top:-.3rem;margin-bottom:.5rem">v2.1.0</div>
 <div style="display:flex;gap:6px;justify-content:center;margin-bottom:.9rem;flex-wrap:wrap">
   <button class="btn raid-sel-btn" data-raid="mc"   id="rsMC"   style="font-family:Inter,sans-serif;font-size:.74rem;padding:5px 14px;border-radius:6px;cursor:pointer;border:1px solid #378ade;background:#1a2433;color:#9fc4f4">&#128293; Molten Core</button>
   <button class="btn raid-sel-btn" data-raid="bwl"  id="rsBWL"  style="font-family:Inter,sans-serif;font-size:.74rem;padding:5px 14px;border-radius:4px;cursor:pointer;border:1px solid #262a36;background:#15171e;color:#9fc4f4">&#128009; Blackwing Lair</button>
@@ -156,11 +156,26 @@ textarea{width:100%;background:#0c0e13;border:1px solid #262a36;color:#e4e6ea;pa
   <div style="font-size:.65rem;color:#5a4020;margin-top:.4rem;font-style:italic">Note: the link encodes the current state. Re-generate after making changes.</div>
   <div class="mbtns"><button class="btn bsm" id="bShareClose">Close</button></div>
 </div>
+<div class="modal-wrap" id="saveRaidModal" style="max-width:420px">
+  <div class="modal-title">&#128190; Save Raid to File</div>
+  <div style="font-size:.75rem;color:#666c7a;margin-bottom:.6rem">This saves the active raid's pool, groups, and all boss assignments to a JSON file. Anyone can load this file back in to restore the exact same setup.</div>
+  <div class="mrow">
+    <input type="text" id="saveRaidLabel" placeholder="Optional label (e.g. tuesday-aq40)" maxlength="40">
+  </div>
+  <div style="font-size:.65rem;color:#525a6a;margin-bottom:.3rem" id="saveRaidPreviewName"></div>
+  <div class="mbtns">
+    <button class="btn bsm" id="bSaveRaidCancel">Cancel</button>
+    <button class="btn bfire" id="bSaveRaidConfirm">Download</button>
+  </div>
+</div>
   <div class="row" style="justify-content:center;flex-wrap:wrap">
     <button class="btn bgold" id="bJsonOpen">Import JSON</button>
     <button class="btn bgold" id="bDemo">Load Demo</button>
     <button class="btn bgold" id="bAdd">+ Add Player</button>
     <button class="btn bfire" id="bShare">&#128279; Share View</button>
+    <button class="btn bsecondary" id="bSaveRaid" style="background:#0e1c18;color:#5dcaa5;border-color:#1a4a3a" title="Save the current raid pool and all assignments to a file">&#128190; Save Raid</button>
+    <button class="btn bsecondary" id="bLoadRaid" style="background:#0e1c18;color:#5dcaa5;border-color:#1a4a3a" title="Load a previously saved raid file">&#128194; Load Raid</button>
+    <input type="file" id="loadRaidFile" accept=".json" style="display:none">
     <button class="btn bsecondary" id="bRealmDb" style="background:#1a2050;color:#9ab8ff;border-color:#2a3a80" title="Open the player realm database in a new tab">&#127760; Realm DB</button>
   </div>
   <div class="tip" id="tip"></div>
@@ -329,8 +344,8 @@ naxx:[
   {id:'loatheb',name:'Loatheb',hint:'1 MT. 12 healers on Spore windows. Set DPS group order below.',note:'Fungal Creep: no healing except during Spore windows. Curse of Loatheb blocks healing — track carefully. Maximize DPS. Assign groups for efficient positioning.',segments:[{title:'Tank',cols:1,slots:[{key:'mt',label:'Loatheb',markIdx:0}]},{title:'Healers (Spore windows only)',cols:6,isHealRow:true,slots:[{key:'h1',label:'Healer 1',isHealer:true},{key:'h2',label:'Healer 2',isHealer:true},{key:'h3',label:'Healer 3',isHealer:true},{key:'h4',label:'Healer 4',isHealer:true},{key:'h5',label:'Healer 5',isHealer:true},{key:'h6',label:'Healer 6',isHealer:true},{key:'h7',label:'Healer 7',isHealer:true},{key:'h8',label:'Healer 8',isHealer:true},{key:'h9',label:'Healer 9',isHealer:true},{key:'h10',label:'Healer 10',isHealer:true},{key:'h11',label:'Healer 11',isHealer:true},{key:'h12',label:'Healer 12',isHealer:true}]}],hasGroupOrder:true,groupCount:6},
   /* Deathknight Quarter */
   {id:'razuvious',name:'Instructor Razuvious',hint:'2 Priests MC Understudies as tanks. 4 OTs on adds with healers.',note:'Two Understudies MC\'d by Priests tank Razuvious. Rotate MC every ~20s. Disrupting Shout hits entire raid.',segments:[{title:'MC Priests (Understudy Tanks)',cols:2,slots:[{key:'mc1',label:'Priest MC 1',markIdx:null,highlightCls:['Priest']},{key:'mc2',label:'Priest MC 2',markIdx:null,highlightCls:['Priest']}]},{title:'OTs (Adds)',cols:4,slots:[{key:'ot1',label:'OT 1',markIdx:2,healerKey:'oh1'},{key:'ot2',label:'OT 2',markIdx:3,healerKey:'oh2'},{key:'ot3',label:'OT 3',markIdx:4,healerKey:'oh3'},{key:'ot4',label:'OT 4',markIdx:5,healerKey:'oh4'}]},{title:'OT Healers',cols:4,isHealRow:true,slots:[{key:'oh1',label:'Heal OT1',isHealer:true},{key:'oh2',label:'Heal OT2',isHealer:true},{key:'oh3',label:'Heal OT3',isHealer:true},{key:'oh4',label:'Heal OT4',isHealer:true}]}]},
-  {id:'gothik',name:'Gothik the Harvester',hint:'Split raid 50/50. 3 tanks Living side, 3 tanks Undead side. Set group order below.',note:'Living side kills mounted then unmounted trainees. Undead side handles spectral versions. Gothik teleports at 55% — burn him.',segments:[{title:'Living Side Tanks',cols:3,slots:[{key:'lt1',label:'Living Tank 1',markIdx:null},{key:'lt2',label:'Living Tank 2',markIdx:null},{key:'lt3',label:'Living Tank 3',markIdx:null}]},{title:'Undead Side Tanks',cols:3,slots:[{key:'ut1',label:'Undead Tank 1',markIdx:null},{key:'ut2',label:'Undead Tank 2',markIdx:null},{key:'ut3',label:'Undead Tank 3',markIdx:null}]},{title:'Shackle — Undead Side (Moon=W8, Tri=W11, Dia=W13, Cir=W16, Star=W18)',cols:5,slots:[{key:'sh1',label:'Shackle Wave 8',markIdx:3,highlightCls:['Priest']},{key:'sh2',label:'Shackle Wave 11',markIdx:4,highlightCls:['Priest']},{key:'sh3',label:'Shackle Wave 13',markIdx:5,highlightCls:['Priest']},{key:'sh4',label:'Shackle Wave 16',markIdx:6,highlightCls:['Priest']},{key:'sh5',label:'Shackle Wave 18',markIdx:7,highlightCls:['Priest']}]},{title:'Sheep — Living Side (Mages)',cols:6,slots:[{key:'sp1',label:'Sheep Wave 8',markIdx:null,highlightCls:['Mage']},{key:'sp2',label:'Sheep Wave 10',markIdx:null,highlightCls:['Mage']},{key:'sp3',label:'Sheep Wave 12',markIdx:null,highlightCls:['Mage']},{key:'sp4',label:'Sheep Wave 14',markIdx:null,highlightCls:['Mage']},{key:'sp5',label:'Sheep Wave 18',markIdx:null,highlightCls:['Mage']}]}],hasGroupOrder:true},
-  {id:'horsemen',name:'The Four Horsemen',hint:'2 tanks per corner, 3 healers each. Swap on Mark stacks (4-5).',note:'Mark stacks every 12s — swap at 4-5 stacks. All 4 must die within 15s of each other.',segments:[{title:'Thane Korth\'azz',cols:5,slots:[{key:'th1',label:'Thane Tank 1',markIdx:null,healerKey:'thh1'},{key:'th2',label:'Thane Tank 2',markIdx:null,healerKey:'thh2'},{key:'thh1',label:'Mark 1 — Thane',isHealer:true},{key:'thh2',label:'Mark 2 — Thane',isHealer:true},{key:'thh3',label:'Mark 3 — Thane',isHealer:true}]},{title:'Lady Blaumeux',cols:5,slots:[{key:'bl1',label:'Blaumeux Tank 1',markIdx:null,healerKey:'blh1'},{key:'bl2',label:'Blaumeux Tank 2',markIdx:null,healerKey:'blh2'},{key:'blh1',label:'Mark 1 — Blaumeux',isHealer:true},{key:'blh2',label:'Mark 2 — Blaumeux',isHealer:true},{key:'blh3',label:'Mark 3 — Blaumeux',isHealer:true}]},{title:'Sir Zeliek',cols:5,slots:[{key:'ze1',label:'Zeliek Tank 1',markIdx:null,healerKey:'zeh1'},{key:'ze2',label:'Zeliek Tank 2',markIdx:null,healerKey:'zeh2'},{key:'zeh1',label:'Mark 1 — Zeliek',isHealer:true},{key:'zeh2',label:'Mark 2 — Zeliek',isHealer:true},{key:'zeh3',label:'Mark 3 — Zeliek',isHealer:true}]},{title:'Baron Mograine',cols:5,slots:[{key:'mo1',label:'Mograine Tank 1',markIdx:null,healerKey:'moh1'},{key:'mo2',label:'Mograine Tank 2',markIdx:null,healerKey:'moh2'},{key:'moh1',label:'Mark 1 — Mograine',isHealer:true},{key:'moh2',label:'Mark 2 — Mograine',isHealer:true},{key:'moh3',label:'Mark 3 — Mograine',isHealer:true}]}],hasGroupOrder:true,groupCount:3,customGroupLabels:['Star Group','Diamond Group','Triangle Group']},
+  {id:'gothik',name:'Gothik the Harvester',hint:'Split raid 50/50. 3 tanks Living side, 3 tanks Undead side. Set group order below.',note:'Living side kills mounted then unmounted trainees. Undead side handles spectral versions. Gothik teleports at 55% — burn him.',segments:[{title:'Undead Side Tanks',cols:3,slots:[{key:'ut1',label:'Undead Tank 1',markIdx:null},{key:'ut2',label:'Undead Tank 2',markIdx:null},{key:'ut3',label:'Undead Tank 3',markIdx:null}]},{title:'Living Side Tanks',cols:3,slots:[{key:'lt1',label:'Living Tank 1',markIdx:null},{key:'lt2',label:'Living Tank 2',markIdx:null},{key:'lt3',label:'Living Tank 3',markIdx:null}]},{title:'Shackle — Undead Side (Moon=W8, Tri=W11, Dia=W13, Cir=W16, Star=W18)',cols:5,slots:[{key:'sh1',label:'Shackle Wave 8',markIdx:3,highlightCls:['Priest']},{key:'sh2',label:'Shackle Wave 11',markIdx:4,highlightCls:['Priest']},{key:'sh3',label:'Shackle Wave 13',markIdx:5,highlightCls:['Priest']},{key:'sh4',label:'Shackle Wave 16',markIdx:6,highlightCls:['Priest']},{key:'sh5',label:'Shackle Wave 18',markIdx:7,highlightCls:['Priest']}]},{title:'Sheep — Living Side (Mages)',cols:6,slots:[{key:'sp1',label:'Sheep Wave 8',markIdx:null,highlightCls:['Mage']},{key:'sp2',label:'Sheep Wave 10',markIdx:null,highlightCls:['Mage']},{key:'sp3',label:'Sheep Wave 12',markIdx:null,highlightCls:['Mage']},{key:'sp4',label:'Sheep Wave 14',markIdx:null,highlightCls:['Mage']},{key:'sp5',label:'Sheep Wave 18',markIdx:null,highlightCls:['Mage']}]}],hasGroupOrder:true},
+  {id:'horsemen',name:'The Four Horsemen',hint:'2 tanks per corner, 3 healers each. Swap on Mark stacks (4-5).',note:'Mark stacks every 12s — swap at 4-5 stacks. All 4 must die within 15s of each other.',segments:[{title:'Thane Korth\'azz',cols:5,slots:[{key:'th1',label:'Thane Tank 1',markIdx:null,healerKey:'thh1'},{key:'th2',label:'Thane Tank 2',markIdx:null,healerKey:'thh2'},{key:'thh1',label:'Mark 1 — Thane',isHealer:true},{key:'thh2',label:'Mark 2 — Thane',isHealer:true},{key:'thh3',label:'Mark 3 — Thane',isHealer:true}]},{title:'Baron Mograine',cols:5,slots:[{key:'mo1',label:'Mograine Tank 1',markIdx:null,healerKey:'moh1'},{key:'mo2',label:'Mograine Tank 2',markIdx:null,healerKey:'moh2'},{key:'moh1',label:'Mark 1 — Mograine',isHealer:true},{key:'moh2',label:'Mark 2 — Mograine',isHealer:true},{key:'moh3',label:'Mark 3 — Mograine',isHealer:true}]},{title:'Lady Blaumeux',cols:5,slots:[{key:'bl1',label:'Blaumeux Tank 1',markIdx:null,healerKey:'blh1'},{key:'bl2',label:'Blaumeux Tank 2',markIdx:null,healerKey:'blh2'},{key:'blh1',label:'Mark 1 — Blaumeux',isHealer:true},{key:'blh2',label:'Mark 2 — Blaumeux',isHealer:true},{key:'blh3',label:'Mark 3 — Blaumeux',isHealer:true}]},{title:'Sir Zeliek',cols:5,slots:[{key:'ze1',label:'Zeliek Tank 1',markIdx:null,healerKey:'zeh1'},{key:'ze2',label:'Zeliek Tank 2',markIdx:null,healerKey:'zeh2'},{key:'zeh1',label:'Mark 1 — Zeliek',isHealer:true},{key:'zeh2',label:'Mark 2 — Zeliek',isHealer:true},{key:'zeh3',label:'Mark 3 — Zeliek',isHealer:true}]}],hasGroupOrder:true,groupCount:3,customGroupLabels:['Star Group','Diamond Group','Triangle Group']},
   /* Abomination Quarter */
   {id:'patchwerk',name:'Patchwerk',hint:'2-3 MTs rotating Hateful Strike. 4 healers per tank.',note:'Hateful Strike hits highest HP non-tank player in melee — keep 2 tanks in melee. Hard DPS check: 6 min enrage.',segments:[{title:'MT 1',cols:1,slots:[{key:'mt1',label:'MT 1',markIdx:null}]},{title:'MT 1 Healers',cols:4,isHealRow:true,slots:[{key:'h1a',label:'Heal MT1 — 1',isHealer:true},{key:'h1b',label:'Heal MT1 — 2',isHealer:true},{key:'h1c',label:'Heal MT1 — 3',isHealer:true},{key:'h1d',label:'Heal MT1 — 4',isHealer:true}]},{title:'Hateful Tank 1',cols:1,slots:[{key:'mt2',label:'Hateful Tank 1',markIdx:null}]},{title:'HT1 Healers',cols:4,isHealRow:true,slots:[{key:'h2a',label:'Heal HT1 — 1',isHealer:true},{key:'h2b',label:'Heal HT1 — 2',isHealer:true},{key:'h2c',label:'Heal HT1 — 3',isHealer:true},{key:'h2d',label:'Heal HT1 — 4',isHealer:true}]},{title:'Hateful Tank 2',cols:1,slots:[{key:'mt3',label:'Hateful Tank 2',markIdx:null}]},{title:'HT2 Healers',cols:4,isHealRow:true,slots:[{key:'h3a',label:'Heal HT2 — 1',isHealer:true},{key:'h3b',label:'Heal HT2 — 2',isHealer:true},{key:'h3c',label:'Heal HT2 — 3',isHealer:true},{key:'h3d',label:'Heal HT2 — 4',isHealer:true}]}]},
   {id:'grobbulus',name:'Grobbulus',hint:'1 MT kiting. 1 Slime Tank OT. Dispeller (Priest/Paladin).',note:'MT kites boss slowly. Mutating Injection: run to wall. Slime Spray: move out.',segments:[{title:'Tanks',cols:2,slots:[{key:'mt',label:'Grobbulus',markIdx:0,healerKey:'mth'},{key:'slimet',label:'Slime Tank',markIdx:null,healerKey:'slimeh'}]},{title:'Healers',cols:2,isHealRow:true,slots:[{key:'mth',label:'Healer — MT',isHealer:true},{key:'slimeh',label:'Healer — Slime',isHealer:true}]},{title:'Dispeller',cols:1,slots:[{key:'disp',label:'Dispeller',markIdx:7,highlightCls:['Priest','Paladin']}]}]},
@@ -1077,9 +1092,9 @@ function buildHorsemenPreview(boss,bd){
   var lines=[boss.name+' assignments'];
   var corners=[
     {pfx:'th',label:'Thane'},
+    {pfx:'mo',label:'Mograine'},
     {pfx:'bl',label:'Blaumeux'},
-    {pfx:'ze',label:'Zeliek'},
-    {pfx:'mo',label:'Mograine'}
+    {pfx:'ze',label:'Zeliek'}
   ];
   corners.forEach(function(c){
     var tanks=[];
@@ -1176,14 +1191,14 @@ function rPool(){
     var inDb=isInRealmDb(p.name);
     var dbBadge=inDb?'<span title="Found in Realm DB" style="font-size:.6rem;color:#5dcaa5;flex-shrink:0;margin-right:1px">&#10003;</span>':'<span title="Not in Realm DB" style="font-size:.6rem;color:#525a6a;flex-shrink:0;margin-right:1px">&#63;</span>';
     h+='<div class="pc'+(dim?' dim':canPick?' pick':'')+'" data-pid="'+he(p.id)+'" style="background:'+c.bg+';border-color:'+c.bd+';'+extraStyle+'">'
-      +'<div class="pc-inner">'+ihtml(p.cls,18,p.role)
+      +'<div class="pc-inner" style="gap:5px">'+ihtml(p.cls,18,p.role)
       +dbBadge
-      +'<span class="pc-name" style="font-size:1rem;font-weight:700;color:#f8f8f8;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" data-pid="'+he(p.id)+'">'+he(p.name)+'</span>'
-      +'<span style="font-size:.62rem;color:rgba(248,248,248,0.55);white-space:nowrap">'+he(p.spec||'')+'</span>'
-      +'<button class="bx" data-a="editname" data-pid="'+he(p.id)+'" title="Edit name" style="font-size:.6rem;padding:1px 5px;color:#9fc4f4;border-color:#1a3a70">&#9998;</button>'
-      +(p.cls==='Warrior'?'<button class="bx" data-a="totank" data-pid="'+he(p.id)+'" title="'+(p.role==='tank'?'Convert to DPS':'Convert to Tank')+'" style="font-size:.55rem;padding:1px 4px;color:'+(p.role==='tank'?'#9fc4f4':'#e07020')+';border-color:'+(p.role==='tank'?'#2a4a90':'#804010')+'">'+(p.role==='tank'?'D':'T')+'</button>':'')
-      +'<button class="bx" data-a="tobench" data-pid="'+he(p.id)+'" title="Move to bench" style="font-size:.55rem;padding:1px 4px">B</button>'
-      +'<button class="bx" data-a="rmp" data-pid="'+he(p.id)+'" title="Remove">x</button>'
+      +'<span class="pc-name" style="font-size:1rem;font-weight:700;color:#f8f8f8;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" data-pid="'+he(p.id)+'">'+he(p.name)+'</span>'
+      +'<span style="font-size:.58rem;color:rgba(248,248,248,0.55);white-space:nowrap;flex-shrink:0">'+he(p.spec||'')+'</span>'
+      +'<button class="bx" data-a="editname" data-pid="'+he(p.id)+'" title="Edit name" style="font-size:.58rem;padding:1px 4px;color:#9fc4f4;border-color:#1a3a70;flex-shrink:0">&#9998;</button>'
+      +(p.cls==='Warrior'?'<button class="bx" data-a="totank" data-pid="'+he(p.id)+'" title="'+(p.role==='tank'?'Convert to DPS':'Convert to Tank')+'" style="font-size:.55rem;padding:1px 4px;color:'+(p.role==='tank'?'#9fc4f4':'#e07020')+';border-color:'+(p.role==='tank'?'#2a4a90':'#804010')+';flex-shrink:0">'+(p.role==='tank'?'D':'T')+'</button>':'')
+      +'<button class="bx" data-a="tobench" data-pid="'+he(p.id)+'" title="Move to bench" style="font-size:.55rem;padding:1px 4px;flex-shrink:0">B</button>'
+      +'<button class="bx" data-a="rmp" data-pid="'+he(p.id)+'" title="Remove" style="flex-shrink:0">x</button>'
       +'</div></div>';
   }
   if(!h&&filt==='all')h='<div style="color:#525a6a;font-size:.82rem;text-align:center;padding:.6rem">No players</div>';
@@ -2137,6 +2152,108 @@ function decodePayload(str){
   try{return JSON.parse(decodeURIComponent(escape(atob(str))));}catch(e){return null;}
 }
 
+/* ── Save Raid to File / Load Raid from File ──
+   Unlike the share-view payload (which is lossy/index-based and read-only),
+   this keeps full player objects with their real IDs so the loaded raid is
+   100% editable afterward — assignments, group setups, everything works
+   exactly as if you'd built it yourself. Scoped to the ACTIVE raid only. */
+function buildFullSaveData(){
+  function fullP(p){return p?{id:p.id,name:p.name,cls:p.cls,spec:p.spec,role:p.role,pos:p.pos}:null;}
+  function fullBd(bd){
+    var o={};
+    for(var k in bd){
+      if(k==='notes'){o[k]=bd[k]||'';}
+      else if(bd[k]&&typeof bd[k]==='object'&&bd[k].id){o[k]=fullP(bd[k]);}
+    }
+    return o;
+  }
+  var savedBossData={};
+  for(var bid in bossData)savedBossData[bid]=fullBd(bossData[bid]);
+
+  var savedBossGroups={};
+  for(var bid2 in bossGroups){
+    savedBossGroups[bid2]=bossGroups[bid2].map(function(grp){
+      return grp.slots.map(function(sl){return sl.p?fullP(sl.p):null;});
+    });
+  }
+
+  return {
+    fmt:'wow-raid-save',
+    ver:1,
+    savedAt:new Date().toISOString(),
+    raid:activeRaid,
+    players:players.map(fullP),
+    benched:benched.map(fullP),
+    lateList:lateList.map(fullP),
+    absentList:absentList.map(fullP),
+    tentativeList:tentativeList.map(fullP),
+    originalStatus:originalStatus,
+    groups:groups.map(function(g){return g.slots.map(function(s){return s.p?fullP(s.p):null;});}),
+    trashMarks:trashMarks.map(function(m){return{name:m.name,col:m.col,tank:fullP(m.tank),healer:fullP(m.healer)};}),
+    puller:fullP(puller),
+    extraTrashMarks:{
+      aq_t:fullP(extraTrashMarks.aq_t),aq_h:fullP(extraTrashMarks.aq_h),
+      nx_t:fullP(extraTrashMarks.nx_t),nx_h:fullP(extraTrashMarks.nx_h)
+    },
+    bossData:savedBossData,
+    bossGroups:savedBossGroups
+  };
+}
+
+function loadFullSaveData(data){
+  if(!data||data.fmt!=='wow-raid-save'){tip('This file is not a valid raid save file.',true);return false;}
+  function rebuildP(p){return p?{id:p.id,name:p.name,cls:p.cls,spec:p.spec,role:p.role,pos:p.pos}:null;}
+
+  /* Switch to the saved raid first so BOSSES/BOSSES_BY_RAID line up,
+     then overwrite the freshly-reset state with the saved data */
+  if(data.raid&&BOSSES_BY_RAID[data.raid])switchRaid(data.raid);
+
+  players=(data.players||[]).map(rebuildP).filter(Boolean);
+  benched=(data.benched||[]).map(rebuildP).filter(Boolean);
+  lateList=(data.lateList||[]).map(rebuildP).filter(Boolean);
+  absentList=(data.absentList||[]).map(rebuildP).filter(Boolean);
+  tentativeList=(data.tentativeList||[]).map(rebuildP).filter(Boolean);
+  originalStatus=data.originalStatus||{};
+
+  groups=(data.groups||[]).map(function(slotArr){
+    return{slots:(slotArr||[]).map(function(p){return{p:rebuildP(p)};})};
+  });
+  /* Pad to 8 groups of 5 if the save has fewer (defensive) */
+  while(groups.length<8)groups.push({slots:[{p:null},{p:null},{p:null},{p:null},{p:null}]});
+  groups.forEach(function(g){while(g.slots.length<5)g.slots.push({p:null});});
+
+  trashMarks=(data.trashMarks||[]).map(function(m){
+    return{name:m.name,col:m.col,tank:rebuildP(m.tank),healer:rebuildP(m.healer)};
+  });
+  puller=rebuildP(data.puller);
+  extraTrashMarks={
+    aq_t:rebuildP(data.extraTrashMarks&&data.extraTrashMarks.aq_t),
+    aq_h:rebuildP(data.extraTrashMarks&&data.extraTrashMarks.aq_h),
+    nx_t:rebuildP(data.extraTrashMarks&&data.extraTrashMarks.nx_t),
+    nx_h:rebuildP(data.extraTrashMarks&&data.extraTrashMarks.nx_h)
+  };
+
+  bossData={};
+  for(var bid in (data.bossData||{})){
+    var sbd=data.bossData[bid],o={};
+    for(var k in sbd){
+      if(k==='notes')o[k]=sbd[k]||'';
+      else o[k]=rebuildP(sbd[k]);
+    }
+    bossData[bid]=o;
+  }
+  bossGroups={};
+  for(var bid2 in (data.bossGroups||{})){
+    bossGroups[bid2]=data.bossGroups[bid2].map(function(slotArr){
+      return{slots:(slotArr||[]).map(function(p){return{p:rebuildP(p)};})};
+    });
+  }
+
+  activeTab='trash';sel=null;
+  rAll();
+  return true;
+}
+
 function buildSlimPayload(){
   /* v4: maximally compact format.
      - Players stored as plain arrays [name,cls,spec,role] — no key names, no id field
@@ -2360,6 +2477,70 @@ document.getElementById('bShare').addEventListener('click',function(){
 document.getElementById('bRealmDb').addEventListener('click',function(){
   window.open('realm-db.html','mc-realm-db','width=1050,height=750,resizable=yes,scrollbars=yes');
 });
+
+/* ── Save Raid to File ── */
+function todayStamp(){
+  var d=new Date();
+  var mm=String(d.getMonth()+1).padStart(2,'0');
+  var dd=String(d.getDate()).padStart(2,'0');
+  return d.getFullYear()+'-'+mm+'-'+dd;
+}
+function buildSaveFilename(label){
+  var raidSlug=activeRaid; /* mc, bwl, aq40, naxx */
+  var base='raid-'+raidSlug+'-'+todayStamp();
+  if(label){
+    var cleanLabel=label.trim().toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
+    if(cleanLabel)base+='-'+cleanLabel;
+  }
+  return base+'.json';
+}
+document.getElementById('bSaveRaid').addEventListener('click',function(){
+  if(!players.length){tip('Load a raid first before saving.',true);return;}
+  document.getElementById('saveRaidLabel').value='';
+  document.getElementById('saveRaidPreviewName').textContent='File: '+buildSaveFilename('');
+  document.getElementById('saveRaidModal').className='modal-wrap on';
+});
+document.getElementById('saveRaidLabel').addEventListener('input',function(){
+  document.getElementById('saveRaidPreviewName').textContent='File: '+buildSaveFilename(this.value);
+});
+document.getElementById('bSaveRaidCancel').addEventListener('click',function(){
+  document.getElementById('saveRaidModal').className='modal-wrap';
+});
+document.getElementById('bSaveRaidConfirm').addEventListener('click',function(){
+  var label=document.getElementById('saveRaidLabel').value;
+  var filename=buildSaveFilename(label);
+  var data=buildFullSaveData();
+  var json=JSON.stringify(data,null,2);
+  var blob=new Blob([json],{type:'application/json'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');
+  a.href=url;a.download=filename;
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  setTimeout(function(){URL.revokeObjectURL(url);},1000);
+  document.getElementById('saveRaidModal').className='modal-wrap';
+  tip('Saved '+filename);
+});
+
+/* ── Load Raid from File ── */
+document.getElementById('bLoadRaid').addEventListener('click',function(){
+  document.getElementById('loadRaidFile').click();
+});
+document.getElementById('loadRaidFile').addEventListener('change',function(e){
+  var file=e.target.files&&e.target.files[0];
+  if(!file)return;
+  var reader=new FileReader();
+  reader.onload=function(evt){
+    var data;
+    try{data=JSON.parse(evt.target.result);}
+    catch(err){tip('Could not read this file — it is not valid JSON.',true);e.target.value='';return;}
+    var ok=loadFullSaveData(data);
+    if(ok)tip('Raid loaded from '+file.name+'.');
+    e.target.value=''; /* reset so the same file can be re-selected later */
+  };
+  reader.onerror=function(){tip('Failed to read the file.',true);};
+  reader.readAsText(file);
+});
+
 document.getElementById('bShareClose').addEventListener('click',function(){document.getElementById('shareModal').className='modal-wrap';});
 document.getElementById('bCopyShareUrl').addEventListener('click',function(){
   var inp=document.getElementById('shareUrl');
