@@ -121,7 +121,7 @@ textarea{width:100%;background:#0d1020;border:1px solid #2a3050;color:#e0d8f8;pa
 <div class="app">
 <h1>WoW Classic Raid Organizer</h1>
 <div class="sub">Organize your 40-man raid &mdash; select a raid below</div>
-<div style="text-align:center;font-size:.6rem;color:#4a6890;font-family:Cinzel,serif;letter-spacing:.08em;margin-top:-.3rem;margin-bottom:.5rem">v1.6.2</div>
+<div style="text-align:center;font-size:.6rem;color:#4a6890;font-family:Cinzel,serif;letter-spacing:.08em;margin-top:-.3rem;margin-bottom:.5rem">v1.7.0</div>
 <div style="display:flex;gap:6px;justify-content:center;margin-bottom:.9rem;flex-wrap:wrap">
   <button class="btn raid-sel-btn" data-raid="mc"   id="rsMC"   style="font-family:Cinzel,serif;font-size:.74rem;padding:5px 14px;border-radius:4px;cursor:pointer;border:1px solid #3a6ae0;background:#1a3a80;color:#c8d8ff">&#128293; Molten Core</button>
   <button class="btn raid-sel-btn" data-raid="bwl"  id="rsBWL"  style="font-family:Cinzel,serif;font-size:.74rem;padding:5px 14px;border-radius:4px;cursor:pointer;border:1px solid #2a3050;background:#131726;color:#7ab0ff">&#128009; Blackwing Lair</button>
@@ -2463,7 +2463,7 @@ function renderViewMode(data){
       h+='<div class="trash-card-hdr" style="background:'+m.col+'18;color:'+m.col+'">'+vMS[i]+' '+m.name+'</div>';
       h+='<div class="trash-card-body">';
       if(tankP){var tc=cd(tankP.cls);h+='<div class="trash-lbl">Tank</div><div class="mark-np" style="background:'+tc.bg+';border:1px solid '+tc.bd+'">'+ihtml(tankP.cls,13,tankP.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(tankP.name)+'</span></div>';}
-      if(healP){var hc2=cd(healP.cls);h+='<div class="trash-lbl" style="margin-top:3px">Healer</div><div class="mark-np" style="background:'+hc2.bg+';border:1px solid '+hc2.bd+';border-left:3px solid #2a8a4a">'+ihtml(healP.cls,13,healP.role)+'<span class="mark-np-name" style="color:#60cc80">'+he(healP.name)+'</span></div>';}
+      if(healP){var hc2=cd(healP.cls);h+='<div class="trash-lbl" style="margin-top:3px">Healer</div><div class="mark-np" style="background:'+hc2.bg+';border:1px solid '+hc2.bd+';border-left:3px solid #2a8a4a">'+ihtml(healP.cls,13,healP.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(healP.name)+'</span></div>';}
       h+='</div></div>';
     });
     /* Extra marks */
@@ -2473,7 +2473,7 @@ function renderViewMode(data){
       h+='<div class="trash-card-hdr" style="background:'+ex[3]+'18;color:'+ex[3]+'">'+ex[2]+' '+ex[4]+'</div>';
       h+='<div class="trash-card-body">';
       if(ex[0]){var tc2=cd(ex[0].cls);h+='<div class="trash-lbl">Tank</div><div class="mark-np" style="background:'+tc2.bg+';border:1px solid '+tc2.bd+'">'+ihtml(ex[0].cls,13,ex[0].role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(ex[0].name)+'</span></div>';}
-      if(ex[1]){var hc3=cd(ex[1].cls);h+='<div class="trash-lbl" style="margin-top:3px">Healer</div><div class="mark-np" style="background:'+hc3.bg+';border:1px solid '+hc3.bd+';border-left:3px solid #2a8a4a">'+ihtml(ex[1].cls,13,ex[1].role)+'<span class="mark-np-name" style="color:#60cc80">'+he(ex[1].name)+'</span></div>';}
+      if(ex[1]){var hc3=cd(ex[1].cls);h+='<div class="trash-lbl" style="margin-top:3px">Healer</div><div class="mark-np" style="background:'+hc3.bg+';border:1px solid '+hc3.bd+';border-left:3px solid #2a8a4a">'+ihtml(ex[1].cls,13,ex[1].role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(ex[1].name)+'</span></div>';}
       h+='</div></div>';
     });
     h+='</div>';
@@ -2522,8 +2522,8 @@ function renderViewMode(data){
 
     var shownHealerKeys={};
 
-    /* Non-healer segments → mark cards (skipped for Four Horsemen — shown in room diagram instead) */
-    if(boss.id!=='horsemen'){
+    /* Non-healer segments → mark cards (skipped for Four Horsemen and Maexxna — custom layouts below) */
+    if(boss.id!=='horsemen'&&boss.id!=='maexxna'&&boss.id!=='gothik'&&boss.id!=='patchwerk'&&boss.id!=='thaddius'){
     boss.segments.forEach(function(seg){
       if(seg.isHealRow)return;
       var assignedSlots=seg.slots.filter(function(sl){
@@ -2556,10 +2556,10 @@ function renderViewMode(data){
         /* Paired healer */
         if(healer){
           var hc=cd(healer.cls);
-          h+='<div class="mark-np" style="background:'+hc.bg+';border:1px solid #1e5a32">';
+          h+='<div class="mark-np" style="background:'+hc.bg+';border:1px solid '+hc.bd+'">';
           h+=ihtml(healer.cls,14,healer.role);
-          h+='<span class="mark-np-name" style="color:#60cc80">'+he(healer.name)+'</span>';
-          h+='<span class="mark-np-label" style="color:#60cc8066">heal</span>';
+          h+='<span class="mark-np-name" style="color:#f8f8f8">'+he(healer.name)+'</span>';
+          h+='<span class="mark-np-label" style="color:rgba(248,248,248,.5)">heal</span>';
           h+='</div>';
         }
         h+='</div></div>';
@@ -2579,14 +2579,130 @@ function renderViewMode(data){
       h+='<div class="healer-chips">';
       healers.forEach(function(sl){
         var hp=pmap[bdata[sl.key]];var hc=cd(hp.cls);
-        h+='<div class="healer-chip" style="background:'+hc.bg+';border:1px solid '+hc.bd+';border-left:3px solid #2a8a4a">';
+        var numLabel='';
+        if(boss.id==='loatheb'||boss.id==='kelthuzad'){
+          var numMatch=sl.key.match(/(\d+)$/);
+          if(numMatch)numLabel='<span style="font-size:.62rem;color:rgba(248,248,248,.55);font-family:Cinzel,serif;margin-right:3px">['+numMatch[1]+']</span>';
+        }
+        h+='<div class="healer-chip" style="background:'+hc.bg+';border:1px solid '+hc.bd+'">';
+        h+=numLabel;
         h+=ihtml(hp.cls,13,hp.role);
-        h+='<span style="font-size:.85rem;font-weight:700;color:#60cc80">'+he(hp.name)+'</span>';
+        h+='<span style="font-size:.85rem;font-weight:700;color:#f8f8f8">'+he(hp.name)+'</span>';
         h+='</div>';
       });
       h+='</div></div>';
     });
     } /* end skip for horsemen */
+
+    /* ── Maexxna custom layout: Tank, then Left/Middle/Right Web (2 DPS + healer together), then T2 Heal / Abolish Poison ── */
+    if(boss.id==='maexxna'){
+      var mxMt=bdata.mt&&pmap[bdata.mt]?pmap[bdata.mt]:null;
+      if(mxMt){
+        var mxc=cd(mxMt.cls);
+        h+='<div style="font-family:Cinzel,serif;font-size:.58rem;color:#4a6090;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.35rem">Tank</div>';
+        h+='<div class="mark-cards" style="margin-bottom:.65rem">';
+        h+='<div class="mark-card" style="background:#0f1322;border:1px solid #f0f0f035">';
+        h+='<div class="mark-card-wm" style="color:#f0f0f0">\u{1F480}</div>';
+        h+='<div class="mark-card-hdr" style="background:#f0f0f014;color:#f0f0f0">\u{1F480} Maexxna</div>';
+        h+='<div class="mark-card-body"><div class="mark-np" style="background:'+mxc.bg+';border:1px solid '+mxc.bd+'">'+ihtml(mxMt.cls,14,mxMt.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(mxMt.name)+'</span></div></div></div>';
+        h+='</div>';
+      }
+      var webGroups=[['Left Web','lw1','lw2','lwh'],['Middle Web','mw1','mw2','mwh'],['Right Web','rw1','rw2','rwh']];
+      webGroups.forEach(function(wg){
+        var d1=bdata[wg[1]]&&pmap[bdata[wg[1]]]?pmap[bdata[wg[1]]]:null;
+        var d2=bdata[wg[2]]&&pmap[bdata[wg[2]]]?pmap[bdata[wg[2]]]:null;
+        var dh=bdata[wg[3]]&&pmap[bdata[wg[3]]]?pmap[bdata[wg[3]]]:null;
+        if(!d1&&!d2&&!dh)return;
+        h+='<div style="font-family:Cinzel,serif;font-size:.58rem;color:#5a7ab0;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.35rem">'+he(wg[0])+'</div>';
+        h+='<div class="mark-cards" style="margin-bottom:.65rem">';
+        h+='<div class="mark-card" style="background:#0f1322;border:1px solid #5a7ab035">';
+        h+='<div class="mark-card-hdr" style="background:#5a7ab014;color:#5a7ab0">'+he(wg[0])+'</div>';
+        h+='<div class="mark-card-body">';
+        [d1,d2].forEach(function(dp){
+          if(!dp)return;
+          var dc=cd(dp.cls);
+          h+='<div class="mark-np" style="background:'+dc.bg+';border:1px solid '+dc.bd+'">'+ihtml(dp.cls,14,dp.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(dp.name)+'</span></div>';
+        });
+        if(dh){
+          var hc4=cd(dh.cls);
+          h+='<div class="mark-np" style="background:'+hc4.bg+';border:1px solid '+hc4.bd+'">'+ihtml(dh.cls,14,dh.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(dh.name)+'</span><span class="mark-np-label" style="color:rgba(248,248,248,.5)">heal</span></div>';
+        }
+        h+='</div></div></div>';
+      });
+      var mxSpecial=[['T2 Heal','t2h'],['Abolish Poison','ap']];
+      var mxSpecialHtml='';
+      mxSpecial.forEach(function(sp){
+        var p=bdata[sp[1]]&&pmap[bdata[sp[1]]]?pmap[bdata[sp[1]]]:null;
+        if(!p)return;
+        var pc4=cd(p.cls);
+        mxSpecialHtml+='<div class="healer-chip" style="background:'+pc4.bg+';border:1px solid '+pc4.bd+'">'+ihtml(p.cls,13,p.role)+'<span style="font-size:.85rem;font-weight:700;color:#f8f8f8">'+he(p.name)+'</span><span style="font-size:.55rem;color:rgba(248,248,248,.5);margin-left:3px">'+he(sp[0])+'</span></div>';
+      });
+      if(mxSpecialHtml){
+        h+='<div class="healer-group"><div class="healer-group-lbl">Special Healers</div><div class="healer-chips">'+mxSpecialHtml+'</div></div>';
+      }
+    }
+
+    /* ── Patchwerk custom layout: each tank grouped with its 4 healers ── */
+    if(boss.id==='patchwerk'){
+      var pwGroups=[['MT 1','mt1',['h1a','h1b','h1c','h1d']],['Hateful Tank 1','mt2',['h2a','h2b','h2c','h2d']],['Hateful Tank 2','mt3',['h3a','h3b','h3c','h3d']]];
+      pwGroups.forEach(function(pg){
+        var pwTank=bdata[pg[1]]&&pmap[bdata[pg[1]]]?pmap[bdata[pg[1]]]:null;
+        var pwHealers=pg[2].map(function(k){return bdata[k]&&pmap[bdata[k]]?pmap[bdata[k]]:null;}).filter(Boolean);
+        if(!pwTank&&!pwHealers.length)return;
+        h+='<div style="font-family:Cinzel,serif;font-size:.58rem;color:#4a6090;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.35rem">'+he(pg[0])+'</div>';
+        h+='<div class="mark-cards" style="margin-bottom:.65rem">';
+        h+='<div class="mark-card" style="background:#0f1322;border:1px solid #5a7ab035;width:100%;grid-column:1/-1">';
+        h+='<div class="mark-card-hdr" style="background:#5a7ab014;color:#5a7ab0">'+he(pg[0])+'</div>';
+        h+='<div class="mark-card-body" style="display:flex;flex-wrap:wrap;gap:5px">';
+        if(pwTank){var pwtc=cd(pwTank.cls);h+='<div class="mark-np" style="background:'+pwtc.bg+';border:1px solid '+pwtc.bd+'">'+ihtml(pwTank.cls,14,pwTank.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(pwTank.name)+'</span><span class="mark-np-label">tank</span></div>';}
+        pwHealers.forEach(function(hp){var phc=cd(hp.cls);h+='<div class="mark-np" style="background:'+phc.bg+';border:1px solid '+phc.bd+'">'+ihtml(hp.cls,14,hp.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(hp.name)+'</span></div>';});
+        h+='</div></div></div>';
+      });
+    }
+
+    /* ── Thaddius custom layout: Thaddius MT first, then Stalagg tanks/healers (left), Feugen tanks/healers (right) ── */
+    if(boss.id==='thaddius'){
+      var thMt=bdata.mt&&pmap[bdata.mt]?pmap[bdata.mt]:null;
+      if(thMt){
+        h+='<div style="font-family:Cinzel,serif;font-size:.58rem;color:#4a6090;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.35rem">Thaddius (P2)</div>';
+        h+='<div class="mark-cards" style="margin-bottom:.65rem">';
+        h+='<div class="mark-card" style="background:#0f1322;border:1px solid #5a7ab035;width:100%;grid-column:1/-1">';
+        h+='<div class="mark-card-hdr" style="background:#5a7ab014;color:#5a7ab0">Thaddius MT</div>';
+        h+='<div class="mark-card-body" style="display:flex;flex-wrap:wrap;gap:5px">';
+        var thmc=cd(thMt.cls);h+='<div class="mark-np" style="background:'+thmc.bg+';border:1px solid '+thmc.bd+'">'+ihtml(thMt.cls,14,thMt.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(thMt.name)+'</span><span class="mark-np-label">tank</span></div>';
+        h+='</div></div></div>';
+      }
+      h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
+      /* Stalagg (left) */
+      var stTanks=['ts1','ts2'].map(function(k){return bdata[k]&&pmap[bdata[k]]?pmap[bdata[k]]:null;}).filter(Boolean);
+      var stHealers=['sh1','sh2'].map(function(k){return bdata[k]&&pmap[bdata[k]]?pmap[bdata[k]]:null;}).filter(Boolean);
+      h+='<div>';
+      if(stTanks.length||stHealers.length){
+        h+='<div style="font-family:Cinzel,serif;font-size:.58rem;color:#4a6090;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.35rem">Stalagg</div>';
+        h+='<div class="mark-card" style="background:#0f1322;border:1px solid #5a7ab035">';
+        h+='<div class="mark-card-hdr" style="background:#5a7ab014;color:#5a7ab0">Stalagg Tanks &amp; Healers</div>';
+        h+='<div class="mark-card-body" style="display:flex;flex-direction:column;gap:4px">';
+        stTanks.forEach(function(tp){var tc=cd(tp.cls);h+='<div class="mark-np" style="background:'+tc.bg+';border:1px solid '+tc.bd+'">'+ihtml(tp.cls,14,tp.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(tp.name)+'</span><span class="mark-np-label">tank</span></div>';});
+        stHealers.forEach(function(hp){var hc5=cd(hp.cls);h+='<div class="mark-np" style="background:'+hc5.bg+';border:1px solid '+hc5.bd+'">'+ihtml(hp.cls,14,hp.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(hp.name)+'</span></div>';});
+        h+='</div></div>';
+      }
+      h+='</div>';
+      /* Feugen (right) */
+      var fgTanks=['tf1','tf2'].map(function(k){return bdata[k]&&pmap[bdata[k]]?pmap[bdata[k]]:null;}).filter(Boolean);
+      var fgHealers=['fh1','fh2'].map(function(k){return bdata[k]&&pmap[bdata[k]]?pmap[bdata[k]]:null;}).filter(Boolean);
+      h+='<div>';
+      if(fgTanks.length||fgHealers.length){
+        h+='<div style="font-family:Cinzel,serif;font-size:.58rem;color:#4a6090;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.35rem">Feugen</div>';
+        h+='<div class="mark-card" style="background:#0f1322;border:1px solid #5a7ab035">';
+        h+='<div class="mark-card-hdr" style="background:#5a7ab014;color:#5a7ab0">Feugen Tanks &amp; Healers</div>';
+        h+='<div class="mark-card-body" style="display:flex;flex-direction:column;gap:4px">';
+        fgTanks.forEach(function(tp){var tc=cd(tp.cls);h+='<div class="mark-np" style="background:'+tc.bg+';border:1px solid '+tc.bd+'">'+ihtml(tp.cls,14,tp.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(tp.name)+'</span><span class="mark-np-label">tank</span></div>';});
+        fgHealers.forEach(function(hp){var hc6=cd(hp.cls);h+='<div class="mark-np" style="background:'+hc6.bg+';border:1px solid '+hc6.bd+'">'+ihtml(hp.cls,14,hp.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(hp.name)+'</span></div>';});
+        h+='</div></div>';
+      }
+      h+='</div>';
+      h+='</div>';
+    }
 
     if(bdata.notes)h+='<div class="note-box">'+he(bdata.notes)+'</div>';
 
@@ -2808,6 +2924,74 @@ function renderViewMode(data){
         h+='</div></div>';
 
         h+='</div>'; /* end margin wrapper */
+
+      } else if(boss.id==='gothik'){
+        /* ── Gothik: tanks alongside their matching odd/even groups, shackle/sheep below ── */
+        var gthUndeadTanks=['ut1','ut2','ut3'].map(function(k){return bdata[k]&&pmap[bdata[k]]?pmap[bdata[k]]:null;}).filter(Boolean);
+        var gthLivingTanks=['lt1','lt2','lt3'].map(function(k){return bdata[k]&&pmap[bdata[k]]?pmap[bdata[k]]:null;}).filter(Boolean);
+
+        h+='<div style="margin-top:.7rem">';
+        h+='<div style="font-family:Cinzel,serif;font-size:.58rem;color:#7ab0ff;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.4rem">Group Setup \u2014 Odd = Undead Side, Even = Living Side</div>';
+
+        /* Tank header row: Undead tanks (left) / Living tanks (right) */
+        h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:.5rem">';
+        h+='<div style="background:#1a0a2a;border:1px solid #4a2880;border-radius:6px;padding:5px 8px">';
+        h+='<div style="font-family:Cinzel,serif;font-size:.6rem;color:#a070d0;margin-bottom:4px">Undead Side Tanks</div>';
+        if(gthUndeadTanks.length){
+          gthUndeadTanks.forEach(function(tp){var tc=cd(tp.cls);h+='<div style="display:flex;align-items:center;gap:5px;background:'+tc.bg+';border-radius:3px;padding:3px 6px;margin-bottom:3px">'+ihtml(tp.cls,13,tp.role)+'<span style="font-size:.8rem;font-weight:700;color:#f8f8f8">'+he(tp.name)+'</span></div>';});
+        } else { h+='<div style="font-size:.68rem;color:#3a5080;font-style:italic">No tanks assigned</div>'; }
+        h+='</div>';
+        h+='<div style="background:#0a1a2a;border:1px solid #2860a0;border-radius:6px;padding:5px 8px">';
+        h+='<div style="font-family:Cinzel,serif;font-size:.6rem;color:#70a0d0;margin-bottom:4px">Living Side Tanks</div>';
+        if(gthLivingTanks.length){
+          gthLivingTanks.forEach(function(tp){var tc=cd(tp.cls);h+='<div style="display:flex;align-items:center;gap:5px;background:'+tc.bg+';border-radius:3px;padding:3px 6px;margin-bottom:3px">'+ihtml(tp.cls,13,tp.role)+'<span style="font-size:.8rem;font-weight:700;color:#f8f8f8">'+he(tp.name)+'</span></div>';});
+        } else { h+='<div style="font-size:.68rem;color:#3a5080;font-style:italic">No tanks assigned</div>'; }
+        h+='</div></div>';
+
+        /* 8 group cards, odd left / even right (already pre-interleaved in bl) */
+        h+='<div class="grp-grid" style="grid-template-columns:repeat(2,1fr)">';
+        for(var gthGi=0;gthGi<8;gthGi++){
+          var gthLabel=(boss.customGroupLabels&&boss.customGroupLabels[gthGi])?boss.customGroupLabels[gthGi]:('Group '+(gthGi+1));
+          h+='<div class="grp-card"><div class="grp-hdr">'+he(gthLabel)+'</div>';
+          (bl[gthGi]||[]).forEach(function(bp){
+            if(bp){var bc=cd(bp.cls);h+='<div class="grp-slot" style="background:'+bc.bg+'">'+ihtml(bp.cls,12,bp.role)+'<span style="font-size:.78rem;font-weight:700;color:#f8f8f8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+he(bp.name)+'</span></div>';}
+            else h+='<div class="grp-slot"><span style="font-size:.6rem;color:#3a5080">\u2014</span></div>';
+          });
+          h+='</div>';
+        }
+        h+='</div></div>';
+
+        /* Shackle & Sheep assignments below the groups */
+        var gthShackle=[];
+        for(var shi=1;shi<=5;shi++){
+          var shKey='sh'+shi,shP=bdata[shKey]&&pmap[bdata[shKey]]?pmap[bdata[shKey]]:null;
+          if(shP)gthShackle.push({p:shP,key:shKey});
+        }
+        var gthSheep=[];
+        for(var spi=1;spi<=5;spi++){
+          var spKey='sp'+spi,spP=bdata[spKey]&&pmap[bdata[spKey]]?pmap[bdata[spKey]]:null;
+          if(spP)gthSheep.push({p:spP,key:spKey});
+        }
+        var WAVE_LABELS_SH={sh1:'Wave 8',sh2:'Wave 11',sh3:'Wave 13',sh4:'Wave 16',sh5:'Wave 18'};
+        var WAVE_LABELS_SP={sp1:'Wave 8',sp2:'Wave 10',sp3:'Wave 12',sp4:'Wave 14',sp5:'Wave 18'};
+        if(gthShackle.length){
+          h+='<div style="margin-top:.6rem"><div style="font-family:Cinzel,serif;font-size:.58rem;color:#e8e8e8;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.35rem">Shackle \u2014 Undead Side (Priest)</div>';
+          h+='<div class="mark-cards">';
+          gthShackle.forEach(function(s){
+            var sc2=cd(s.p.cls);
+            h+='<div class="mark-card" style="background:#0f1322;border:1px solid #c0c0c035"><div class="mark-card-hdr" style="background:#c0c0c014;color:#c0c0c0">'+he(WAVE_LABELS_SH[s.key])+'</div><div class="mark-card-body"><div class="mark-np" style="background:'+sc2.bg+';border:1px solid '+sc2.bd+'">'+ihtml(s.p.cls,14,s.p.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(s.p.name)+'</span></div></div></div>';
+          });
+          h+='</div></div>';
+        }
+        if(gthSheep.length){
+          h+='<div style="margin-top:.6rem"><div style="font-family:Cinzel,serif;font-size:.58rem;color:#8080e8;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.35rem">Sheep \u2014 Living Side (Mage)</div>';
+          h+='<div class="mark-cards">';
+          gthSheep.forEach(function(s){
+            var sc3=cd(s.p.cls);
+            h+='<div class="mark-card" style="background:#0f1322;border:1px solid #8080e835"><div class="mark-card-hdr" style="background:#8080e814;color:#8080e8">'+he(WAVE_LABELS_SP[s.key])+'</div><div class="mark-card-body"><div class="mark-np" style="background:'+sc3.bg+';border:1px solid '+sc3.bd+'">'+ihtml(s.p.cls,14,s.p.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(s.p.name)+'</span></div></div></div>';
+          });
+          h+='</div></div>';
+        }
 
       } else {
         /* Standard grid for Gothik, Sapphiron, KT, Loatheb */
