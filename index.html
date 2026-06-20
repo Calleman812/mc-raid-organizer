@@ -121,7 +121,7 @@ textarea{width:100%;background:#0d1020;border:1px solid #2a3050;color:#e0d8f8;pa
 <div class="app">
 <h1>WoW Classic Raid Organizer</h1>
 <div class="sub">Organize your 40-man raid &mdash; select a raid below</div>
-<div style="text-align:center;font-size:.6rem;color:#4a6890;font-family:Cinzel,serif;letter-spacing:.08em;margin-top:-.3rem;margin-bottom:.5rem">v1.5.0</div>
+<div style="text-align:center;font-size:.6rem;color:#4a6890;font-family:Cinzel,serif;letter-spacing:.08em;margin-top:-.3rem;margin-bottom:.5rem">v1.6.0</div>
 <div style="display:flex;gap:6px;justify-content:center;margin-bottom:.9rem;flex-wrap:wrap">
   <button class="btn raid-sel-btn" data-raid="mc"   id="rsMC"   style="font-family:Cinzel,serif;font-size:.74rem;padding:5px 14px;border-radius:4px;cursor:pointer;border:1px solid #3a6ae0;background:#1a3a80;color:#c8d8ff">&#128293; Molten Core</button>
   <button class="btn raid-sel-btn" data-raid="bwl"  id="rsBWL"  style="font-family:Cinzel,serif;font-size:.74rem;padding:5px 14px;border-radius:4px;cursor:pointer;border:1px solid #2a3050;background:#131726;color:#7ab0ff">&#128009; Blackwing Lair</button>
@@ -503,38 +503,41 @@ function initSapphironGroups(gc){
   var bg=[];
   for(var i=0;i<8;i++)bg.push([]);
 
-  /* Group 1: tank + up to 2 paladins */
+  /* Group 1: tank + up to 2 paladins (cap 5 naturally since only 3 items max here) */
   if(tankP)bg[0].push(tankP);
-  for(var pp=0;pp<2&&paladins.length;pp++)bg[0].push(paladins.shift());
+  for(var pp=0;pp<2&&paladins.length&&bg[0].length<5;pp++)bg[0].push(paladins.shift());
 
-  /* 1 healer per group (index 0..7), skip group already has 1 healer logic — simple round robin */
-  for(var hg=0;hg<8&&healers.length;hg++)bg[hg].push(healers.shift());
+  /* 1 healer per group (index 0..7), capped at 5 — group 1 already has up to 3, still room */
+  for(var hg=0;hg<8&&healers.length;hg++){
+    if(bg[hg].length<5)bg[hg].push(healers.shift());
+  }
   var leftoverHealers=healers; /* if more than 8 healers, rest go to general pool */
 
-  /* Mages and Druids evenly split into groups 7 and 8 (index 6 and 7) */
+  /* Mages and Druids evenly split into groups 7 and 8 (index 6 and 7), capped at 5 */
   var mdPool=mages.concat(druids);
   shuffleS(mdPool);
   var mdIdx=0;
+  var mdOverflow=[];
   while(mdPool.length){
-    bg[6+(mdIdx%2)].push(mdPool.shift());
+    var targetIdx=6+(mdIdx%2);
+    if(bg[targetIdx].length<5){bg[targetIdx].push(mdPool.shift());}
+    else{mdOverflow.push(mdPool.shift());}
     mdIdx++;
   }
 
-  /* Remaining paladins (beyond the 2 in group 1) + rest + leftover healers fill remaining slots,
-     round-robin across all 8 groups for even spread */
-  var remaining=paladins.concat(rest,leftoverHealers);
+  /* Remaining paladins (beyond the 2 in group 1) + rest + leftover healers + md overflow
+     fill remaining slots, round-robin across all 8 groups, capped at 5 each */
+  var remaining=paladins.concat(rest,leftoverHealers,mdOverflow);
   shuffleS(remaining);
-  var ri=0;
-  while(remaining.length){
-    bg[ri%8].push(remaining.shift());
-    ri++;
+  var ri=0,stall2=0;
+  while(remaining.length&&stall2<remaining.length*8+50){
+    if(bg[ri%8].length<5){bg[ri%8].push(remaining[0]);remaining.shift();}
+    ri++;stall2++;
   }
 
-  var maxLen=5;
-  bg.forEach(function(g){if(g.length>maxLen)maxLen=g.length;});
   var finalBg=bg.map(function(arr){
     var slots=[];
-    for(var s=0;s<maxLen;s++){
+    for(var s=0;s<5;s++){
       var p=arr[s]||null;
       slots.push({p:p?{id:p.id,name:p.name,cls:p.cls,spec:p.spec,role:p.role}:null});
     }
@@ -544,11 +547,11 @@ function initSapphironGroups(gc){
 }
 
 function initGothikGroups(gc){
-  /* Groups 1-4 = Undead Side (left), Groups 5-8 = Living Side (right).
-     The 3 assigned Living Side tanks must land in groups 5-8.
-     The 3 assigned Undead Side tanks must land in groups 1-4.
-     Preferred classes: Undead side gets Paladins/Druids/Hunters, Living side gets Mages/Warlocks/Priests.
-     ALL raid members must end up in one of the 8 groups — no one left out. */
+  /* Group numbering: ODD groups (1,3,5,7) = Undead Side, EVEN groups (2,4,6,8) = Living Side.
+     Max 5 players per group (40 total raid cap).
+     The 3 assigned Undead tanks land in odd groups, 3 Living tanks land in even groups.
+     Preferred classes: Undead gets Paladins/Druids/Hunters, Living gets Mages/Warlocks/Priests.
+     ALL raid members must end up in one of the 8 groups. */
   var bd=bossData['gothik']||{};
   var livingTankIds={};
   var undeadTankIds={};
@@ -560,22 +563,19 @@ function initGothikGroups(gc){
     for(var si=0;si<groups[gi].slots.length;si++)
       if(groups[gi].slots[si].p)allPlayers.push(groups[gi].slots[si].p);
 
-  var half=gc/2; /* 4 groups each side for gc=8 */
-  var undeadGroups=[],livingGroups=[];
-  for(var i=0;i<half;i++){undeadGroups.push([]);livingGroups.push([]);}
+  var half=gc/2; /* 4 odd-side groups, 4 even-side groups */
+  var oddGroups=[],evenGroups=[]; /* index 0..3 maps to group numbers 1,3,5,7 and 2,4,6,8 */
+  for(var i=0;i<half;i++){oddGroups.push([]);evenGroups.push([]);}
 
-  /* Step 1: force the assigned Undead/Living tanks onto their correct side first,
-     spread one per group (1 tank per group, in order) */
+  /* Step 1: place the 3 Undead tanks into odd groups (1 per group), Living tanks into even groups */
   var undeadTanks=allPlayers.filter(function(p){return undeadTankIds[p.id];});
   var livingTanks=allPlayers.filter(function(p){return livingTankIds[p.id];});
-  for(var t=0;t<undeadTanks.length&&t<half;t++)undeadGroups[t].push(undeadTanks[t]);
-  for(var t=0;t<livingTanks.length&&t<half;t++)livingGroups[t].push(livingTanks[t]);
-  /* Overflow tanks beyond 4 (shouldn't normally happen with 3 tanks/side) go into general pool below */
+  for(var t=0;t<undeadTanks.length&&t<half;t++)oddGroups[t].push(undeadTanks[t]);
+  for(var t=0;t<livingTanks.length&&t<half;t++)evenGroups[t].push(livingTanks[t]);
   var placedIds={};
   undeadTanks.slice(0,half).forEach(function(p){placedIds[p.id]=true;});
   livingTanks.slice(0,half).forEach(function(p){placedIds[p.id]=true;});
 
-  /* Step 2: remaining pool = everyone not already placed as a tank */
   var pool=allPlayers.filter(function(p){return !placedIds[p.id];});
 
   var undeadCls={Paladin:1,Druid:1,Hunter:1};
@@ -584,29 +584,44 @@ function initGothikGroups(gc){
   var livingPref=pool.filter(function(p){return livingCls[p.cls];});
   var neutral=pool.filter(function(p){return !undeadCls[p.cls]&&!livingCls[p.cls];});
 
-  /* Fill undead side (groups 1-4) round-robin with preferred classes first, no cap —
-     group sizes flex so everyone fits even if a side has more than 20 people */
-  var ui=0,gIdxU=0;
-  while(ui<undeadPref.length){undeadGroups[gIdxU%half].push(undeadPref[ui++]);gIdxU++;}
-  var li=0,gIdxL=0;
-  while(li<livingPref.length){livingGroups[gIdxL%half].push(livingPref[li++]);gIdxL++;}
+  /* Fill preferred classes round-robin, capped at 5 per group, skipping full groups */
+  function fillCapped(targetGroups,list){
+    var li=0,gIdx=0,attempts=0;
+    while(li<list.length&&attempts<targetGroups.length*list.length+50){
+      if(targetGroups[gIdx%targetGroups.length].length<5){
+        targetGroups[gIdx%targetGroups.length].push(list[li++]);
+      }
+      gIdx++;attempts++;
+    }
+    return list.slice(li); /* unplaced overflow (side is full) */
+  }
+  var undeadOverflow=fillCapped(oddGroups,undeadPref);
+  var livingOverflow=fillCapped(evenGroups,livingPref);
 
-  /* Step 3: neutral classes fill whichever side is smaller, alternating, to keep balance */
-  var totalUndead=undeadGroups.reduce(function(s,g){return s+g.length;},0);
-  var totalLiving=livingGroups.reduce(function(s,g){return s+g.length;},0);
-  var ni=0,side=(totalUndead<=totalLiving)?0:1;
-  while(ni<neutral.length){
-    if(side===0){undeadGroups[ni%half].push(neutral[ni]);}
-    else{livingGroups[ni%half].push(neutral[ni]);}
-    ni++;side=1-side;
+  /* Step 3: neutral classes + any overflow fill whichever side has room, alternating */
+  var leftover=neutral.concat(undeadOverflow,livingOverflow);
+  var ni=0,side=0,stall=0;
+  while(ni<leftover.length&&stall<leftover.length*4+20){
+    var targetGroups=side===0?oddGroups:evenGroups;
+    var placedThis=false;
+    for(var g=0;g<half;g++){
+      if(targetGroups[g].length<5){targetGroups[g].push(leftover[ni]);placedThis=true;break;}
+    }
+    if(placedThis)ni++;
+    side=1-side;
+    stall++;
   }
 
-  var combined=undeadGroups.concat(livingGroups);
-  var maxLen=5;
-  combined.forEach(function(g){if(g.length>maxLen)maxLen=g.length;});
+  /* Interleave: combined[0]=Group1(odd0), combined[1]=Group2(even0), combined[2]=Group3(odd1), ... */
+  var combined=[];
+  for(var k=0;k<half;k++){
+    combined.push(oddGroups[k]);
+    combined.push(evenGroups[k]);
+  }
+
   var finalBg=combined.map(function(arr){
     var slots=[];
-    for(var s=0;s<maxLen;s++){
+    for(var s=0;s<5;s++){
       var p=arr[s]||null;
       slots.push({p:p?{id:p.id,name:p.name,cls:p.cls,spec:p.spec,role:p.role}:null});
     }
@@ -616,9 +631,8 @@ function initGothikGroups(gc){
 }
 
 function initKelthuzadGroups(gc){
-  /* Exclude the MT, P3 add tanks, and all 12+2 healers.
-     Distribute remaining melee (Warrior/Rogue) and others into 3 groups:
-     Cross Group, Square Group, Moon Group — same approach as Four Horsemen. */
+  /* Exclude the MT and P3 add tanks/healers and all 12 healers.
+     ONLY Warriors and Rogues go into these 3 groups — no Mages, Warlocks, Hunters, etc. */
   var bd=bossData['kelthuzad']||{};
   var excludedIds={};
   ['mt','p3t1','p3t2','p3h1','p3h2',
@@ -630,22 +644,15 @@ function initKelthuzadGroups(gc){
     for(var si=0;si<groups[gi].slots.length;si++)
       if(groups[gi].slots[si].p)allPlayers.push(groups[gi].slots[si].p);
 
-  var pool=allPlayers.filter(function(p){return !excludedIds[p.id];});
-
-  var leaders=pool.filter(function(p){return p.cls==='Warrior'||p.cls==='Rogue';});
-  var others=pool.filter(function(p){return p.cls!=='Warrior'&&p.cls!=='Rogue';});
+  var pool=allPlayers.filter(function(p){return !excludedIds[p.id]&&(p.cls==='Warrior'||p.cls==='Rogue');});
 
   function shuffleK(arr){for(var i=arr.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=arr[i];arr[i]=arr[j];arr[j]=t;}return arr;}
-  shuffleK(leaders);shuffleK(others);
+  shuffleK(pool);
 
   var bg=[[],[],[]];
-  for(var g=0;g<3&&leaders.length;g++)bg[g].push(leaders.shift());
-
-  var remaining=leaders.concat(others);
-  shuffleK(remaining);
   var gi2=0;
-  while(remaining.length){
-    bg[gi2%3].push(remaining.shift());
+  while(pool.length){
+    bg[gi2%3].push(pool.shift());
     gi2++;
   }
 
@@ -960,6 +967,7 @@ function buildBossPreview(boss,bd){
   if(boss.id==='maexxna')return buildMaexxnaPreview(boss,bd);
   if(boss.id==='loatheb')return buildLoathebPreview(boss,bd);
   if(boss.id==='horsemen')return buildHorsemenPreview(boss,bd);
+  if(boss.id==='kelthuzad')return buildKelthuzadPreview(boss,bd);
 
   var lines=[boss.name+' assignments'];
   /* Track which healer keys have already been printed via healerKey reference
@@ -1033,6 +1041,21 @@ function buildMaexxnaPreview(boss,bd){
 function buildLoathebPreview(boss,bd){
   var lines=[boss.name+' assignments'];
   if(bd.mt)lines.push('{Skull} Tank: '+bd.mt.name);
+  var healerNames=[];
+  for(var i=1;i<=12;i++){
+    var k='h'+i;
+    if(bd[k])healerNames.push('['+i+'] '+bd[k].name);
+  }
+  if(healerNames.length)lines.push('Healers: '+healerNames.join(', '));
+  if(lines.length===1)return '';
+  return lines.join('\n');
+}
+
+function buildKelthuzadPreview(boss,bd){
+  var lines=[boss.name+' assignments'];
+  if(bd.mt)lines.push("{Skull} Kel'Thuzad MT: "+bd.mt.name);
+  if(bd.p3t1)lines.push('{Cross} P3 Add Tank 1: '+bd.p3t1.name+(bd.p3h1?' / '+bd.p3h1.name:''));
+  if(bd.p3t2)lines.push('{Square} P3 Add Tank 2: '+bd.p3t2.name+(bd.p3h2?' / '+bd.p3h2.name:''));
   var healerNames=[];
   for(var i=1;i<=12;i++){
     var k='h'+i;
@@ -1288,7 +1311,8 @@ function renderTrashTab(){
   var dp=trashDups();
   var h='<div class="boss-header">Trash \u2014 Tank Marks &amp; Healing</div>';
   h+='<div class="boss-hint">Assign the 5 kill marks and puller. Healer assignments here auto-fill boss healers.</div>';
-  h+='<div class="asgrid asgrid-5">';
+  var trashCols=(activeRaid==='aq40'||activeRaid==='naxx')?6:5;
+  h+='<div class="asgrid asgrid-'+trashCols+'">';
   trashMarks.forEach(function(m,mi){
     var tp=sel&&sel.t==='tm'&&sel.mi===mi, hp=sel&&sel.t==='th'&&sel.mi===mi;
     h+='<div class="mc"><div class="mh" style="background:'+m.col+'33;color:'+m.col+'">'+MARK_SYMS[mi]+' '+m.name+'</div><div class="mas">';
@@ -1300,12 +1324,10 @@ function renderTrashTab(){
     else h+='<div class="abtn'+(hp?' picking':'')+'" data-a="sh" data-mi="'+mi+'">+ Assign healer</div>';
     h+='</div></div>';
   });
-  h+='</div>';
-  /* AQ40: Diamond 6th mark */
+  /* Diamond 6th mark merged into the same grid, immediately after the standard 5 marks */
   if(activeRaid==='aq40'){
     var aTank=extraTrashMarks.aq_t||null, aHeal=extraTrashMarks.aq_h||null;
     var aTp=sel&&sel.t==='etank'&&sel.ekey==='aq_t', aHp=sel&&sel.t==='ehealer'&&sel.ekey==='aq_h';
-    h+='<div style="margin-top:.6rem"><div class="asgrid asgrid-1">';
     h+='<div class="mc"><div class="mh" style="background:#c060e033;color:#c060e0">'+MARK_SYMS[5]+' Diamond</div><div class="mas">';
     h+='<div class="mlbl">Tank</div>';
     if(aTank)h+='<div class="abar">'+pbar(aTank,false,'rextra','data-ekey="aq_t"')+'</div>';
@@ -1313,13 +1335,11 @@ function renderTrashTab(){
     h+='<div class="mlbl">Healer</div>';
     if(aHeal)h+='<div class="abar">'+pbar(aHeal,false,'rextra','data-ekey="aq_h"')+'</div>';
     else h+='<div class="abtn'+(aHp?' picking':'')+'" data-a="ehealer" data-ekey="aq_h">+ Assign healer</div>';
-    h+='</div></div></div></div>';
+    h+='</div></div>';
   }
-  /* Naxx: Diamond 6th mark */
   if(activeRaid==='naxx'){
     var nTank=extraTrashMarks.nx_t||null, nHeal=extraTrashMarks.nx_h||null;
     var nTp=sel&&sel.t==='etank'&&sel.ekey==='nx_t', nHp=sel&&sel.t==='ehealer'&&sel.ekey==='nx_h';
-    h+='<div style="margin-top:.6rem"><div class="asgrid asgrid-1">';
     h+='<div class="mc"><div class="mh" style="background:#c060e033;color:#c060e0">'+MARK_SYMS[5]+' Diamond</div><div class="mas">';
     h+='<div class="mlbl">Tank</div>';
     if(nTank)h+='<div class="abar">'+pbar(nTank,false,'rextra','data-ekey="nx_t"')+'</div>';
@@ -1327,8 +1347,9 @@ function renderTrashTab(){
     h+='<div class="mlbl">Healer</div>';
     if(nHeal)h+='<div class="abar">'+pbar(nHeal,false,'rextra','data-ekey="nx_h"')+'</div>';
     else h+='<div class="abtn'+(nHp?' picking':'')+'" data-a="ehealer" data-ekey="nx_h">+ Assign healer</div>';
-    h+='</div></div></div></div>';
+    h+='</div></div>';
   }
+  h+='</div>';
   var pp=sel&&sel.t==='pu';
   h+='<div class="prow"><span class="plbl">Puller</span>';
   if(puller)h+='<div class="abar" style="flex:1">'+pbar(puller,false,'rpu','')+'</div>';
@@ -1413,28 +1434,19 @@ function renderBossTab(boss){
     var isSelecting=_goActiveBid===boss.id&&_goActiveGi>=0;
     h+='<div style="font-size:.68rem;color:#4a6090;margin-bottom:.5rem">'+(isSelecting?'<span style="color:#60cc80">&#10003; Player selected \u2014 click another slot to swap</span>':'Click a player to select, then click another slot to swap positions.')+'</div>';
     if(boss.id==='gothik'){
-      h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:.4rem">';
-      h+='<div style="text-align:center;font-family:Cinzel,serif;font-size:.65rem;color:#a070d0;background:#1a0a2a;border-radius:4px;padding:3px">Undead Side (Groups 1\u20134)</div>';
-      h+='<div style="text-align:center;font-family:Cinzel,serif;font-size:.65rem;color:#70a0d0;background:#0a1a2a;border-radius:4px;padding:3px">Living Side (Groups 5\u20138)</div>';
-      h+='</div>';
+      h+='<div style="font-size:.62rem;color:#4a6090;margin-bottom:.4rem;text-align:center">Odd groups (1,3,5,7) = Undead Side (left) &middot; Even groups (2,4,6,8) = Living Side (right)</div>';
     }
     if(boss.id==='sapphiron'){
       h+='<div style="font-size:.62rem;color:#4a6090;margin-bottom:.4rem;text-align:center">Odd groups (1,3,5,7) on the left &middot; Even groups (2,4,6,8) on the right</div>';
     }
-    /* Display order: Sapphiron shows odd groups first (left column) then even (right column)
-       via a 4-row x 2-col grid where column order is odd,even per row */
+    /* Display order: Sapphiron and Gothik both store groups pre-interleaved
+       (odd,even,odd,even...) so natural index order already alternates correctly
+       in a 2-col grid. */
     var displayOrder=[];
-    if(boss.id==='sapphiron'&&gc===8){
-      /* row-major pairs: (1,2),(3,4),(5,6),(7,8) -> indices (0,1),(2,3),(4,5),(6,7) */
-      displayOrder=[0,1,2,3,4,5,6,7]; /* grid is already 4-col so natural order works if gridCols=4;
-                                          force 2-col explicit ordering instead below */
-    } else {
-      for(var di=0;di<gc;di++)displayOrder.push(di);
-    }
+    for(var di=0;di<gc;di++)displayOrder.push(di);
     var gridColsLocal=gridCols;
-    if(boss.id==='sapphiron'&&gc===8){
+    if((boss.id==='sapphiron'||boss.id==='gothik')&&gc===8){
       gridColsLocal='repeat(2,1fr)';
-      displayOrder=[0,1,2,3,4,5,6,7]; /* natural index order already alternates odd/even per row in a 2-col grid */
     }
     h+='<div style="display:grid;grid-template-columns:'+gridColsLocal+';gap:5px">';
     for(var gOrderIdx=0;gOrderIdx<displayOrder.length;gOrderIdx++){
@@ -1506,10 +1518,11 @@ function doAssign(pid){
   else if(s.t==='bs'){
     if(!bossData[s.bid])bossData[s.bid]={notes:''};
     bossData[s.bid][s.key]=p;
-    /* Auto-fill healer from trash assignments */
+    /* Auto-fill healer from trash assignments — skip for Four Horsemen,
+       where tanks should never automatically pull in a healer assignment */
     var boss=null;
     for(var i=0;i<BOSSES.length;i++)if(BOSSES[i].id===s.bid){boss=BOSSES[i];break;}
-    if(boss){
+    if(boss&&s.bid!=='horsemen'){
       boss.segments.forEach(function(seg){
         seg.slots.forEach(function(sl){
           if(sl.key===s.key&&sl.healerKey&&!bossData[s.bid][sl.healerKey]){
@@ -2720,7 +2733,7 @@ function renderViewMode(data){
         /* Standard grid for Gothik, Sapphiron, KT, Loatheb */
         var glCols='repeat('+(gc<=6?3:4)+',1fr)';
         var shDisplayOrder=[];
-        if(boss.id==='sapphiron'&&gc===8){glCols='repeat(2,1fr)';for(var sdi=0;sdi<8;sdi++)shDisplayOrder.push(sdi);}
+        if((boss.id==='sapphiron'||boss.id==='gothik')&&gc===8){glCols='repeat(2,1fr)';for(var sdi=0;sdi<8;sdi++)shDisplayOrder.push(sdi);}
         else{for(var sdi=0;sdi<bl.length;sdi++)shDisplayOrder.push(sdi);}
         h+='<div style="margin-top:.6rem">';
         h+='<div style="font-family:Cinzel,serif;font-size:.58rem;color:#7ab0ff;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.35rem">Group Setup</div>';
