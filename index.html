@@ -121,7 +121,7 @@ textarea{width:100%;background:#0d1020;border:1px solid #2a3050;color:#e0d8f8;pa
 <div class="app">
 <h1>WoW Classic Raid Organizer</h1>
 <div class="sub">Organize your 40-man raid &mdash; select a raid below</div>
-<div style="text-align:center;font-size:.6rem;color:#4a6890;font-family:Cinzel,serif;letter-spacing:.08em;margin-top:-.3rem;margin-bottom:.5rem">v1.6.0</div>
+<div style="text-align:center;font-size:.6rem;color:#4a6890;font-family:Cinzel,serif;letter-spacing:.08em;margin-top:-.3rem;margin-bottom:.5rem">v1.6.1</div>
 <div style="display:flex;gap:6px;justify-content:center;margin-bottom:.9rem;flex-wrap:wrap">
   <button class="btn raid-sel-btn" data-raid="mc"   id="rsMC"   style="font-family:Cinzel,serif;font-size:.74rem;padding:5px 14px;border-radius:4px;cursor:pointer;border:1px solid #3a6ae0;background:#1a3a80;color:#c8d8ff">&#128293; Molten Core</button>
   <button class="btn raid-sel-btn" data-raid="bwl"  id="rsBWL"  style="font-family:Cinzel,serif;font-size:.74rem;padding:5px 14px;border-radius:4px;cursor:pointer;border:1px solid #2a3050;background:#131726;color:#7ab0ff">&#128009; Blackwing Lair</button>
@@ -472,12 +472,10 @@ function initHorsemenGroups(gc){
 }
 
 function initSapphironGroups(gc){
-  /* Group 1: assigned Tank + 2 Paladins.
-     1 healer in each of the 8 groups.
-     Mages and Druids evenly distributed between groups 7 and 8.
-     Everyone else fills remaining slots, mixed.
-     Display order: odd groups (1,3,5,7) on the left, even groups (2,4,6,8) on the right —
-     this is handled visually in the editor grid ordering, not in the data array itself. */
+  /* Group 1: assigned Tank + 2 Paladins + 1 healer.
+     Groups 2-8: 1 healer each.
+     Mages and Druids evenly distributed between groups 7 and 8 (in addition to their healer).
+     Everyone else fills remaining slots, mixed. Every group capped at 5. */
   var bd=bossData['sapphiron']||{};
   var tankId=bd.mt?bd.mt.id:null;
 
@@ -491,33 +489,31 @@ function initSapphironGroups(gc){
 
   var healers=pool.filter(function(p){return p.role==='healer';});
   var paladins=pool.filter(function(p){return p.cls==='Paladin'&&p.role!=='healer';});
-  var mages=pool.filter(function(p){return p.cls==='Mage';});
+  var mages=pool.filter(function(p){return p.cls==='Mage'&&p.role!=='healer';});
   var druids=pool.filter(function(p){return p.cls==='Druid'&&p.role!=='healer';});
   var rest=pool.filter(function(p){
-    return p.role!=='healer'&&!(p.cls==='Paladin')&&p.cls!=='Mage'&&!(p.cls==='Druid');
+    return p.role!=='healer'&&p.cls!=='Paladin'&&p.cls!=='Mage'&&p.cls!=='Druid';
   });
 
   function shuffleS(arr){for(var i=arr.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=arr[i];arr[i]=arr[j];arr[j]=t;}return arr;}
   shuffleS(paladins);shuffleS(mages);shuffleS(druids);shuffleS(healers);shuffleS(rest);
 
-  var bg=[];
-  for(var i=0;i<8;i++)bg.push([]);
+  var bg=[[],[],[],[],[],[],[],[]];
 
-  /* Group 1: tank + up to 2 paladins (cap 5 naturally since only 3 items max here) */
+  /* Step 1: Group 1 = tank + up to 2 paladins */
   if(tankP)bg[0].push(tankP);
-  for(var pp=0;pp<2&&paladins.length&&bg[0].length<5;pp++)bg[0].push(paladins.shift());
+  for(var pp=0;pp<2&&paladins.length;pp++)bg[0].push(paladins.shift());
 
-  /* 1 healer per group (index 0..7), capped at 5 — group 1 already has up to 3, still room */
-  for(var hg=0;hg<8&&healers.length;hg++){
-    if(bg[hg].length<5)bg[hg].push(healers.shift());
+  /* Step 2: 1 healer in EVERY group (0-7), including group 1 */
+  for(var hg=0;hg<8;hg++){
+    if(healers.length&&bg[hg].length<5)bg[hg].push(healers.shift());
   }
-  var leftoverHealers=healers; /* if more than 8 healers, rest go to general pool */
+  var leftoverHealers=healers; /* extra healers beyond 8 fall into the general pool */
 
-  /* Mages and Druids evenly split into groups 7 and 8 (index 6 and 7), capped at 5 */
+  /* Step 3: Mages and Druids evenly alternated into group 7 (idx6) and group 8 (idx7) */
   var mdPool=mages.concat(druids);
   shuffleS(mdPool);
-  var mdIdx=0;
-  var mdOverflow=[];
+  var mdIdx=0,mdOverflow=[];
   while(mdPool.length){
     var targetIdx=6+(mdIdx%2);
     if(bg[targetIdx].length<5){bg[targetIdx].push(mdPool.shift());}
@@ -525,14 +521,14 @@ function initSapphironGroups(gc){
     mdIdx++;
   }
 
-  /* Remaining paladins (beyond the 2 in group 1) + rest + leftover healers + md overflow
-     fill remaining slots, round-robin across all 8 groups, capped at 5 each */
+  /* Step 4: remaining paladins, rest, leftover healers, md overflow —
+     round-robin across all 8 groups, capped at 5 each, skipping full groups */
   var remaining=paladins.concat(rest,leftoverHealers,mdOverflow);
   shuffleS(remaining);
-  var ri=0,stall2=0;
-  while(remaining.length&&stall2<remaining.length*8+50){
+  var ri=0,stall=0;
+  while(remaining.length&&stall<remaining.length*8+80){
     if(bg[ri%8].length<5){bg[ri%8].push(remaining[0]);remaining.shift();}
-    ri++;stall2++;
+    ri++;stall++;
   }
 
   var finalBg=bg.map(function(arr){
@@ -2131,8 +2127,16 @@ function decodePayload(str){
 }
 
 function buildSlimPayload(){
-  /* Build a minimal payload — omit null/unassigned slots to save space */
-  var pmap={};players.forEach(function(p){pmap[p.id]=1;});
+  /* Build a minimal payload — omit null/unassigned slots to save space.
+     Use array INDEX references into the combined players+benched list instead of
+     full ID strings — IDs can be long (e.g. manually-added players use 'm'+timestamp)
+     and get repeated dozens of times across boss groups, which was blowing out the
+     share URL length. Index refs are 1-3 chars regardless of ID length. */
+  var allRoster=players.concat(benched);
+  var idToIdx={};
+  allRoster.forEach(function(p,i){idToIdx[p.id]=i;});
+  function idxOf(p){return p&&idToIdx.hasOwnProperty(p.id)?idToIdx[p.id]:-1;}
+
   function slimP(p){return p?{id:p.id,name:p.name,cls:p.cls,spec:p.spec,role:p.role}:null;}
 
   var slimBosses={};
@@ -2140,7 +2144,10 @@ function buildSlimPayload(){
     var bd=bossData[bid];var sbd={};
     for(var k in bd){
       if(k==='notes'){if(bd[k])sbd[k]=bd[k];}
-      else if(bd[k]&&typeof bd[k]==='object'&&bd[k].id){sbd[k]=bd[k].id;}
+      else if(bd[k]&&typeof bd[k]==='object'&&bd[k].id){
+        var idx=idxOf(bd[k]);
+        if(idx>=0)sbd[k]=idx;
+      }
     }
     if(Object.keys(sbd).length)slimBosses[bid]=sbd;
   }
@@ -2148,66 +2155,123 @@ function buildSlimPayload(){
   var slimBossGroups={};
   for(var bid2 in bossGroups){
     slimBossGroups[bid2]=bossGroups[bid2].map(function(grp){
-      return grp.slots.map(function(sl){return sl.p?sl.p.id:null;});
+      return grp.slots.map(function(sl){
+        if(!sl.p)return null;
+        var idx=idxOf(sl.p);
+        return idx>=0?idx:null;
+      });
     });
   }
 
   var slimTrash=trashMarks.map(function(m){
-    return{tank:m.tank?m.tank.id:null,healer:m.healer?m.healer.id:null};
+    return{tank:idxOf(m.tank)>=0?idxOf(m.tank):null,healer:idxOf(m.healer)>=0?idxOf(m.healer):null};
   });
 
   return {
-    v:2, /* version */
+    v:3, /* version 3 = index-based refs */
     raid:activeRaid,
     p:players.map(slimP),
     b:benched.map(slimP),
-    g:groups.map(function(g){return g.slots.map(function(s){return s.p?s.p.id:null;});}),
+    g:groups.map(function(g){return g.slots.map(function(s){var idx=idxOf(s.p);return idx>=0?idx:null;});}),
     t:slimTrash,
     td:TRASH_MARKS.map(function(m){return{name:m.name,col:m.col};}),
-    pu:puller?puller.id:null,
+    pu:idxOf(puller)>=0?idxOf(puller):null,
     bs:slimBosses,
     bg:slimBossGroups,
-    ex:{aq_t:extraTrashMarks.aq_t?extraTrashMarks.aq_t.id:null,aq_h:extraTrashMarks.aq_h?extraTrashMarks.aq_h.id:null,nx_t:extraTrashMarks.nx_t?extraTrashMarks.nx_t.id:null,nx_h:extraTrashMarks.nx_h?extraTrashMarks.nx_h.id:null}
+    ex:{
+      aq_t:idxOf(extraTrashMarks.aq_t)>=0?idxOf(extraTrashMarks.aq_t):null,
+      aq_h:idxOf(extraTrashMarks.aq_h)>=0?idxOf(extraTrashMarks.aq_h):null,
+      nx_t:idxOf(extraTrashMarks.nx_t)>=0?idxOf(extraTrashMarks.nx_t):null,
+      nx_h:idxOf(extraTrashMarks.nx_h)>=0?idxOf(extraTrashMarks.nx_h):null
+    }
   };
 }
 
 function expandSlimPayload(data){
-  /* v2 slim format — expand back to what renderViewMode expects */
-  if(!data||data.v!==2)return data; /* pass through v1 format */
-  var pmap={};
-  (data.p||[]).forEach(function(p){if(p)pmap[p.id]=p;});
-  (data.b||[]).forEach(function(p){if(p)pmap[p.id]=p;});
+  /* v3 format: index-based refs into a combined players+benched roster array.
+     v2 format: id-string refs (kept for backward compatibility with old share links). */
+  if(!data)return data;
 
-  /* Expand bossData: id references back to player objects */
-  var bosses={};
-  for(var bid in (data.bs||{})){
-    var sb=data.bs[bid];bosses[bid]={};
-    for(var k in sb){
-      if(k==='notes')bosses[bid][k]=sb[k];
-      else bosses[bid][k]=sb[k]; /* keep as id — renderViewMode uses pmap lookup */
+  if(data.v===3){
+    var roster=(data.p||[]).concat(data.b||[]);
+    function byIdx(i){return (i!=null&&i>=0&&roster[i])?roster[i]:null;}
+
+    var bosses3={};
+    for(var bid in (data.bs||{})){
+      var sb=data.bs[bid];bosses3[bid]={};
+      for(var k in sb){
+        if(k==='notes'){bosses3[bid][k]=sb[k];}
+        else{
+          var p3=byIdx(sb[k]);
+          bosses3[bid][k]=p3?p3.id:null; /* renderViewMode expects id strings + pmap lookup */
+        }
+      }
     }
-  }
-  /* Expand bossGroupLayouts */
-  var bossLayouts={};
-  for(var bid2 in (data.bg||{})){
-    bossLayouts[bid2]=data.bg[bid2].map(function(slotIds){
-      return slotIds.map(function(id){return id&&pmap[id]?pmap[id]:null;});
+    var bossLayouts3={};
+    for(var bid2 in (data.bg||{})){
+      bossLayouts3[bid2]=data.bg[bid2].map(function(slotIdxs){
+        return slotIdxs.map(function(i){return byIdx(i);});
+      });
+    }
+    var ex3=data.ex||{};
+    var trash3=(data.t||[]).map(function(m){
+      var tp=byIdx(m.tank),hp=byIdx(m.healer);
+      return {tank:tp?tp.id:null,healer:hp?hp.id:null};
     });
+    var groups3=(data.g||[]).map(function(slotIdxs){
+      return slotIdxs.map(function(i){var p=byIdx(i);return p?p.id:null;});
+    });
+    var pullerP3=byIdx(data.pu);
+
+    return {
+      raid:data.raid,
+      players:data.p||[],
+      benched:data.b||[],
+      groups:groups3,
+      trash:trash3,
+      trashDefs:data.td||[],
+      puller:pullerP3?pullerP3.id:null,
+      bosses:bosses3,
+      bossGroupLayouts:bossLayouts3,
+      extraTrash:{
+        aq_t:byIdx(ex3.aq_t),aq_h:byIdx(ex3.aq_h),
+        nx_t:byIdx(ex3.nx_t),nx_h:byIdx(ex3.nx_h)
+      }
+    };
   }
-  /* Expand extraTrash */
-  var ex=data.ex||{};
-  return {
-    raid:data.raid,
-    players:data.p||[],
-    benched:data.b||[],
-    groups:data.g||[],
-    trash:data.t||[],
-    trashDefs:data.td||[],
-    puller:data.pu||null,
-    bosses:bosses,
-    bossGroupLayouts:bossLayouts,
-    extraTrash:{aq_t:ex.aq_t&&pmap[ex.aq_t]?pmap[ex.aq_t]:null,aq_h:ex.aq_h&&pmap[ex.aq_h]?pmap[ex.aq_h]:null,nx_t:ex.nx_t&&pmap[ex.nx_t]?pmap[ex.nx_t]:null,nx_h:ex.nx_h&&pmap[ex.nx_h]?pmap[ex.nx_h]:null}
-  };
+
+  /* v2 format — id-string refs, pass through largely as-is */
+  if(data.v===2){
+    var pmap2={};
+    (data.p||[]).forEach(function(p){if(p)pmap2[p.id]=p;});
+    (data.b||[]).forEach(function(p){if(p)pmap2[p.id]=p;});
+    var bosses2={};
+    for(var bidv2 in (data.bs||{})){
+      var sbv2=data.bs[bidv2];bosses2[bidv2]={};
+      for(var kv2 in sbv2){bosses2[bidv2][kv2]=sbv2[kv2];}
+    }
+    var bossLayouts2={};
+    for(var bidv2b in (data.bg||{})){
+      bossLayouts2[bidv2b]=data.bg[bidv2b].map(function(slotIds){
+        return slotIds.map(function(id){return id&&pmap2[id]?pmap2[id]:null;});
+      });
+    }
+    var ex2=data.ex||{};
+    return {
+      raid:data.raid,
+      players:data.p||[],
+      benched:data.b||[],
+      groups:data.g||[],
+      trash:data.t||[],
+      trashDefs:data.td||[],
+      puller:data.pu||null,
+      bosses:bosses2,
+      bossGroupLayouts:bossLayouts2,
+      extraTrash:{aq_t:ex2.aq_t&&pmap2[ex2.aq_t]?pmap2[ex2.aq_t]:null,aq_h:ex2.aq_h&&pmap2[ex2.aq_h]?pmap2[ex2.aq_h]:null,nx_t:ex2.nx_t&&pmap2[ex2.nx_t]?pmap2[ex2.nx_t]:null,nx_h:ex2.nx_h&&pmap2[ex2.nx_h]?pmap2[ex2.nx_h]:null}
+    };
+  }
+
+  return data; /* v1 / unknown — pass through */
 }
 
 document.getElementById('bShare').addEventListener('click',function(){
@@ -2217,6 +2281,10 @@ document.getElementById('bShare').addEventListener('click',function(){
   var url=window.location.href.split('?')[0].split('#')[0]+'?view='+encoded;
   document.getElementById('shareUrl').value=url;
   document.getElementById('shareModal').className='modal-wrap on';
+  /* Most browsers and servers cap URLs around 8000 chars; warn well before that */
+  if(url.length>7000){
+    tip('Warning: this share link is very long ('+url.length+' chars) and may not work in all browsers. Consider clearing unused boss group setups to shorten it.',true);
+  }
 });
 document.getElementById('bRealmDb').addEventListener('click',function(){
   window.open('realm-db.html','mc-realm-db','width=1050,height=750,resizable=yes,scrollbars=yes');
