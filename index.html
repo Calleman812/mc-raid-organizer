@@ -120,7 +120,7 @@ textarea{width:100%;background:#0c0e13;border:1px solid #262a36;color:#e4e6ea;pa
 <div class="app">
 <h1>WoW Classic Raid Organizer</h1>
 <div class="sub">Organize your 40-man raid &mdash; select a raid below</div>
-<div style="text-align:center;font-size:.6rem;color:#525a6a;font-family:Inter,sans-serif;letter-spacing:.08em;margin-top:-.3rem;margin-bottom:.5rem">v2.1.2</div>
+<div style="text-align:center;font-size:.6rem;color:#525a6a;font-family:Inter,sans-serif;letter-spacing:.08em;margin-top:-.3rem;margin-bottom:.5rem">v2.2.1</div>
 <div style="display:flex;gap:6px;justify-content:center;margin-bottom:.9rem;flex-wrap:wrap">
   <button class="btn raid-sel-btn" data-raid="mc"   id="rsMC"   style="font-family:Inter,sans-serif;font-size:.74rem;padding:5px 14px;border-radius:6px;cursor:pointer;border:1px solid #378ade;background:#1a2433;color:#9fc4f4">&#128293; Molten Core</button>
   <button class="btn raid-sel-btn" data-raid="bwl"  id="rsBWL"  style="font-family:Inter,sans-serif;font-size:.74rem;padding:5px 14px;border-radius:4px;cursor:pointer;border:1px solid #262a36;background:#15171e;color:#9fc4f4">&#128009; Blackwing Lair</button>
@@ -2581,6 +2581,17 @@ function renderViewMode(data){
   var CLS_BG={Warrior:'#3d2218',Paladin:'#3a1228',Priest:'#2a2a2a',Druid:'#3a1e00',Rogue:'#2e2800',Hunter:'#102808',Mage:'#0a1e48',Warlock:'#220a3a',Shaman:'#0a1a38'};
   (data.players||[]).forEach(function(p){if(p.cls)clsCounts[p.cls]=(clsCounts[p.cls]||0)+1;});
 
+  /* Stat bar counts: Raiders / Bosses / Tanks / Healers / Melee DPS / Ranged DPS */
+  var statRaiders=(data.players||[]).length;
+  var statBosses=viewBosses.filter(function(b){return !b.isTrash;}).length;
+  var statTanks=0,statHealers=0,statMelee=0,statRanged=0;
+  (data.players||[]).forEach(function(p){
+    if(p.role==='tank')statTanks++;
+    else if(p.role==='healer')statHealers++;
+    else if(p.cls==='Warrior'||p.cls==='Rogue')statMelee++;
+    else if(p.cls==='Mage'||p.cls==='Warlock'||p.cls==='Hunter')statRanged++;
+  });
+
   var css=''
     +'*{box-sizing:border-box;margin:0;padding:0;}'
     +'body{background:#0c0e13;color:#e4e6ea;font-family:"Inter",sans-serif;font-size:15px;padding:1.4rem 1.6rem;max-width:1100px;margin:0 auto;}'
@@ -2636,7 +2647,21 @@ function renderViewMode(data){
     +'.grp-hdr{background:#15171e;padding:2px 7px;font-family:"Inter",sans-serif;font-size:.62rem;font-weight:700;color:#a8b0c0;border-bottom:1px solid #262a36;}'
     +'.grp-slot{display:flex;align-items:center;gap:3px;padding:2px 6px;border-bottom:1px solid #1c1f28;}'
     +'.grp-slot:last-child{border-bottom:none;}'
-    +'.note-box{font-size:.74rem;color:#5dcaa5;background:#0e1c18;border:1px solid #1a4a3a;border-radius:6px;padding:.4rem .65rem;margin:.4rem 0;line-height:1.6;}';
+    +'.note-box{font-size:.74rem;color:#5dcaa5;background:#0e1c18;border:1px solid #1a4a3a;border-radius:6px;padding:.4rem .65rem;margin:.4rem 0;line-height:1.6;}'
+    /* Stat bar */
+    +'.statbar{display:grid;grid-template-columns:repeat(6,1fr);gap:7px;margin-bottom:1rem;}'
+    +'.stat{background:#15171e;border:1px solid #262a36;border-radius:8px;padding:.6rem .4rem;text-align:center;}'
+    +'.stat-v{font-size:1.2rem;font-weight:700;color:#ffffff;}'
+    +'.stat-l{font-size:.6rem;color:#666c7a;text-transform:uppercase;letter-spacing:.03em;margin-top:1px;}'
+    /* Command Center boss dashboard */
+    +'.dash-layout{display:grid;grid-template-columns:170px 1fr;gap:.7rem;align-items:start;}'
+    +'.dash-rail{display:flex;flex-direction:column;gap:4px;}'
+    +'.rail-item{background:#0c0e13;border:1px solid #262a36;border-radius:6px;padding:.45rem .6rem;font-size:.74rem;font-weight:600;color:#a8b0c0;display:flex;justify-content:space-between;align-items:center;cursor:pointer;}'
+    +'.rail-item:hover{border-color:#378ade;color:#fff;}'
+    +'.rail-item.on{border-color:#378ade;color:#fff;background:#1a2433;}'
+    +'.rail-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-left:6px;}'
+    +'.dash-panel{display:none;}'
+    +'.dash-panel.on{display:block;}';
 
   var h='<!DOCTYPE html><html lang="en"><head>'
     +'<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
@@ -2648,6 +2673,16 @@ function renderViewMode(data){
   /* ── Page header ── */
   h+='<h1>'+he(raidTitle)+'</h1>';
   h+='<div class="sub">Raid Assignments &mdash; Read-only view</div>';
+
+  /* ── Stat bar ── */
+  h+='<div class="statbar">';
+  h+='<div class="stat"><div class="stat-v">'+statRaiders+'</div><div class="stat-l">Raiders</div></div>';
+  h+='<div class="stat"><div class="stat-v">'+statBosses+'</div><div class="stat-l">Bosses</div></div>';
+  h+='<div class="stat"><div class="stat-v">'+statTanks+'</div><div class="stat-l">Tanks</div></div>';
+  h+='<div class="stat"><div class="stat-v">'+statHealers+'</div><div class="stat-l">Healers</div></div>';
+  h+='<div class="stat"><div class="stat-v">'+statMelee+'</div><div class="stat-l">Melee DPS</div></div>';
+  h+='<div class="stat"><div class="stat-v">'+statRanged+'</div><div class="stat-l">Ranged DPS</div></div>';
+  h+='</div>';
 
   /* ── Composition banner ── */
   h+='<div class="comp-bar">';
@@ -2730,19 +2765,20 @@ function renderViewMode(data){
     h+='</div>';
   }
 
-  /* ── Boss Assignments ── */
+  /* ── Boss Assignments (Command Center: rail + click-switchable panels) ── */
   h+='<div class="section"><div class="sh">Boss Assignments</div>';
-  var firstBoss=true;
+  var railItemsHtml='';
+  var panelsHtml='';
   viewBosses.forEach(function(boss){
     if(boss.isTrash)return;
     var bdata=bd[boss.id]||{};
     var hasAny=boss.segments.some(function(seg){
       return seg.slots.some(function(sl){return bdata[sl.key]&&pmap[bdata[sl.key]];});
     });
-    if(!hasAny&&!bossLayouts[boss.id])return;
+    var hasContent=hasAny||!!bossLayouts[boss.id];
 
-    if(!firstBoss)h+='<div class="boss-divider"></div>';
-    firstBoss=false;
+    /* Capture this boss's panel body by redirecting h into a local buffer */
+    var hOuter=h;h='';
 
     /* Boss title row with mark symbols */
     var bossMarks=[];
@@ -3354,8 +3390,41 @@ function renderViewMode(data){
       }
     }
     h+='</div>'; /* end boss-sec */
+
+    /* Capture this boss's panel and restore the outer buffer */
+    var panelBody=h;
+    h=hOuter;
+    if(hasContent){
+      var dotCol=hasAny?'#5dcaa5':'#666c7a';
+      railItemsHtml+='<div class="rail-item" data-bossid="'+he(boss.id)+'"><span>'+he(boss.name)+'</span><span class="rail-dot" style="background:'+dotCol+'"></span></div>';
+      panelsHtml+='<div class="dash-panel" id="panel-'+he(boss.id)+'">'+panelBody+'</div>';
+    }
   });
+
+  if(railItemsHtml){
+    h+='<div class="dash-layout">';
+    h+='<div class="dash-rail">'+railItemsHtml+'</div>';
+    h+='<div class="dash-main">'+panelsHtml+'</div>';
+    h+='</div>';
+  } else {
+    h+='<div style="font-size:.8rem;color:#525a6a;text-align:center;padding:1rem">No boss assignments yet.</div>';
+  }
   h+='</div>'; /* end section */
+
+  /* Tiny script to switch the active boss panel — runs after the page is parsed.
+     NOTE: the literal tag text is split across concatenation so the browser's
+     HTML parser (which runs before any JS executes) doesn't mistake this string
+     content for a real closing tag and truncate our own script block. */
+  h+='<scr'+'ipt>(function(){'
+    +'var rail=document.querySelectorAll(".rail-item");'
+    +'var panels=document.querySelectorAll(".dash-panel");'
+    +'function show(id){'
+      +'rail.forEach(function(r){r.classList.toggle("on",r.getAttribute("data-bossid")===id);});'
+      +'panels.forEach(function(p){p.classList.toggle("on",p.id==="panel-"+id);});'
+    +'}'
+    +'rail.forEach(function(r){r.addEventListener("click",function(){show(r.getAttribute("data-bossid"));});});'
+    +'if(rail.length)show(rail[0].getAttribute("data-bossid"));'
+    +'})();</scr'+'ipt>';
 
   h+='</body></html>';
   return h;
