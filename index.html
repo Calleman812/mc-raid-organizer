@@ -6,78 +6,77 @@
 <title>WoW Classic Raid Organizer</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:wght@400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
-<noscript><link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:wght@400;500&display=swap" rel="stylesheet"></noscript>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"></noscript>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
-body{background:#0a0d18;color:#e0d8f8;font-family:'Crimson Pro',Georgia,serif;font-size:15px;}
-@font-face{font-family:'Cinzel';font-display:swap;}
-@font-face{font-family:'Crimson Pro';font-display:swap;}
+body{background:#0c0e13;color:#e4e6ea;font-family:'Inter',sans-serif;font-size:15px;}
+@font-face{font-family:'Inter';font-display:swap;}
 .app{max-width:1400px;margin:0 auto;padding:1rem 1.5rem;}
-h1{font-family:'Cinzel',serif;font-size:1.6rem;font-weight:700;color:#7ab0ff;text-align:center;letter-spacing:.05em;margin-bottom:.15rem;}
-.sub{text-align:center;color:#4a6090;font-size:.85rem;margin-bottom:.9rem;font-family:'Cinzel',serif;}
-.card{background:#131726;border:1px solid #2a3050;border-radius:8px;padding:.75rem 1rem;margin-bottom:.8rem;}
-.stitle{font-family:'Cinzel',serif;font-size:.8rem;color:#7ab0ff;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.5rem;display:flex;justify-content:space-between;align-items:center;}
+h1{font-family:'Inter',sans-serif;font-size:1.5rem;font-weight:700;color:#ffffff;text-align:center;letter-spacing:-.01em;margin-bottom:.15rem;}
+.sub{text-align:center;color:#666c7a;font-size:.8rem;margin-bottom:.9rem;font-family:'Inter',sans-serif;}
+.card{background:#15171e;border:1px solid #262a36;border-radius:10px;padding:.75rem 1rem;margin-bottom:.8rem;}
+.stitle{font-family:'Inter',sans-serif;font-size:.72rem;font-weight:700;color:#8890a0;letter-spacing:.06em;text-transform:uppercase;margin-bottom:.5rem;display:flex;justify-content:space-between;align-items:center;}
 .row{display:flex;gap:7px;align-items:center;flex-wrap:wrap;}
-input[type=text]{flex:1;min-width:160px;background:#0d1020;border:1px solid #2a3050;color:#e0d8f8;padding:6px 10px;border-radius:4px;font-family:'Crimson Pro',serif;font-size:.88rem;}
-input[type=text]::placeholder{color:#4a6090;}
-select{background:#0d1020;border:1px solid #2a3050;color:#e0d8f8;padding:5px 7px;border-radius:4px;font-family:'Crimson Pro',serif;font-size:.85rem;}
-select option{background:#131726;}
-.btn{font-family:'Cinzel',serif;cursor:pointer;border-radius:4px;letter-spacing:.04em;transition:background .15s;}
-.bfire{background:#1a3a80;color:#c8d8ff;padding:6px 15px;font-size:.76rem;border:1px solid #3a6ae0;}
-.bfire:hover{background:#2a4a90;}
-.bsecondary{background:#1a2050;color:#9ab8ff;padding:5px 13px;font-size:.74rem;border:1px solid #2a3a80;cursor:pointer;border-radius:4px;font-family:'Cinzel',serif;letter-spacing:.04em;transition:background .15s;}
-.bsecondary:hover{background:#222a60;}
-.bgold{background:#1c2236;color:#7ab0ff;padding:5px 13px;font-size:.74rem;border:1px solid #2a3a70;}
-.bgold:hover{background:#222a44;}
-.bsm{background:#131726;color:#7ab0ff;padding:3px 9px;font-size:.7rem;border:1px solid #2a3050;}
-.bsm:hover{background:#1c2236;}
-.bx{background:#0d1020;color:#5890e8;padding:2px 6px;font-size:.68rem;border:1px solid #2a3a70;border-radius:3px;cursor:pointer;flex-shrink:0;}
-.bx:hover{background:#1a2a50;color:#7ab0ff;}
-.tip{font-size:.75rem;color:#4a6090;margin-top:.35rem;font-style:italic;min-height:15px;}
-.tip.err{color:#e06060;}
-.statsbar{display:flex;gap:.7rem;background:#131726;border:1px solid #2a3050;border-radius:8px;padding:.6rem .9rem;flex-wrap:wrap;align-items:center;margin-bottom:.8rem;}
-.sv{font-family:'Cinzel',serif;font-size:1.1rem;color:#7ab0ff;text-align:center;}
-.sl{font-size:.65rem;color:#4a6090;text-transform:uppercase;letter-spacing:.07em;text-align:center;}
-.vsep{width:1px;background:#2a3050;height:28px;}
+input[type=text]{flex:1;min-width:160px;background:#0c0e13;border:1px solid #262a36;color:#e4e6ea;padding:6px 10px;border-radius:6px;font-family:'Inter',sans-serif;font-size:.85rem;}
+input[type=text]::placeholder{color:#525a6a;}
+select{background:#0c0e13;border:1px solid #262a36;color:#e4e6ea;padding:5px 7px;border-radius:6px;font-family:'Inter',sans-serif;font-size:.82rem;}
+select option{background:#15171e;}
+.btn{font-family:'Inter',sans-serif;font-weight:600;cursor:pointer;border-radius:6px;letter-spacing:0;transition:background .15s;}
+.bfire{background:#378ade;color:#ffffff;padding:6px 15px;font-size:.78rem;border:1px solid #378ade;}
+.bfire:hover{background:#2a78c8;}
+.bsecondary{background:#1c1f28;color:#a8b0c0;padding:5px 13px;font-size:.76rem;border:1px solid #2a2e3a;cursor:pointer;border-radius:6px;font-family:'Inter',sans-serif;font-weight:600;transition:background .15s;}
+.bsecondary:hover{background:#23262f;}
+.bgold{background:#1c1f28;color:#e4e6ea;padding:5px 13px;font-size:.76rem;border:1px solid #2a2e3a;}
+.bgold:hover{background:#23262f;}
+.bsm{background:#15171e;color:#a8b0c0;padding:3px 9px;font-size:.72rem;border:1px solid #262a36;}
+.bsm:hover{background:#1c1f28;}
+.bx{background:#0c0e13;color:#7090c0;padding:2px 6px;font-size:.68rem;border:1px solid #262a36;border-radius:4px;cursor:pointer;flex-shrink:0;}
+.bx:hover{background:#1a2433;color:#9fc4f4;}
+.tip{font-size:.76rem;color:#666c7a;margin-top:.35rem;font-style:normal;min-height:15px;}
+.tip.err{color:#e07070;}
+.statsbar{display:flex;gap:.7rem;background:#15171e;border:1px solid #262a36;border-radius:10px;padding:.6rem .9rem;flex-wrap:wrap;align-items:center;margin-bottom:.8rem;}
+.sv{font-family:'Inter',sans-serif;font-size:1.05rem;font-weight:700;color:#ffffff;text-align:center;}
+.sl{font-size:.62rem;color:#666c7a;text-transform:uppercase;letter-spacing:.05em;text-align:center;}
+.vsep{width:1px;background:#262a36;height:28px;}
 .layout{display:grid;grid-template-columns:280px 1fr;gap:.85rem;align-items:start;}
-.pool{background:#131726;border:1px solid #2a3050;border-radius:8px;padding:.7rem;max-height:84vh;overflow-y:auto;position:sticky;top:0;will-change:transform;transform:translateZ(0);contain:layout style;}
+.pool{background:#15171e;border:1px solid #262a36;border-radius:10px;padding:.7rem;max-height:84vh;overflow-y:auto;position:sticky;top:0;will-change:transform;transform:translateZ(0);contain:layout style;}
 .pool::-webkit-scrollbar{width:3px;}
-.pool::-webkit-scrollbar-thumb{background:#2a3a70;}
-.ptitle{font-family:'Cinzel',serif;font-size:.75rem;color:#7ab0ff;text-transform:uppercase;margin-bottom:.4rem;display:flex;justify-content:space-between;align-items:center;}
+.pool::-webkit-scrollbar-thumb{background:#2a2e3a;}
+.ptitle{font-family:'Inter',sans-serif;font-size:.72rem;font-weight:700;color:#8890a0;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.4rem;display:flex;justify-content:space-between;align-items:center;}
 .fbtnrow{display:flex;gap:3px;margin-bottom:.45rem;}
-.fbtn{background:#0d1020;color:#4a6090;padding:3px 9px;font-size:.68rem;border:1px solid #2a3050;border-radius:3px;cursor:pointer;font-family:'Cinzel',serif;}
-.fbtn.on{background:#1a2a50;color:#7ab0ff;border-color:#3a5090;}
-.pc{border-radius:5px;margin-bottom:4px;border:2px solid transparent;overflow:hidden;user-select:none;}
-.pc.pick{cursor:pointer;outline:2px solid #60cc80;outline-offset:1px;}
-.pc.pick:hover{filter:brightness(1.1);}
+.fbtn{background:#0c0e13;color:#666c7a;padding:3px 9px;font-size:.7rem;border:1px solid #262a36;border-radius:5px;cursor:pointer;font-family:'Inter',sans-serif;font-weight:600;}
+.fbtn.on{background:#1a2433;color:#9fc4f4;border-color:#378ade;}
+.pc{border-radius:6px;margin-bottom:4px;border:2px solid transparent;overflow:hidden;user-select:none;}
+.pc.pick{cursor:pointer;outline:2px solid #5dcaa5;outline-offset:1px;}
+.pc.pick:hover{filter:brightness(1.12);}
 .pc.dim{opacity:.25;pointer-events:none;}
 .pc-inner{padding:5px 7px;display:flex;align-items:center;gap:7px;}
 .rcol{display:flex;flex-direction:column;gap:.85rem;}
-.sectitle{font-family:'Cinzel',serif;font-size:.8rem;color:#7ab0ff;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.5rem;display:flex;justify-content:space-between;align-items:center;}
+.sectitle{font-family:'Inter',sans-serif;font-size:.72rem;font-weight:700;color:#8890a0;letter-spacing:.06em;text-transform:uppercase;margin-bottom:.5rem;display:flex;justify-content:space-between;align-items:center;}
 .ggrid{display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem;contain:layout style;}
-.gc{background:#131726;border:1px solid #2a3050;border-radius:7px;overflow:hidden;}
-.gh{background:#0f1322;padding:5px 9px;font-family:'Cinzel',serif;font-size:.74rem;color:#7ab0ff;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #2a3050;}
-.ghint{font-size:.6rem;color:#3a5080;font-style:italic;font-family:'Crimson Pro',serif;}
-.gcnt{font-size:.68rem;color:#4a6090;}
+.gc{background:#0c0e13;border:1px solid #262a36;border-radius:8px;overflow:hidden;}
+.gh{background:#15171e;padding:5px 9px;font-family:'Inter',sans-serif;font-size:.72rem;font-weight:700;color:#a8b0c0;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #262a36;}
+.ghint{font-size:.6rem;color:#525a6a;font-style:normal;font-family:'Inter',sans-serif;}
+.gcnt{font-size:.68rem;color:#666c7a;}
 .gs{padding:5px 7px;min-height:130px;}
-.se{background:#0d1020;border:1.5px dashed #3a5090;border-radius:4px;margin-bottom:4px;padding:5px 8px;font-size:.76rem;color:#5878b0;font-style:italic;cursor:pointer;min-height:28px;display:flex;align-items:center;}
-.se:hover{border-color:#7ab0ff;background:#131d35;color:#7ab0ff;}
-.se.picking{border-color:#60cc80;border-style:solid;background:#0a1a12;color:#60cc80;}
-.sf{border-radius:5px;margin-bottom:4px;overflow:hidden;}
+.se{background:#15171e;border:1.5px dashed #2e3344;border-radius:6px;margin-bottom:4px;padding:5px 8px;font-size:.76rem;color:#525a6a;font-style:normal;cursor:pointer;min-height:28px;display:flex;align-items:center;}
+.se:hover{border-color:#378ade;background:#161c26;color:#9fc4f4;}
+.se.picking{border-color:#5dcaa5;border-style:solid;background:#0e1c18;color:#5dcaa5;}
+.sf{border-radius:6px;margin-bottom:4px;overflow:hidden;}
 .sb{padding:5px 8px;display:flex;align-items:center;gap:7px;}
 .sname{font-size:1rem;font-weight:700;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.smeta{font-size:.6rem;opacity:.65;white-space:nowrap;font-style:italic;}
-.banner{background:#0a1a12;border:1px solid #1a5a3a;border-radius:6px;padding:6px 10px;margin-bottom:.65rem;font-size:.82rem;color:#60cc80;display:none;align-items:center;gap:8px;}
+.smeta{font-size:.6rem;opacity:.65;white-space:nowrap;font-style:normal;}
+.banner{background:#0e1c18;border:1px solid #1a4a3a;border-radius:8px;padding:6px 10px;margin-bottom:.65rem;font-size:.82rem;color:#5dcaa5;display:none;align-items:center;gap:8px;}
 .banner.on{display:flex;}
-.assign-section{background:#131726;border:1px solid #2a3050;border-radius:8px;overflow:hidden;contain:layout style;}
-.tabs{display:flex;border-bottom:2px solid #2a3050;background:#0f1322;overflow:hidden;flex-wrap:wrap;}
-.tab{font-family:'Cinzel',serif;font-size:.8rem;color:#4a6090;padding:8px 14px;cursor:pointer;border-right:1px solid #2a3050;white-space:nowrap;letter-spacing:.06em;transition:all .15s;}
-.tab:hover{background:#131d35;color:#7ab0ff;}
-.tab.active{background:#131726;color:#f8f8f8;border-bottom:3px solid #7ab0ff;margin-bottom:-2px;font-weight:600;}
+.assign-section{background:#15171e;border:1px solid #262a36;border-radius:10px;overflow:hidden;contain:layout style;}
+.tabs{display:flex;border-bottom:1px solid #262a36;background:#0c0e13;overflow:hidden;flex-wrap:wrap;}
+.tab{font-family:'Inter',sans-serif;font-size:.78rem;font-weight:600;color:#666c7a;padding:8px 14px;cursor:pointer;border-right:1px solid #262a36;white-space:nowrap;letter-spacing:0;transition:all .15s;}
+.tab:hover{background:#15171e;color:#a8b0c0;}
+.tab.active{background:#15171e;color:#ffffff;border-bottom:2px solid #378ade;margin-bottom:-1px;font-weight:700;}
 .tab-content{padding:.75rem;}
-.boss-header{font-family:'Cinzel',serif;font-size:.95rem;color:#7ab0ff;margin-bottom:.2rem;font-weight:600;}
-.boss-hint{font-size:.74rem;color:#4a6090;font-style:italic;font-family:'Crimson Pro',serif;margin-bottom:.6rem;}
+.boss-header{font-family:'Inter',sans-serif;font-size:1rem;color:#ffffff;margin-bottom:.2rem;font-weight:700;}
+.boss-hint{font-size:.76rem;color:#666c7a;font-style:normal;font-family:'Inter',sans-serif;margin-bottom:.6rem;}
 .asgrid{display:grid;gap:.4rem;margin-bottom:.45rem;}
 .asgrid-1{grid-template-columns:repeat(1,1fr);}
 .asgrid-2{grid-template-columns:repeat(2,1fr);}
@@ -85,48 +84,48 @@ select option{background:#131726;}
 .asgrid-4{grid-template-columns:repeat(4,1fr);}
 .asgrid-5{grid-template-columns:repeat(5,1fr);}
 .asgrid-6{grid-template-columns:repeat(6,1fr);}
-.mc{background:#0f1322;border:1px solid #2a3050;border-radius:6px;overflow:hidden;}
-.mh{padding:5px 9px;font-family:'Cinzel',serif;font-size:.72rem;font-weight:600;border-bottom:1px solid #2a3050;display:flex;align-items:center;gap:4px;}
-.mlbl{font-size:.62rem;color:#4a6090;font-family:'Cinzel',serif;text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px;margin-top:4px;}
+.mc{background:#0c0e13;border:1px solid #262a36;border-radius:8px;overflow:hidden;}
+.mh{padding:5px 9px;font-family:'Inter',sans-serif;font-size:.7rem;font-weight:700;border-bottom:1px solid #262a36;display:flex;align-items:center;gap:4px;}
+.mlbl{font-size:.6rem;color:#666c7a;font-family:'Inter',sans-serif;text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px;margin-top:4px;font-weight:600;}
 .mas{padding:5px 7px;}
-.abtn{cursor:pointer;padding:5px 9px;font-size:.74rem;border:1.5px dashed #3a5090;border-radius:3px;color:#5878b0;display:block;background:#0d1020;margin-bottom:3px;}
-.abtn:hover{border-color:#7ab0ff;color:#7ab0ff;background:#131d35;}
-.abtn.picking{border-color:#60cc80;color:#60cc80;background:#0a1a12;border-style:solid;}
+.abtn{cursor:pointer;padding:5px 9px;font-size:.76rem;border:1.5px dashed #2e3344;border-radius:5px;color:#525a6a;display:block;background:#15171e;margin-bottom:3px;}
+.abtn:hover{border-color:#378ade;color:#9fc4f4;background:#161c26;}
+.abtn.picking{border-color:#5dcaa5;color:#5dcaa5;background:#0e1c18;border-style:solid;}
 .abar{display:flex;align-items:center;gap:3px;margin-bottom:3px;}
-.prow{display:flex;align-items:center;gap:.55rem;padding:.45rem .65rem;background:#0f1322;border:1px solid #2a3050;border-radius:6px;margin-bottom:.5rem;}
-.plbl{font-family:'Cinzel',serif;font-size:.74rem;color:#7ab0ff;white-space:nowrap;}
-.prow-empty{cursor:pointer;padding:5px 9px;font-size:.74rem;border:1.5px dashed #3a5090;border-radius:3px;color:#5878b0;background:#0d1020;display:inline-block;}
-.prow-empty:hover{border-color:#7ab0ff;color:#7ab0ff;}
-.prow-empty.picking{border-color:#60cc80;color:#60cc80;background:#0a1a12;border-style:solid;}
-.expbox{background:#0a0d18;border:1px solid #2a3050;border-radius:6px;padding:.55rem .75rem;font-size:.8rem;color:#8090c0;white-space:pre;line-height:1.6;font-family:monospace;overflow-x:auto;max-height:140px;overflow-y:auto;}
-.dup{font-size:.6rem;background:#3a1a1a;color:#ff8080;border:1px solid #7a2a2a;border-radius:3px;padding:1px 4px;white-space:nowrap;}
-.logbox{background:#0a0d18;border:1px solid #2a3a50;border-radius:5px;padding:.45rem .7rem;font-size:.74rem;color:#5890e8;line-height:1.55;margin-top:.45rem;font-family:monospace;white-space:pre-wrap;}
-.modal-wrap{display:none;background:#131726;border:1px solid #3a5090;border-radius:10px;padding:1.2rem;max-width:380px;margin:.5rem 0 .9rem;}
+.prow{display:flex;align-items:center;gap:.55rem;padding:.45rem .65rem;background:#0c0e13;border:1px solid #262a36;border-radius:8px;margin-bottom:.5rem;}
+.plbl{font-family:'Inter',sans-serif;font-size:.74rem;font-weight:700;color:#a8b0c0;white-space:nowrap;}
+.prow-empty{cursor:pointer;padding:5px 9px;font-size:.76rem;border:1.5px dashed #2e3344;border-radius:5px;color:#525a6a;background:#15171e;display:inline-block;}
+.prow-empty:hover{border-color:#378ade;color:#9fc4f4;}
+.prow-empty.picking{border-color:#5dcaa5;color:#5dcaa5;background:#0e1c18;border-style:solid;}
+.expbox{background:#0c0e13;border:1px solid #262a36;border-radius:8px;padding:.55rem .75rem;font-size:.8rem;color:#8890a0;white-space:pre;line-height:1.6;font-family:monospace;overflow-x:auto;max-height:140px;overflow-y:auto;}
+.dup{font-size:.6rem;background:#2a1414;color:#f09595;border:1px solid #5a2424;border-radius:4px;padding:1px 4px;white-space:nowrap;}
+.logbox{background:#0c0e13;border:1px solid #262a36;border-radius:7px;padding:.45rem .7rem;font-size:.74rem;color:#7090c0;line-height:1.55;margin-top:.45rem;font-family:monospace;white-space:pre-wrap;}
+.modal-wrap{display:none;background:#15171e;border:1px solid #378ade;border-radius:12px;padding:1.2rem;max-width:380px;margin:.5rem 0 .9rem;}
 .modal-wrap.on{display:block;}
-.modal-title{font-family:'Cinzel',serif;color:#7ab0ff;font-size:.9rem;margin-bottom:.8rem;}
+.modal-title{font-family:'Inter',sans-serif;color:#ffffff;font-weight:700;font-size:.92rem;margin-bottom:.8rem;}
 .mrow{display:flex;gap:6px;margin-bottom:.45rem;flex-wrap:wrap;}
 .mrow input,.mrow select{flex:1;}
 .mbtns{display:flex;gap:8px;justify-content:flex-end;margin-top:.7rem;}
-textarea{width:100%;background:#0d1020;border:1px solid #2a3050;color:#e0d8f8;padding:5px 8px;border-radius:4px;font-family:monospace;font-size:.75rem;resize:vertical;}
-.div-sep{border:none;border-top:1px solid #2a3050;margin:.45rem 0;}
-.note-box{font-size:.72rem;color:#60cc80;background:#0a1a12;border:1px solid #1a5a3a;border-radius:5px;padding:.45rem .65rem;margin-bottom:.4rem;line-height:1.6;}
-.auto-tag{font-size:.6rem;background:#0a1a2a;color:#5890e8;border:1px solid #1a4a80;border-radius:3px;padding:1px 5px;white-space:nowrap;margin-left:3px;}
+textarea{width:100%;background:#0c0e13;border:1px solid #262a36;color:#e4e6ea;padding:5px 8px;border-radius:6px;font-family:monospace;font-size:.75rem;resize:vertical;}
+.div-sep{border:none;border-top:1px solid #262a36;margin:.45rem 0;}
+.note-box{font-size:.74rem;color:#5dcaa5;background:#0e1c18;border:1px solid #1a4a3a;border-radius:7px;padding:.45rem .65rem;margin-bottom:.4rem;line-height:1.6;}
+.auto-tag{font-size:.6rem;background:#101e2e;color:#7090c0;border:1px solid #1a3a5a;border-radius:4px;padding:1px 5px;white-space:nowrap;margin-left:3px;}
 .prev-row{margin-top:.5rem;display:flex;justify-content:space-between;align-items:center;margin-bottom:.35rem;}
-.prev-lbl{font-family:'Cinzel',serif;font-size:.67rem;color:#4a6090;text-transform:uppercase;letter-spacing:.08em;}
+.prev-lbl{font-family:'Inter',sans-serif;font-size:.68rem;font-weight:700;color:#666c7a;text-transform:uppercase;letter-spacing:.06em;}
 .mark-sym{font-size:.9rem;margin-right:2px;}
-.sheep-label{font-size:.6rem;background:#181830;color:#8080e8;border:1px solid #3030a0;border-radius:3px;padding:1px 5px;white-space:nowrap;margin-left:3px;}
+.sheep-label{font-size:.6rem;background:#181830;color:#8a8af0;border:1px solid #303a60;border-radius:4px;padding:1px 5px;white-space:nowrap;margin-left:3px;}
 </style>
 </head>
 <body>
 <div class="app">
 <h1>WoW Classic Raid Organizer</h1>
 <div class="sub">Organize your 40-man raid &mdash; select a raid below</div>
-<div style="text-align:center;font-size:.6rem;color:#4a6890;font-family:Cinzel,serif;letter-spacing:.08em;margin-top:-.3rem;margin-bottom:.5rem">v1.8.1</div>
+<div style="text-align:center;font-size:.6rem;color:#525a6a;font-family:Inter,sans-serif;letter-spacing:.08em;margin-top:-.3rem;margin-bottom:.5rem">v2.0.0</div>
 <div style="display:flex;gap:6px;justify-content:center;margin-bottom:.9rem;flex-wrap:wrap">
-  <button class="btn raid-sel-btn" data-raid="mc"   id="rsMC"   style="font-family:Cinzel,serif;font-size:.74rem;padding:5px 14px;border-radius:4px;cursor:pointer;border:1px solid #3a6ae0;background:#1a3a80;color:#c8d8ff">&#128293; Molten Core</button>
-  <button class="btn raid-sel-btn" data-raid="bwl"  id="rsBWL"  style="font-family:Cinzel,serif;font-size:.74rem;padding:5px 14px;border-radius:4px;cursor:pointer;border:1px solid #2a3050;background:#131726;color:#7ab0ff">&#128009; Blackwing Lair</button>
-  <button class="btn raid-sel-btn" data-raid="aq40" id="rsAQ40" style="font-family:Cinzel,serif;font-size:.74rem;padding:5px 14px;border-radius:4px;cursor:pointer;border:1px solid #2a3050;background:#131726;color:#7ab0ff">&#129412; Temple of Ahn'Qiraj</button>
-  <button class="btn raid-sel-btn" data-raid="naxx" id="rsNAXX" style="font-family:Cinzel,serif;font-size:.74rem;padding:5px 14px;border-radius:4px;cursor:pointer;border:1px solid #2a3050;background:#131726;color:#7ab0ff">&#128128; Naxxramas</button>
+  <button class="btn raid-sel-btn" data-raid="mc"   id="rsMC"   style="font-family:Inter,sans-serif;font-size:.74rem;padding:5px 14px;border-radius:6px;cursor:pointer;border:1px solid #378ade;background:#1a2433;color:#9fc4f4">&#128293; Molten Core</button>
+  <button class="btn raid-sel-btn" data-raid="bwl"  id="rsBWL"  style="font-family:Inter,sans-serif;font-size:.74rem;padding:5px 14px;border-radius:4px;cursor:pointer;border:1px solid #262a36;background:#15171e;color:#9fc4f4">&#128009; Blackwing Lair</button>
+  <button class="btn raid-sel-btn" data-raid="aq40" id="rsAQ40" style="font-family:Inter,sans-serif;font-size:.74rem;padding:5px 14px;border-radius:4px;cursor:pointer;border:1px solid #262a36;background:#15171e;color:#9fc4f4">&#129412; Temple of Ahn'Qiraj</button>
+  <button class="btn raid-sel-btn" data-raid="naxx" id="rsNAXX" style="font-family:Inter,sans-serif;font-size:.74rem;padding:5px 14px;border-radius:4px;cursor:pointer;border:1px solid #262a36;background:#15171e;color:#9fc4f4">&#128128; Naxxramas</button>
 </div>
 
 <div class="modal-wrap" id="modal">
@@ -213,15 +212,15 @@ textarea{width:100%;background:#0d1020;border:1px solid #2a3050;color:#e0d8f8;pa
         <div class="tabs" id="bossTabsRow"></div>
         <div class="tab-content" id="bossTabContent"></div>
       </div>
-      <div style="background:#131726;border:1px solid #2a3050;border-radius:8px;padding:.75rem;">
+      <div style="background:#15171e;border:1px solid #262a36;border-radius:8px;padding:.75rem;">
         <div class="sectitle" style="margin-bottom:.5rem">MRT Group Export</div>
-        <div style="font-size:.72rem;color:#4a6090;margin-bottom:.6rem">Select your server — your realm suffix is omitted, others are appended.</div>
+        <div style="font-size:.72rem;color:#666c7a;margin-bottom:.6rem">Select your server — your realm suffix is omitted, others are appended.</div>
         <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:.55rem">
           <button class="btn bsm mrt-server-btn" data-realm="PyrewoodVillage" id="bMrtPV" style="font-size:.72rem;padding:4px 12px">Copy — Pyrewood Village</button>
           <button class="btn bsm mrt-server-btn" data-realm="NethergardeKeep" id="bMrtNK" style="font-size:.72rem;padding:4px 12px">Copy — Nethergarde Keep</button>
           <button class="btn bsm mrt-server-btn" data-realm="MirageRaceway" id="bMrtMR" style="font-size:.72rem;padding:4px 12px">Copy — Mirage Raceway</button>
         </div>
-        <div style="font-size:.65rem;color:#4a6090;margin-bottom:.35rem;font-style:italic" id="mrtLabel">Click a button above to generate the export for your server</div>
+        <div style="font-size:.65rem;color:#666c7a;margin-bottom:.35rem;font-style:italic" id="mrtLabel">Click a button above to generate the export for your server</div>
         <div class="expbox" id="mrtBox"></div>
       </div>
     </div>
@@ -773,9 +772,9 @@ function switchRaid(raidId){
   var RAID_NAMES={mc:'&#128293; Molten Core',bwl:'&#128009; Blackwing Lair',aq40:"&#129412; Temple of Ahn'Qiraj",naxx:'&#128128; Naxxramas'};
   document.querySelectorAll('.raid-sel-btn').forEach(function(b){
     var active=b.dataset.raid===raidId;
-    b.style.background=active?'#1a3a80':'#131726';
-    b.style.borderColor=active?'#3a6ae0':'#2a3050';
-    b.style.color=active?'#c8d8ff':'#7ab0ff';
+    b.style.background=active?'#1a2433':'#15171e';
+    b.style.borderColor=active?'#378ade':'#262a36';
+    b.style.color=active?'#9fc4f4':'#9fc4f4';
     b.style.fontWeight=active?'700':'400';
   });
   /* Update subtitle */
@@ -1173,25 +1172,25 @@ function rPool(){
         roleMismatch=!baseMatch||alreadyUsed;
       }
     }
-    var extraStyle=roleMatch?'outline:2px solid #60cc80;outline-offset:1px;':roleMismatch?'opacity:.4;':'';
+    var extraStyle=roleMatch?'outline:2px solid #5dcaa5;outline-offset:1px;':roleMismatch?'opacity:.4;':'';
     var inDb=isInRealmDb(p.name);
-    var dbBadge=inDb?'<span title="Found in Realm DB" style="font-size:.6rem;color:#60cc80;flex-shrink:0;margin-right:1px">&#10003;</span>':'<span title="Not in Realm DB" style="font-size:.6rem;color:#3a5080;flex-shrink:0;margin-right:1px">&#63;</span>';
+    var dbBadge=inDb?'<span title="Found in Realm DB" style="font-size:.6rem;color:#5dcaa5;flex-shrink:0;margin-right:1px">&#10003;</span>':'<span title="Not in Realm DB" style="font-size:.6rem;color:#525a6a;flex-shrink:0;margin-right:1px">&#63;</span>';
     h+='<div class="pc'+(dim?' dim':canPick?' pick':'')+'" data-pid="'+he(p.id)+'" style="background:'+c.bg+';border-color:'+c.bd+';'+extraStyle+'">'
       +'<div class="pc-inner">'+ihtml(p.cls,18,p.role)
       +dbBadge
       +'<span class="pc-name" style="font-size:1rem;font-weight:700;color:#f8f8f8;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" data-pid="'+he(p.id)+'">'+he(p.name)+'</span>'
       +'<span style="font-size:.62rem;color:rgba(248,248,248,0.55);white-space:nowrap">'+he(p.spec||'')+'</span>'
-      +'<button class="bx" data-a="editname" data-pid="'+he(p.id)+'" title="Edit name" style="font-size:.6rem;padding:1px 5px;color:#7ab0ff;border-color:#1a3a70">&#9998;</button>'
-      +(p.cls==='Warrior'?'<button class="bx" data-a="totank" data-pid="'+he(p.id)+'" title="'+(p.role==='tank'?'Convert to DPS':'Convert to Tank')+'" style="font-size:.55rem;padding:1px 4px;color:'+(p.role==='tank'?'#7ab0ff':'#e07020')+';border-color:'+(p.role==='tank'?'#2a4a90':'#804010')+'">'+(p.role==='tank'?'D':'T')+'</button>':'')
+      +'<button class="bx" data-a="editname" data-pid="'+he(p.id)+'" title="Edit name" style="font-size:.6rem;padding:1px 5px;color:#9fc4f4;border-color:#1a3a70">&#9998;</button>'
+      +(p.cls==='Warrior'?'<button class="bx" data-a="totank" data-pid="'+he(p.id)+'" title="'+(p.role==='tank'?'Convert to DPS':'Convert to Tank')+'" style="font-size:.55rem;padding:1px 4px;color:'+(p.role==='tank'?'#9fc4f4':'#e07020')+';border-color:'+(p.role==='tank'?'#2a4a90':'#804010')+'">'+(p.role==='tank'?'D':'T')+'</button>':'')
       +'<button class="bx" data-a="tobench" data-pid="'+he(p.id)+'" title="Move to bench" style="font-size:.55rem;padding:1px 4px">B</button>'
       +'<button class="bx" data-a="rmp" data-pid="'+he(p.id)+'" title="Remove">x</button>'
       +'</div></div>';
   }
-  if(!h&&filt==='all')h='<div style="color:#3a5080;font-size:.82rem;text-align:center;padding:.6rem">No players</div>';
+  if(!h&&filt==='all')h='<div style="color:#525a6a;font-size:.82rem;text-align:center;padding:.6rem">No players</div>';
 
   /* Late section */
   if(lateList.length||(filt==='all')){
-    h+='<div class="pool-sec-hdr" style="background:#0d1a2a;border-top:1px solid #1a4a70;margin:4px -7px 3px;padding:3px 7px;font-family:Cinzel,serif;font-size:.6rem;color:#e8c040;text-transform:uppercase;letter-spacing:.08em">&#128336; Late ('+lateList.length+')</div>';
+    h+='<div class="pool-sec-hdr" style="background:#0d1a2a;border-top:1px solid #1a4a70;margin:4px -7px 3px;padding:3px 7px;font-family:Inter,sans-serif;font-size:.6rem;color:#e8c040;text-transform:uppercase;letter-spacing:.08em">&#128336; Late ('+lateList.length+')</div>';
     if(lateList.length){
       lateList.forEach(function(p){
         var c=p.cls?cd(p.cls):{c:'#e8c040',bg:'#0d1a2a',bd:'#1a4a70'};
@@ -1208,10 +1207,10 @@ function rPool(){
 
   /* Benched section */
   if(benched.length||(filt==='all')){
-    h+='<div class="pool-sec-hdr" style="background:#0a1a12;border-top:1px solid #1a5a3a;margin:4px -7px 3px;padding:3px 7px;font-family:Cinzel,serif;font-size:.6rem;color:#50a050;text-transform:uppercase;letter-spacing:.08em">&#128196; Bench ('+benched.length+')</div>';
+    h+='<div class="pool-sec-hdr" style="background:#0e1c18;border-top:1px solid #1a4a3a;margin:4px -7px 3px;padding:3px 7px;font-family:Inter,sans-serif;font-size:.6rem;color:#50a050;text-transform:uppercase;letter-spacing:.08em">&#128196; Bench ('+benched.length+')</div>';
     if(benched.length){
       benched.forEach(function(p){
-        var c=p.cls?cd(p.cls):{c:'#60cc80',bg:'#0a1a12',bd:'#1a5a3a'};
+        var c=p.cls?cd(p.cls):{c:'#5dcaa5',bg:'#0e1c18',bd:'#1a4a3a'};
         h+='<div class="pc" style="background:'+c.bg+';border-color:#1a4a1a">'
           +'<div class="pc-inner">'+(p.cls?ihtml(p.cls,16,p.role):'<span style="width:16px;height:16px;flex-shrink:0;display:inline-block"></span>')
           +'<span style="font-size:.8rem;color:'+c.c+';flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+he(p.name)+'</span>'
@@ -1225,7 +1224,7 @@ function rPool(){
 
   /* Absent section */
   if(absentList.length||(filt==='all')){
-    h+='<div class="pool-sec-hdr" style="background:#1a0a10;border-top:1px solid #4a1030;margin:4px -7px 3px;padding:3px 7px;font-family:Cinzel,serif;font-size:.6rem;color:#a04040;text-transform:uppercase;letter-spacing:.08em">&#10060; Absent ('+absentList.length+')</div>';
+    h+='<div class="pool-sec-hdr" style="background:#1a0a10;border-top:1px solid #4a1030;margin:4px -7px 3px;padding:3px 7px;font-family:Inter,sans-serif;font-size:.6rem;color:#a04040;text-transform:uppercase;letter-spacing:.08em">&#10060; Absent ('+absentList.length+')</div>';
     if(absentList.length){
       absentList.forEach(function(p){
         h+='<div class="pc" style="background:#1a0a0a;border-color:#4a1010">'
@@ -1240,7 +1239,7 @@ function rPool(){
 
   /* Tentative section */
   if(tentativeList.length||(filt==='all')){
-    h+='<div class="pool-sec-hdr" style="background:#12102a;border-top:1px solid #3a3080;margin:4px -7px 3px;padding:3px 7px;font-family:Cinzel,serif;font-size:.6rem;color:#8a70c0;text-transform:uppercase;letter-spacing:.08em">&#10067; Tentative ('+tentativeList.length+')</div>';
+    h+='<div class="pool-sec-hdr" style="background:#12102a;border-top:1px solid #3a3080;margin:4px -7px 3px;padding:3px 7px;font-family:Inter,sans-serif;font-size:.6rem;color:#8a70c0;text-transform:uppercase;letter-spacing:.08em">&#10067; Tentative ('+tentativeList.length+')</div>';
     if(tentativeList.length){
       tentativeList.forEach(function(p){
         h+='<div class="pc" style="background:#1a1520;border-color:#4a3a70">'
@@ -1284,16 +1283,16 @@ function rGroups(){
   /* Benched section below groups */
   var bh='';
   if(benched.length){
-    bh+='<div style="background:#0d1020;border:1px solid #1a3a6a;border-radius:7px;overflow:hidden;margin-top:.5rem">';
-    bh+='<div style="background:#0f1322;padding:4px 9px;font-family:Cinzel,serif;font-size:.74rem;color:#60cc80;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #1a3a6a"><span>&#128196; Benched ('+benched.length+')</span><span style="font-size:.62rem;color:#3a6080">Available if needed</span></div>';
+    bh+='<div style="background:#0c0e13;border:1px solid #1a3a6a;border-radius:7px;overflow:hidden;margin-top:.5rem">';
+    bh+='<div style="background:#0c0e13;padding:4px 9px;font-family:Inter,sans-serif;font-size:.74rem;color:#5dcaa5;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #1a3a6a"><span>&#128196; Benched ('+benched.length+')</span><span style="font-size:.62rem;color:#3a6080">Available if needed</span></div>';
     bh+='<div style="padding:5px 7px;display:flex;flex-wrap:wrap;gap:4px">';
     benched.forEach(function(p){
-      var c=p.cls?cd(p.cls):{c:'#f8f8f8',bg:'#0d1020',bd:'#1a3a6a'};
+      var c=p.cls?cd(p.cls):{c:'#f8f8f8',bg:'#0c0e13',bd:'#1a3a6a'};
       bh+='<div style="display:inline-flex;align-items:center;gap:5px;background:'+c.bg+';border:2px solid '+c.bd+';border-radius:5px;padding:4px 8px">'
         +(p.cls?ihtml(p.cls,14,p.role):'')
         +'<span style="font-size:.95rem;color:#f8f8f8;font-weight:700">'+he(p.name)+'</span>'
         +(p.spec?'<span style="font-size:.58rem;color:rgba(248,248,248,0.5)">'+he(p.spec)+'</span>':'')
-        +'<button class="bx" data-a="topool" data-pid="'+he(p.id)+'" title="Move to active pool" style="font-size:.52rem;padding:1px 4px;color:#60cc80;border-color:#1a5a3a">&#8593;</button>'
+        +'<button class="bx" data-a="topool" data-pid="'+he(p.id)+'" title="Move to active pool" style="font-size:.52rem;padding:1px 4px;color:#5dcaa5;border-color:#1a4a3a">&#8593;</button>'
         +'</div>';
     });
     bh+='</div></div>';
@@ -1389,11 +1388,11 @@ function renderBossTab(boss){
   boss.segments.forEach(function(seg){
     var cols=Math.min(seg.cols||seg.slots.length,6);
     var colClass='asgrid-'+cols;
-    var rowBg=seg.isHealRow?'#0a1a12':seg.isSheepRow?'#0a0a20':'#0d1020';
+    var rowBg=seg.isHealRow?'#0e1c18':seg.isSheepRow?'#0a0a20':'#0c0e13';
     var rowLblColor=seg.isHealRow?'#60c060':seg.isSheepRow?'#8080e8':'#9a8050';
     var titleSuffix=seg.isHealRow?'<span class="auto-tag">auto-filled from Trash</span>':seg.isSheepRow?'<span class="sheep-label">Polymorph</span>':'';
 
-    h+='<div style="font-family:Cinzel,serif;font-size:.62rem;color:'+rowLblColor+';text-transform:uppercase;letter-spacing:.06em;margin:.35rem 0 .3rem">'+he(seg.title)+titleSuffix+'</div>';
+    h+='<div style="font-family:Inter,sans-serif;font-size:.62rem;color:'+rowLblColor+';text-transform:uppercase;letter-spacing:.06em;margin:.35rem 0 .3rem">'+he(seg.title)+titleSuffix+'</div>';
     h+='<div class="asgrid '+colClass+'">';
 
     seg.slots.forEach(function(sl){
@@ -1404,9 +1403,9 @@ function renderBossTab(boss){
       if(sl.markIdx!==null&&sl.markIdx!==undefined){
         markHtml='<span style="font-size:1rem;margin-right:2px">'+MARK_SYMS[sl.markIdx]+'</span>';
       }
-      var headerBg=seg.isSheepRow?'#181830':sl.isHealer?'#0a1a12':'#1e3858';
+      var headerBg=seg.isSheepRow?'#181830':sl.isHealer?'#0e1c18':'#1e3858';
       var headerCol=seg.isSheepRow?'#8080e8':sl.isHealer?'#60c060':MARK_COLS[sl.markIdx]||'#c8d8f8';
-      if(sl.markIdx===null||sl.markIdx===undefined) headerCol='#7ab0ff';
+      if(sl.markIdx===null||sl.markIdx===undefined) headerCol='#9fc4f4';
 
       h+='<div class="mc"><div class="mh" style="background:'+headerBg+'88;color:'+headerCol+'">'+markHtml+he(sl.label)+'</div><div class="mas">';
       if(p){
@@ -1429,7 +1428,7 @@ function renderBossTab(boss){
     var gc=boss.groupCount||8;
     var gridCols=gc<=6?'repeat(3,1fr)':'repeat(4,1fr)';
     h+='<div style="margin:.6rem 0">';
-    h+='<div style="font-family:Cinzel,serif;font-size:.72rem;color:#7ab0ff;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.4rem;display:flex;justify-content:space-between;align-items:center">';
+    h+='<div style="font-family:Inter,sans-serif;font-size:.72rem;color:#9fc4f4;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.4rem;display:flex;justify-content:space-between;align-items:center">';
     h+='<span>Group Setup \u2014 '+he(boss.name)+'</span>';
     h+='<button class="btn bsm" data-a="bgReset" data-bid="'+boss.id+'" style="font-size:.6rem">Reset from main groups</button>';
     if(boss.id==='cthun')h+='<button class="btn bsm" data-a="bgAutoAssign" data-bid="'+boss.id+'" style="font-size:.6rem;background:#1a3a20;border-color:#2a6a3a;color:#80d870;margin-left:4px">&#9881; Auto-assign</button>';
@@ -1440,12 +1439,12 @@ function renderBossTab(boss){
     if(boss.id==='kelthuzad')h+='<button class="btn bsm" data-a="bgAutoAssign" data-bid="'+boss.id+'" style="font-size:.6rem;background:#1a3a20;border-color:#2a6a3a;color:#80d870;margin-left:4px">&#9881; Auto-assign</button>';
     h+='</div>';
     var isSelecting=_goActiveBid===boss.id&&_goActiveGi>=0;
-    h+='<div style="font-size:.68rem;color:#4a6090;margin-bottom:.5rem">'+(isSelecting?'<span style="color:#60cc80">&#10003; Player selected \u2014 click another slot to swap</span>':'Click a player to select, then click another slot to swap positions.')+'</div>';
+    h+='<div style="font-size:.68rem;color:#666c7a;margin-bottom:.5rem">'+(isSelecting?'<span style="color:#5dcaa5">&#10003; Player selected \u2014 click another slot to swap</span>':'Click a player to select, then click another slot to swap positions.')+'</div>';
     if(boss.id==='gothik'){
-      h+='<div style="font-size:.62rem;color:#4a6090;margin-bottom:.4rem;text-align:center">Odd groups (1,3,5,7) = Undead Side (left) &middot; Even groups (2,4,6,8) = Living Side (right)</div>';
+      h+='<div style="font-size:.62rem;color:#666c7a;margin-bottom:.4rem;text-align:center">Odd groups (1,3,5,7) = Undead Side (left) &middot; Even groups (2,4,6,8) = Living Side (right)</div>';
     }
     if(boss.id==='sapphiron'){
-      h+='<div style="font-size:.62rem;color:#4a6090;margin-bottom:.4rem;text-align:center">Odd groups (1,3,5,7) on the left &middot; Even groups (2,4,6,8) on the right</div>';
+      h+='<div style="font-size:.62rem;color:#666c7a;margin-bottom:.4rem;text-align:center">Odd groups (1,3,5,7) on the left &middot; Even groups (2,4,6,8) on the right</div>';
     }
     /* Display order: Sapphiron and Gothik both store groups pre-interleaved
        (odd,even,odd,even...) so natural index order already alternates correctly
@@ -1461,23 +1460,23 @@ function renderBossTab(boss){
       var gi4=displayOrder[gOrderIdx];
       var grp4=bg[gi4];
       var slotCount4=grp4.slots.length;
-      h+='<div style="background:#0d1020;border:1px solid #2a3050;border-radius:5px;overflow:hidden">';
+      h+='<div style="background:#0c0e13;border:1px solid #262a36;border-radius:5px;overflow:hidden">';
       var gLabel4=(boss.customGroupLabels&&boss.customGroupLabels[gi4])?boss.customGroupLabels[gi4]:('Group '+(gi4+1));
-      h+='<div style="background:#131726;padding:3px 7px;font-family:Cinzel,serif;font-size:.65rem;color:#7ab0ff;border-bottom:1px solid #2a3050">'+he(gLabel4)+'</div>';
+      h+='<div style="background:#15171e;padding:3px 7px;font-family:Inter,sans-serif;font-size:.65rem;color:#9fc4f4;border-bottom:1px solid #262a36">'+he(gLabel4)+'</div>';
       for(var si4=0;si4<slotCount4;si4++){
         var sp=grp4.slots[si4].p;
         var isSelected=_goActiveBid===boss.id&&_goActiveGi===gi4&&_goActiveSi===si4;
         var canBeTarget=isSelecting&&!isSelected;
         if(sp){
           var sc=cd(sp.cls);
-          var slotBorder=isSelected?'border:2px solid #60cc80;':canBeTarget?'border:2px solid #3a6090;':'';
+          var slotBorder=isSelected?'border:2px solid #5dcaa5;':canBeTarget?'border:2px solid #3a6090;':'';
           h+='<div style="display:flex;align-items:center;gap:4px;padding:3px 6px;background:'+sc.bg+';border-bottom:1px solid #1a2040;cursor:pointer;'+slotBorder+'" data-a="bgSlotClick" data-bid="'+boss.id+'" data-gi="'+gi4+'" data-si="'+si4+'">';
           h+=ihtml(sp.cls,14,sp.role);
-          h+='<span style="font-size:.82rem;font-weight:700;color:'+(isSelected?'#60cc80':'#f8f8f8')+';flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+he(sp.name)+'</span>';
+          h+='<span style="font-size:.82rem;font-weight:700;color:'+(isSelected?'#5dcaa5':'#f8f8f8')+';flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+he(sp.name)+'</span>';
           h+='<span style="font-size:.55rem;color:rgba(248,248,248,0.5)">'+he(sp.spec||'')+'</span>';
           h+='</div>';
         } else {
-          var emptyBorder=canBeTarget?'border:1.5px dashed #60cc80;color:#60cc80;':'border:1px dashed #2a3050;color:#3a5080;';
+          var emptyBorder=canBeTarget?'border:1.5px dashed #5dcaa5;color:#5dcaa5;':'border:1px dashed #262a36;color:#525a6a;';
           h+='<div style="padding:3px 6px;font-size:.65rem;font-style:italic;border-bottom:1px solid #1a2040;cursor:pointer;min-height:24px;'+emptyBorder+'" data-a="bgSlotClick" data-bid="'+boss.id+'" data-gi="'+gi4+'" data-si="'+si4+'">'+(canBeTarget?'&#8613; move here':'empty')+'</div>';
         }
       }
@@ -1486,7 +1485,7 @@ function renderBossTab(boss){
     h+='</div>';
     /* Boss MRT export */
     h+='<div style="margin-top:.6rem">';
-    h+='<div style="font-size:.68rem;color:#4a6090;margin-bottom:.4rem">MRT export using this group setup:</div>';
+    h+='<div style="font-size:.68rem;color:#666c7a;margin-bottom:.4rem">MRT export using this group setup:</div>';
     h+='<div style="display:flex;gap:5px;flex-wrap:wrap">';
     h+='<button class="btn bsm mrt-boss-btn" data-bid="'+boss.id+'" data-realm="PyrewoodVillage" style="font-size:.68rem;padding:3px 10px">Copy \u2014 Pyrewood</button>';
     h+='<button class="btn bsm mrt-boss-btn" data-bid="'+boss.id+'" data-realm="NethergardeKeep" style="font-size:.68rem;padding:3px 10px">Copy \u2014 Nethergarde</button>';
@@ -1503,7 +1502,7 @@ function renderBossTab(boss){
   h+='<div class="prev-row"><span class="prev-lbl">Preview</span><button class="btn bsm" data-a="copyBoss" data-bid="'+boss.id+'">Copy</button></div>';
   h+='<div class="expbox" id="bossExpBox_'+boss.id+'">'+he(prevText)+'</div>';
 
-  h+='<div style="font-family:Cinzel,serif;font-size:.62rem;color:#7ab0ff;text-transform:uppercase;letter-spacing:.06em;margin:.4rem 0 .3rem">Extra notes</div>';
+  h+='<div style="font-family:Inter,sans-serif;font-size:.62rem;color:#9fc4f4;text-transform:uppercase;letter-spacing:.06em;margin:.4rem 0 .3rem">Extra notes</div>';
   h+='<textarea style="height:50px" data-a="bossnote" data-bid="'+boss.id+'" placeholder="Add raid-specific notes...">'+he(bd.notes||'')+'</textarea>';
   return h;
 }
@@ -2400,66 +2399,66 @@ function renderViewMode(data){
 
   var css=''
     +'*{box-sizing:border-box;margin:0;padding:0;}'
-    +'body{background:#0a0d18;color:#e0d8f8;font-family:"Crimson Pro",Georgia,serif;font-size:15px;padding:1.4rem 1.6rem;max-width:1100px;margin:0 auto;}'
-    +'h1{font-family:"Cinzel",serif;font-size:1.5rem;color:#7ab0ff;text-align:center;margin-bottom:.15rem;letter-spacing:.07em;font-weight:700;}'
-    +'.sub{text-align:center;color:#3a5080;font-size:.72rem;margin-bottom:.25rem;font-family:"Cinzel",serif;letter-spacing:.1em;}'
-    +'.ver{text-align:center;font-size:.58rem;color:#1e2a4a;font-family:"Cinzel",serif;letter-spacing:.12em;margin-bottom:1.2rem;}'
-    +'.comp-bar{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;background:#0d1020;border:1px solid #1a2240;border-radius:8px;padding:.6rem 1rem;margin-bottom:1.2rem;}'
+    +'body{background:#0c0e13;color:#e4e6ea;font-family:"Inter",sans-serif;font-size:15px;padding:1.4rem 1.6rem;max-width:1100px;margin:0 auto;}'
+    +'h1{font-family:"Inter",sans-serif;font-size:1.5rem;color:#ffffff;text-align:center;margin-bottom:.15rem;letter-spacing:-.01em;font-weight:700;}'
+    +'.sub{text-align:center;color:#666c7a;font-size:.74rem;margin-bottom:.25rem;font-family:"Inter",sans-serif;letter-spacing:.02em;}'
+    +'.ver{text-align:center;font-size:.6rem;color:#3a3e4a;font-family:"Inter",sans-serif;letter-spacing:.04em;margin-bottom:1.2rem;}'
+    +'.comp-bar{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;background:#15171e;border:1px solid #262a36;border-radius:10px;padding:.6rem 1rem;margin-bottom:1.2rem;}'
     +'.comp-pill{display:flex;align-items:center;gap:5px;border-radius:20px;padding:3px 10px 3px 6px;}'
     +'.comp-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}'
-    +'.comp-count{font-family:"Cinzel",serif;font-size:.78rem;font-weight:700;}'
-    +'.comp-cls{font-family:"Cinzel",serif;font-size:.65rem;opacity:.7;}'
-    +'.section{background:#131726;border:1px solid #2a3050;border-radius:8px;padding:.9rem 1.1rem;margin-bottom:1.1rem;}'
-    +'.sh{font-family:"Cinzel",serif;font-size:.85rem;color:#7ab0ff;margin-bottom:.7rem;border-bottom:1px solid #2a3050;padding-bottom:.4rem;letter-spacing:.07em;}'
+    +'.comp-count{font-family:"Inter",sans-serif;font-size:.78rem;font-weight:700;}'
+    +'.comp-cls{font-family:"Inter",sans-serif;font-size:.66rem;opacity:.75;}'
+    +'.section{background:#15171e;border:1px solid #262a36;border-radius:10px;padding:.9rem 1.1rem;margin-bottom:1.1rem;}'
+    +'.sh{font-family:"Inter",sans-serif;font-size:.78rem;font-weight:700;color:#8890a0;margin-bottom:.7rem;border-bottom:1px solid #262a36;padding-bottom:.4rem;letter-spacing:.04em;text-transform:uppercase;}'
     +'.ggrid{display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem;}'
-    +'.gc{background:#0f1322;border:1px solid #2a3050;border-radius:6px;overflow:hidden;}'
-    +'.gh{background:#0d1020;padding:4px 9px;font-family:"Cinzel",serif;font-size:.7rem;color:#7ab0ff;border-bottom:1px solid #2a3050;}'
+    +'.gc{background:#0c0e13;border:1px solid #262a36;border-radius:8px;overflow:hidden;}'
+    +'.gh{background:#15171e;padding:4px 9px;font-family:"Inter",sans-serif;font-size:.7rem;font-weight:700;color:#a8b0c0;border-bottom:1px solid #262a36;}'
     +'.gs{padding:5px 7px;}'
-    +'.sf{border-radius:4px;margin-bottom:3px;overflow:hidden;}'
+    +'.sf{border-radius:5px;margin-bottom:3px;overflow:hidden;}'
     +'.sb{padding:3px 7px;display:flex;align-items:center;gap:5px;}'
     +'.np-name{font-size:.88rem;font-weight:700;color:#f8f8f8;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}'
     +'.np-spec{font-size:.55rem;color:rgba(248,248,248,.45);white-space:nowrap;}'
     /* Boss section */
     +'.boss-sec{margin-bottom:1.5rem;}'
-    +'.boss-divider{height:1px;background:linear-gradient(to right,transparent,#2a3a6a 30%,#2a3a6a 70%,transparent);margin:1.3rem 0 1rem;}'
+    +'.boss-divider{height:1px;background:linear-gradient(to right,transparent,#262a36 30%,#262a36 70%,transparent);margin:1.3rem 0 1rem;}'
     +'.boss-title-row{display:flex;align-items:center;gap:10px;margin-bottom:.85rem;}'
-    +'.boss-title-bar{width:4px;border-radius:2px;background:#7ab0ff;flex-shrink:0;align-self:stretch;}'
-    +'.boss-name{font-family:"Cinzel",serif;font-size:1rem;font-weight:700;color:#f8f8f8;letter-spacing:.05em;}'
+    +'.boss-title-bar{width:4px;border-radius:2px;background:#378ade;flex-shrink:0;align-self:stretch;}'
+    +'.boss-name{font-family:"Inter",sans-serif;font-size:1rem;font-weight:700;color:#f8f8f8;letter-spacing:-.01em;}'
     +'.boss-marks{display:flex;gap:4px;margin-left:auto;}'
     +'.boss-mark-sym{font-size:1.1rem;opacity:.8;}'
     /* Mark cards */
     +'.mark-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:7px;margin-bottom:.6rem;}'
-    +'.mark-card{border-radius:7px;overflow:hidden;position:relative;}'
-    +'.mark-card-wm{position:absolute;top:4px;right:8px;font-size:2rem;opacity:.12;line-height:1;pointer-events:none;}'
-    +'.mark-card-hdr{padding:5px 9px 4px;font-family:"Cinzel",serif;font-size:.6rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.05);}'
+    +'.mark-card{border-radius:8px;overflow:hidden;position:relative;border:1px solid #262a36;}'
+    +'.mark-card-wm{position:absolute;top:4px;right:8px;font-size:2rem;opacity:.1;line-height:1;pointer-events:none;}'
+    +'.mark-card-hdr{padding:5px 9px 4px;font-family:"Inter",sans-serif;font-size:.6rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.05);}'
     +'.mark-card-body{padding:5px 8px 7px;display:flex;flex-direction:column;gap:3px;}'
-    +'.mark-np{display:flex;align-items:center;gap:5px;border-radius:4px;padding:3px 7px;overflow:hidden;}'
-    +'.mark-np-label{font-size:.52rem;font-family:"Cinzel",serif;opacity:.6;white-space:nowrap;margin-left:auto;}'
+    +'.mark-np{display:flex;align-items:center;gap:5px;border-radius:5px;padding:3px 7px;overflow:hidden;}'
+    +'.mark-np-label{font-size:.52rem;font-family:"Inter",sans-serif;opacity:.6;white-space:nowrap;margin-left:auto;}'
     +'.mark-np-name{font-size:.85rem;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;}'
     /* Healer chips */
     +'.healer-group{margin-bottom:.55rem;}'
-    +'.healer-group-lbl{font-family:"Cinzel",serif;font-size:.58rem;color:#60cc80;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.3rem;}'
+    +'.healer-group-lbl{font-family:"Inter",sans-serif;font-size:.6rem;font-weight:700;color:#5dcaa5;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.3rem;}'
     +'.healer-chips{display:flex;flex-wrap:wrap;gap:4px;}'
-    +'.healer-chip{display:inline-flex;align-items:center;gap:4px;border-radius:4px;padding:3px 8px;}'
+    +'.healer-chip{display:inline-flex;align-items:center;gap:4px;border-radius:5px;padding:3px 8px;}'
     /* Trash */
     +'.trash-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:6px;margin-bottom:.5rem;}'
-    +'.trash-card{border-radius:6px;overflow:hidden;}'
-    +'.trash-card-hdr{padding:4px 8px;font-family:"Cinzel",serif;font-size:.62rem;font-weight:600;border-bottom:1px solid rgba(255,255,255,.06);}'
+    +'.trash-card{border-radius:7px;overflow:hidden;border:1px solid #262a36;}'
+    +'.trash-card-hdr{padding:4px 8px;font-family:"Inter",sans-serif;font-size:.62rem;font-weight:700;border-bottom:1px solid rgba(255,255,255,.06);}'
     +'.trash-card-body{padding:5px 7px;display:flex;flex-direction:column;gap:3px;}'
-    +'.trash-lbl{font-size:.52rem;font-family:"Cinzel",serif;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.08em;margin-bottom:1px;}'
+    +'.trash-lbl{font-size:.54rem;font-family:"Inter",sans-serif;font-weight:600;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.05em;margin-bottom:1px;}'
     /* Group setup */
     +'.grp-grid{display:grid;gap:5px;}'
-    +'.grp-card{background:#0d1020;border:1px solid #2a3050;border-radius:5px;overflow:hidden;}'
-    +'.grp-hdr{background:#131726;padding:2px 7px;font-family:"Cinzel",serif;font-size:.62rem;color:#7ab0ff;border-bottom:1px solid #2a3050;}'
-    +'.grp-slot{display:flex;align-items:center;gap:3px;padding:2px 6px;border-bottom:1px solid #1a2040;}'
+    +'.grp-card{background:#0c0e13;border:1px solid #262a36;border-radius:6px;overflow:hidden;}'
+    +'.grp-hdr{background:#15171e;padding:2px 7px;font-family:"Inter",sans-serif;font-size:.62rem;font-weight:700;color:#a8b0c0;border-bottom:1px solid #262a36;}'
+    +'.grp-slot{display:flex;align-items:center;gap:3px;padding:2px 6px;border-bottom:1px solid #1c1f28;}'
     +'.grp-slot:last-child{border-bottom:none;}'
-    +'.note-box{font-size:.72rem;color:#60cc80;background:#0a1a12;border:1px solid #1a5a3a;border-radius:5px;padding:.4rem .65rem;margin:.4rem 0;line-height:1.6;}';
+    +'.note-box{font-size:.74rem;color:#5dcaa5;background:#0e1c18;border:1px solid #1a4a3a;border-radius:6px;padding:.4rem .65rem;margin:.4rem 0;line-height:1.6;}';
 
   var h='<!DOCTYPE html><html lang="en"><head>'
     +'<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
     +'<title>'+he(raidTitle)+' \u2014 Raid View</title>'
     +'<link rel="preconnect" href="https://fonts.googleapis.com">'
-    +'<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:wght@400;500&display=swap" rel="stylesheet">'
+    +'<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">'
     +'<style>'+css+'</style></head><body>';
 
   /* ── Page header ── */
@@ -2502,7 +2501,7 @@ function renderViewMode(data){
   if(benchedV.length){
     h+='<div class="section"><div class="sh">Bench</div><div style="display:flex;flex-wrap:wrap;gap:4px">';
     benchedV.forEach(function(p){
-      var c=p.cls?cd(p.cls):{bg:'#0a1a12',bd:'#1a5a3a'};
+      var c=p.cls?cd(p.cls):{bg:'#0e1c18',bd:'#1a4a3a'};
       h+='<div style="display:inline-flex;align-items:center;gap:4px;background:'+c.bg+';border:1.5px solid '+c.bd+';border-radius:4px;padding:3px 8px">'
         +(p.cls?ihtml(p.cls,13,p.role):'')
         +'<span style="font-size:.85rem;font-weight:700;color:#f8f8f8">'+he(p.name)+'</span>'
@@ -2519,7 +2518,7 @@ function renderViewMode(data){
       var tankP=trash[i]&&trash[i].tank?pmap[trash[i].tank]:null;
       var healP=trash[i]&&trash[i].healer?pmap[trash[i].healer]:null;
       if(!tankP&&!healP)return;
-      h+='<div class="trash-card" style="background:#0f1322;border:1px solid '+m.col+'30">';
+      h+='<div class="trash-card" style="background:#0c0e13;border:1px solid '+m.col+'30">';
       h+='<div class="trash-card-hdr" style="background:'+m.col+'18;color:'+m.col+'">'+vMS[i]+' '+m.name+'</div>';
       h+='<div class="trash-card-body">';
       if(tankP){var tc=cd(tankP.cls);h+='<div class="trash-lbl">Tank</div><div class="mark-np" style="background:'+tc.bg+';border:1px solid '+tc.bd+'">'+ihtml(tankP.cls,13,tankP.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(tankP.name)+'</span></div>';}
@@ -2529,7 +2528,7 @@ function renderViewMode(data){
     /* Extra marks */
     [[extraTrash.aq_t,extraTrash.aq_h,vMS[5],'#c060e0','Diamond'],[extraTrash.nx_t,extraTrash.nx_h,vMS[5],'#c060e0','Diamond']].forEach(function(ex){
       if(!ex[0]&&!ex[1])return;
-      h+='<div class="trash-card" style="background:#0f1322;border:1px solid '+ex[3]+'30">';
+      h+='<div class="trash-card" style="background:#0c0e13;border:1px solid '+ex[3]+'30">';
       h+='<div class="trash-card-hdr" style="background:'+ex[3]+'18;color:'+ex[3]+'">'+ex[2]+' '+ex[4]+'</div>';
       h+='<div class="trash-card-body">';
       if(ex[0]){var tc2=cd(ex[0].cls);h+='<div class="trash-lbl">Tank</div><div class="mark-np" style="background:'+tc2.bg+';border:1px solid '+tc2.bd+'">'+ihtml(ex[0].cls,13,ex[0].role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(ex[0].name)+'</span></div>';}
@@ -2539,8 +2538,8 @@ function renderViewMode(data){
     h+='</div>';
     if(pullerP){
       var pc2=cd(pullerP.cls);
-      h+='<div style="display:flex;align-items:center;gap:8px;margin-top:.5rem;padding:.4rem .7rem;background:#0d1020;border-radius:5px;border:1px solid #2a3050">';
-      h+='<span style="font-family:Cinzel,serif;font-size:.62rem;color:#4a6090;text-transform:uppercase;letter-spacing:.1em">Puller</span>';
+      h+='<div style="display:flex;align-items:center;gap:8px;margin-top:.5rem;padding:.4rem .7rem;background:#0c0e13;border-radius:5px;border:1px solid #262a36">';
+      h+='<span style="font-family:Inter,sans-serif;font-size:.62rem;color:#666c7a;text-transform:uppercase;letter-spacing:.1em">Puller</span>';
       h+='<div class="mark-np" style="background:'+pc2.bg+';border:1px solid '+pc2.bd+'">'+ihtml(pullerP.cls,13,pullerP.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(pullerP.name)+'</span></div>';
       h+='</div>';
     }
@@ -2591,8 +2590,8 @@ function renderViewMode(data){
       });
       if(!assignedSlots.length)return;
 
-      var segColor=seg.isSheepRow?'#8080e8':'#4a6090';
-      h+='<div style="font-family:Cinzel,serif;font-size:.58rem;color:'+segColor+';text-transform:uppercase;letter-spacing:.1em;margin-bottom:.35rem">'+he(seg.title)+'</div>';
+      var segColor=seg.isSheepRow?'#8080e8':'#666c7a';
+      h+='<div style="font-family:Inter,sans-serif;font-size:.58rem;color:'+segColor+';text-transform:uppercase;letter-spacing:.1em;margin-bottom:.35rem">'+he(seg.title)+'</div>';
       h+='<div class="mark-cards" style="margin-bottom:.65rem">';
 
       assignedSlots.forEach(function(sl){
@@ -2603,7 +2602,7 @@ function renderViewMode(data){
         if(healer)shownHealerKeys[sl.healerKey]=true;
 
         var pc=cd(p.cls);
-        h+='<div class="mark-card" style="background:#0f1322;border:1px solid '+mCol+'35">';
+        h+='<div class="mark-card" style="background:#0c0e13;border:1px solid '+mCol+'35">';
         h+='<div class="mark-card-wm" style="color:'+mCol+'">'+mSym+'</div>';
         h+='<div class="mark-card-hdr" style="background:'+mCol+'14;color:'+mCol+'">'+mSym+(mSym?' ':'')+he(sl.label)+'</div>';
         h+='<div class="mark-card-body">';
@@ -2644,7 +2643,7 @@ function renderViewMode(data){
         var numLabel='';
         if(boss.id==='loatheb'||boss.id==='kelthuzad'){
           var numMatch=sl.key.match(/(\d+)$/);
-          if(numMatch)numLabel='<span style="font-size:.62rem;color:rgba(248,248,248,.55);font-family:Cinzel,serif;margin-right:3px">['+numMatch[1]+']</span>';
+          if(numMatch)numLabel='<span style="font-size:.62rem;color:rgba(248,248,248,.55);font-family:Inter,sans-serif;margin-right:3px">['+numMatch[1]+']</span>';
         }
         h+='<div class="healer-chip" style="background:'+hc.bg+';border:1px solid '+hc.bd+'">';
         h+=numLabel;
@@ -2661,9 +2660,9 @@ function renderViewMode(data){
       var mxMt=bdata.mt&&pmap[bdata.mt]?pmap[bdata.mt]:null;
       if(mxMt){
         var mxc=cd(mxMt.cls);
-        h+='<div style="font-family:Cinzel,serif;font-size:.58rem;color:#4a6090;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.35rem">Tank</div>';
+        h+='<div style="font-family:Inter,sans-serif;font-size:.58rem;color:#666c7a;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.35rem">Tank</div>';
         h+='<div class="mark-cards" style="margin-bottom:.65rem">';
-        h+='<div class="mark-card" style="background:#0f1322;border:1px solid #f0f0f035">';
+        h+='<div class="mark-card" style="background:#0c0e13;border:1px solid #f0f0f035">';
         h+='<div class="mark-card-wm" style="color:#f0f0f0">\u{1F480}</div>';
         h+='<div class="mark-card-hdr" style="background:#f0f0f014;color:#f0f0f0">\u{1F480} Maexxna</div>';
         h+='<div class="mark-card-body"><div class="mark-np" style="background:'+mxc.bg+';border:1px solid '+mxc.bd+'">'+ihtml(mxMt.cls,14,mxMt.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(mxMt.name)+'</span></div></div></div>';
@@ -2675,9 +2674,9 @@ function renderViewMode(data){
         var d2=bdata[wg[2]]&&pmap[bdata[wg[2]]]?pmap[bdata[wg[2]]]:null;
         var dh=bdata[wg[3]]&&pmap[bdata[wg[3]]]?pmap[bdata[wg[3]]]:null;
         if(!d1&&!d2&&!dh)return;
-        h+='<div style="font-family:Cinzel,serif;font-size:.58rem;color:#5a7ab0;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.35rem">'+he(wg[0])+'</div>';
+        h+='<div style="font-family:Inter,sans-serif;font-size:.58rem;color:#5a7ab0;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.35rem">'+he(wg[0])+'</div>';
         h+='<div class="mark-cards" style="margin-bottom:.65rem">';
-        h+='<div class="mark-card" style="background:#0f1322;border:1px solid #5a7ab035">';
+        h+='<div class="mark-card" style="background:#0c0e13;border:1px solid #5a7ab035">';
         h+='<div class="mark-card-hdr" style="background:#5a7ab014;color:#5a7ab0">'+he(wg[0])+'</div>';
         h+='<div class="mark-card-body">';
         [d1,d2].forEach(function(dp){
@@ -2713,12 +2712,12 @@ function renderViewMode(data){
         var pwHealers=pg[2].map(function(k){return bdata[k]&&pmap[bdata[k]]?pmap[bdata[k]]:null;}).filter(Boolean);
         h+='<div>';
         if(pwTank||pwHealers.length){
-          h+='<div style="font-family:Cinzel,serif;font-size:.58rem;color:#4a6090;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.35rem">'+he(pg[0])+'</div>';
-          h+='<div class="mark-card" style="background:#0f1322;border:1px solid #5a7ab035">';
+          h+='<div style="font-family:Inter,sans-serif;font-size:.58rem;color:#666c7a;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.35rem">'+he(pg[0])+'</div>';
+          h+='<div class="mark-card" style="background:#0c0e13;border:1px solid #5a7ab035">';
           h+='<div class="mark-card-hdr" style="background:#5a7ab014;color:#5a7ab0">'+he(pg[0])+' Tank &amp; Healers</div>';
           h+='<div class="mark-card-body" style="display:flex;flex-direction:column;gap:4px">';
           if(pwTank){var pwtc=cd(pwTank.cls);h+='<div class="mark-np" style="background:'+pwtc.bg+';border:1px solid '+pwtc.bd+'">'+ihtml(pwTank.cls,14,pwTank.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(pwTank.name)+'</span><span class="mark-np-label">tank</span></div>';}
-          if(pwTank&&pwHealers.length)h+='<div style="height:1px;background:#2a3050;margin:2px 0"></div>';
+          if(pwTank&&pwHealers.length)h+='<div style="height:1px;background:#262a36;margin:2px 0"></div>';
           pwHealers.forEach(function(hp){var phc=cd(hp.cls);h+='<div class="mark-np" style="background:'+phc.bg+';border:1px solid '+phc.bd+'">'+ihtml(hp.cls,14,hp.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(hp.name)+'</span></div>';});
           h+='</div></div>';
         }
@@ -2731,9 +2730,9 @@ function renderViewMode(data){
     if(boss.id==='thaddius'){
       var thMt=bdata.mt&&pmap[bdata.mt]?pmap[bdata.mt]:null;
       if(thMt){
-        h+='<div style="font-family:Cinzel,serif;font-size:.58rem;color:#4a6090;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.35rem">Thaddius (P2)</div>';
+        h+='<div style="font-family:Inter,sans-serif;font-size:.58rem;color:#666c7a;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.35rem">Thaddius (P2)</div>';
         h+='<div class="mark-cards" style="margin-bottom:.65rem">';
-        h+='<div class="mark-card" style="background:#0f1322;border:1px solid #5a7ab035;width:100%;grid-column:1/-1">';
+        h+='<div class="mark-card" style="background:#0c0e13;border:1px solid #5a7ab035;width:100%;grid-column:1/-1">';
         h+='<div class="mark-card-hdr" style="background:#5a7ab014;color:#5a7ab0">Thaddius MT</div>';
         h+='<div class="mark-card-body" style="display:flex;flex-wrap:wrap;gap:5px">';
         var thmc=cd(thMt.cls);h+='<div class="mark-np" style="background:'+thmc.bg+';border:1px solid '+thmc.bd+'">'+ihtml(thMt.cls,14,thMt.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(thMt.name)+'</span><span class="mark-np-label">tank</span></div>';
@@ -2745,12 +2744,12 @@ function renderViewMode(data){
       var stHealers=['sh1','sh2'].map(function(k){return bdata[k]&&pmap[bdata[k]]?pmap[bdata[k]]:null;}).filter(Boolean);
       h+='<div>';
       if(stTanks.length||stHealers.length){
-        h+='<div style="font-family:Cinzel,serif;font-size:.58rem;color:#4a6090;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.35rem">Stalagg \u2014 Left</div>';
-        h+='<div class="mark-card" style="background:#0f1322;border:1px solid #5a7ab035">';
+        h+='<div style="font-family:Inter,sans-serif;font-size:.58rem;color:#666c7a;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.35rem">Stalagg \u2014 Left</div>';
+        h+='<div class="mark-card" style="background:#0c0e13;border:1px solid #5a7ab035">';
         h+='<div class="mark-card-hdr" style="background:#5a7ab014;color:#5a7ab0">Stalagg Tanks &amp; Healers</div>';
         h+='<div class="mark-card-body" style="display:flex;flex-direction:column;gap:4px">';
         stTanks.forEach(function(tp){var tc=cd(tp.cls);h+='<div class="mark-np" style="background:'+tc.bg+';border:1px solid '+tc.bd+'">'+ihtml(tp.cls,14,tp.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(tp.name)+'</span><span class="mark-np-label">tank</span></div>';});
-        if(stTanks.length&&stHealers.length)h+='<div style="height:1px;background:#2a3050;margin:2px 0"></div>';
+        if(stTanks.length&&stHealers.length)h+='<div style="height:1px;background:#262a36;margin:2px 0"></div>';
         stHealers.forEach(function(hp){var hc5=cd(hp.cls);h+='<div class="mark-np" style="background:'+hc5.bg+';border:1px solid '+hc5.bd+'">'+ihtml(hp.cls,14,hp.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(hp.name)+'</span></div>';});
         h+='</div></div>';
       }
@@ -2760,12 +2759,12 @@ function renderViewMode(data){
       var fgHealers=['fh1','fh2'].map(function(k){return bdata[k]&&pmap[bdata[k]]?pmap[bdata[k]]:null;}).filter(Boolean);
       h+='<div>';
       if(fgTanks.length||fgHealers.length){
-        h+='<div style="font-family:Cinzel,serif;font-size:.58rem;color:#4a6090;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.35rem">Feugen \u2014 Right</div>';
-        h+='<div class="mark-card" style="background:#0f1322;border:1px solid #5a7ab035">';
+        h+='<div style="font-family:Inter,sans-serif;font-size:.58rem;color:#666c7a;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.35rem">Feugen \u2014 Right</div>';
+        h+='<div class="mark-card" style="background:#0c0e13;border:1px solid #5a7ab035">';
         h+='<div class="mark-card-hdr" style="background:#5a7ab014;color:#5a7ab0">Feugen Tanks &amp; Healers</div>';
         h+='<div class="mark-card-body" style="display:flex;flex-direction:column;gap:4px">';
         fgTanks.forEach(function(tp){var tc=cd(tp.cls);h+='<div class="mark-np" style="background:'+tc.bg+';border:1px solid '+tc.bd+'">'+ihtml(tp.cls,14,tp.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(tp.name)+'</span><span class="mark-np-label">tank</span></div>';});
-        if(fgTanks.length&&fgHealers.length)h+='<div style="height:1px;background:#2a3050;margin:2px 0"></div>';
+        if(fgTanks.length&&fgHealers.length)h+='<div style="height:1px;background:#262a36;margin:2px 0"></div>';
         fgHealers.forEach(function(hp){var hc6=cd(hp.cls);h+='<div class="mark-np" style="background:'+hc6.bg+';border:1px solid '+hc6.bd+'">'+ihtml(hp.cls,14,hp.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(hp.name)+'</span></div>';});
         h+='</div></div>';
       }
@@ -2802,9 +2801,9 @@ function renderViewMode(data){
           var grp=ctGroups[gi]||[];
           var mc=vMCct[mIdx];
           var ms=vMSct[mIdx];
-          var h2='<div style="background:#0f1322;border:1px solid '+mc+'28;border-radius:6px;overflow:hidden;width:116px">';
+          var h2='<div style="background:#0c0e13;border:1px solid '+mc+'28;border-radius:6px;overflow:hidden;width:116px">';
           h2+='<div style="background:'+mc+'18;padding:3px 7px;display:flex;align-items:center;gap:4px;border-bottom:1px solid '+mc+'25">';
-          h2+='<span style="font-family:Cinzel,serif;font-size:.95rem;font-weight:700;color:'+mc+';line-height:1">'+(gi+1)+'</span>';
+          h2+='<span style="font-family:Inter,sans-serif;font-size:.95rem;font-weight:700;color:'+mc+';line-height:1">'+(gi+1)+'</span>';
           h2+='<span style="font-size:.75rem;color:'+mc+';opacity:.65">'+ms+'</span>';
           h2+='</div>';
           for(var si=0;si<5;si++)h2+=ctNp(grp[si]||null);
@@ -2813,29 +2812,29 @@ function renderViewMode(data){
         }
 
         h+='<div style="margin-top:.8rem">';
-        h+='<div style="font-family:Cinzel,serif;font-size:.58rem;color:#7ab0ff;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.6rem">Group Setup — Phase 1 Positions</div>';
+        h+='<div style="font-family:Inter,sans-serif;font-size:.58rem;color:#9fc4f4;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.6rem">Group Setup — Phase 1 Positions</div>';
 
         /* Wrap everything in a relative container matching the SVG */
-        h+='<div style="position:relative;width:680px;height:740px;font-family:Crimson Pro,Georgia,serif">';
+        h+='<div style="position:relative;width:680px;height:740px;font-family:Inter,sans-serif">';
 
         /* SVG: shield + rings + marks + guide lines */
         h+='<svg width="680" height="740" style="position:absolute;top:0;left:0" viewBox="0 0 680 740">';
 
         /* Shield */
-        h+='<path d="M340,18 L600,100 L612,340 Q605,490 470,585 Q420,615 380,632 L380,740 L300,740 L300,632 Q260,615 210,585 Q75,490 68,340 L80,100 Z" fill="#0d1228" stroke="#2a3a6a" stroke-width="2"/>';
+        h+='<path d="M340,18 L600,100 L612,340 Q605,490 470,585 Q420,615 380,632 L380,740 L300,740 L300,632 Q260,615 210,585 Q75,490 68,340 L80,100 Z" fill="#0c0e13" stroke="#378ade" stroke-width="2"/>';
 
         /* Staircase — straight parallel lines, no choke */
         h+='<g fill="none" stroke="#243858" stroke-width="1">';
         for(var si2=0;si2<6;si2++)h+='<line x1="300" y1="'+(640+si2*15)+'" x2="380" y2="'+(640+si2*15)+'"/>';
         h+='</g>';
-        h+='<text x="340" y="734" text-anchor="middle" font-family="Cinzel,serif" font-size="7.5" fill="#3a5070" letter-spacing="3">ENTRANCE</text>';
+        h+='<text x="340" y="734" text-anchor="middle" font-family="Inter,sans-serif" font-size="7.5" fill="#3a5070" letter-spacing="3">ENTRANCE</text>';
 
         /* Rings */
         h+='<circle cx="340" cy="320" r="175" fill="none" stroke="#1e2a50" stroke-width="1" stroke-dasharray="2,5"/>';
         h+='<circle cx="340" cy="320" r="105" fill="#0c0a22" stroke="#4a2880" stroke-width="1.5"/>';
         h+='<circle cx="340" cy="320" r="50" fill="#180a38" stroke="#7040c0" stroke-width="2"/>';
-        h+='<text x="340" y="316" text-anchor="middle" font-family="Cinzel,serif" font-size="8" fill="#a070d0">C\'THUN</text>';
-        h+='<text x="340" y="328" text-anchor="middle" font-family="Cinzel,serif" font-size="7" fill="#6040a0">STOMACH</text>';
+        h+='<text x="340" y="316" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#a070d0">C\'THUN</text>';
+        h+='<text x="340" y="328" text-anchor="middle" font-family="Inter,sans-serif" font-size="7" fill="#6040a0">STOMACH</text>';
 
         /* Marks: equal 45° at r=105, cx=340 cy=320
            Skull=337.5°→(300,223), Cross=22.5°→(380,223),
@@ -2900,28 +2899,28 @@ function renderViewMode(data){
         function fhCorner(name,markSym,markCol,t1k,t2k,top,leftOrRight,sideVal,markOnTop){
           var t1=fhP(t1k),t2=fhP(t2k);
           var posStyle=(leftOrRight==='left'?'left:8px;':'right:8px;')+(top?'top:8px;':'bottom:8px;');
-          var c='<div style="position:absolute;'+posStyle+'width:200px;background:#0f1322;border:1px solid #2a3050;border-radius:6px;overflow:hidden">';
-          var hdr='<div style="font-family:Cinzel,serif;font-size:.74rem;font-weight:700;color:#f8f8f8;background:#1a1d28;padding:4px 8px;display:flex;justify-content:space-between;align-items:center"><span>'+he(name)+'</span><span style="font-size:.85rem;color:'+markCol+'">'+markSym+'</span></div>';
+          var c='<div style="position:absolute;'+posStyle+'width:200px;background:#0c0e13;border:1px solid #262a36;border-radius:6px;overflow:hidden">';
+          var hdr='<div style="font-family:Inter,sans-serif;font-size:.74rem;font-weight:700;color:#f8f8f8;background:#1a1d28;padding:4px 8px;display:flex;justify-content:space-between;align-items:center"><span>'+he(name)+'</span><span style="font-size:.85rem;color:'+markCol+'">'+markSym+'</span></div>';
           if(markOnTop)c+=hdr;
-          c+='<div style="display:flex;align-items:center;gap:5px;padding:3px 7px;border-top:1px solid #1a2030"><span style="font-size:.55rem;font-family:Cinzel,serif;color:#4a6090;width:24px;flex-shrink:0">'+(t1?'pull':'')+'</span><div style="flex:1;min-width:0">'+(t1?fhNp(t1):'<span style="font-size:.65rem;color:#3a5080;font-style:italic">empty</span>')+'</div></div>';
-          c+='<div style="display:flex;align-items:center;gap:5px;padding:3px 7px;border-top:1px solid #1a2030"><span style="font-size:.55rem;width:24px;flex-shrink:0"></span><div style="flex:1;min-width:0">'+(t2?fhNp(t2):'<span style="font-size:.65rem;color:#3a5080;font-style:italic">empty</span>')+'</div></div>';
+          c+='<div style="display:flex;align-items:center;gap:5px;padding:3px 7px;border-top:1px solid #1a2030"><span style="font-size:.55rem;font-family:Inter,sans-serif;color:#666c7a;width:24px;flex-shrink:0">'+(t1?'pull':'')+'</span><div style="flex:1;min-width:0">'+(t1?fhNp(t1):'<span style="font-size:.65rem;color:#525a6a;font-style:italic">empty</span>')+'</div></div>';
+          c+='<div style="display:flex;align-items:center;gap:5px;padding:3px 7px;border-top:1px solid #1a2030"><span style="font-size:.55rem;width:24px;flex-shrink:0"></span><div style="flex:1;min-width:0">'+(t2?fhNp(t2):'<span style="font-size:.65rem;color:#525a6a;font-style:italic">empty</span>')+'</div></div>';
           if(!markOnTop)c+=hdr;
           c+='</div>';
           return c;
         }
         function fhHealBlock(left,top,h1k,h2k,h3k){
-          var c='<div style="position:absolute;top:'+top+'px;left:'+left+'px;width:184px;background:#15182a;border:1px solid #2a3050;border-radius:6px;overflow:hidden">';
+          var c='<div style="position:absolute;top:'+top+'px;left:'+left+'px;width:184px;background:#15182a;border:1px solid #262a36;border-radius:6px;overflow:hidden">';
           [['mark 1',h1k],['mark 2',h2k],['mark 3',h3k]].forEach(function(row,idx){
             var p=fhP(row[1]);
             c+='<div style="display:flex;align-items:center'+(idx<2?';border-bottom:1px solid #1a2030':'')+'">';
-            c+='<div style="width:48px;font-size:.58rem;font-family:Cinzel,serif;color:#7090c0;text-align:center;background:#0d1020;padding:4px 0;border-right:1px solid #1a2030;flex-shrink:0;align-self:stretch;display:flex;align-items:center;justify-content:center">'+row[0]+'</div>';
+            c+='<div style="width:48px;font-size:.58rem;font-family:Inter,sans-serif;color:#7090c0;text-align:center;background:#0c0e13;padding:4px 0;border-right:1px solid #1a2030;flex-shrink:0;align-self:stretch;display:flex;align-items:center;justify-content:center">'+row[0]+'</div>';
             if(p){
               var hc=cd(p.cls);
               c+='<div style="flex:1;display:flex;align-items:center;gap:6px;padding:4px 8px;background:'+hc.bg+';overflow:hidden;min-width:0">'
                 +ihtml(p.cls,14,p.role)
                 +'<span style="font-size:.8rem;font-weight:700;color:#f8f8f8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+he(p.name)+'</span></div>';
             } else {
-              c+='<div style="flex:1;padding:4px 8px;font-size:.74rem;color:#3a5080;font-style:italic">empty</div>';
+              c+='<div style="flex:1;padding:4px 8px;font-size:.74rem;color:#525a6a;font-style:italic">empty</div>';
             }
             c+='</div>';
           });
@@ -2930,8 +2929,8 @@ function renderViewMode(data){
         }
 
         h+='<div style="margin-top:.8rem">';
-        h+='<div style="font-family:Cinzel,serif;font-size:.58rem;color:#7ab0ff;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.6rem">Room Layout — Tanks &amp; Healer Rotation</div>';
-        h+='<div style="position:relative;width:840px;height:560px;background:#15171f;border:1px solid #2a3050;border-radius:8px;font-family:Crimson Pro,Georgia,serif">';
+        h+='<div style="font-family:Inter,sans-serif;font-size:.58rem;color:#9fc4f4;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.6rem">Room Layout — Tanks &amp; Healer Rotation</div>';
+        h+='<div style="position:relative;width:840px;height:560px;background:#15171f;border:1px solid #262a36;border-radius:8px;font-family:Inter,sans-serif">';
 
         /*
           Wider layout: room 840x560. Corners 200px wide at x=8 and x=632 (840-200-8).
@@ -2967,20 +2966,20 @@ function renderViewMode(data){
         h+=fhHealBlock(440,282,'moh1','moh2','moh3');
         h+=fhHealBlock(216,282,'thh1','thh2','thh3');
 
-        h+='<div style="position:absolute;bottom:6px;left:0;right:0;text-align:center;font-family:Cinzel,serif;font-size:.7rem;color:#e08020;letter-spacing:.15em;font-weight:700">ENTRANCE</div>';
+        h+='<div style="position:absolute;bottom:6px;left:0;right:0;text-align:center;font-family:Inter,sans-serif;font-size:.7rem;color:#e08020;letter-spacing:.15em;font-weight:700">ENTRANCE</div>';
         h+='</div>'; /* end relative room */
 
         /* Three groups below: Star / Diamond / Triangle */
         h+='<div style="margin-top:.7rem">';
-        h+='<div style="font-family:Cinzel,serif;font-size:.58rem;color:#7ab0ff;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.4rem">Raid Sub-Groups</div>';
+        h+='<div style="font-family:Inter,sans-serif;font-size:.58rem;color:#9fc4f4;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.4rem">Raid Sub-Groups</div>';
         h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">';
         var grpMarkInfo=[['Star Group','★','#f0d030'],['Diamond Group','◆','#c060e0'],['Triangle Group','▲','#30b050']];
         for(var hgi=0;hgi<3;hgi++){
           var hgMembers=bl[hgi]||[];
-          h+='<div style="background:#0f1322;border:1px solid '+grpMarkInfo[hgi][2]+'30;border-radius:6px;overflow:hidden">';
+          h+='<div style="background:#0c0e13;border:1px solid '+grpMarkInfo[hgi][2]+'30;border-radius:6px;overflow:hidden">';
           h+='<div style="background:'+grpMarkInfo[hgi][2]+'18;padding:5px 9px;display:flex;align-items:center;gap:6px;border-bottom:1px solid '+grpMarkInfo[hgi][2]+'25">';
           h+='<span style="font-size:1rem;color:'+grpMarkInfo[hgi][2]+'">'+grpMarkInfo[hgi][1]+'</span>';
-          h+='<span style="font-family:Cinzel,serif;font-size:.74rem;font-weight:700;color:'+grpMarkInfo[hgi][2]+'">'+grpMarkInfo[hgi][0]+'</span>';
+          h+='<span style="font-family:Inter,sans-serif;font-size:.74rem;font-weight:700;color:'+grpMarkInfo[hgi][2]+'">'+grpMarkInfo[hgi][0]+'</span>';
           h+='</div>';
           h+='<div style="padding:4px 0">';
           hgMembers.forEach(function(bp){
@@ -3000,21 +2999,21 @@ function renderViewMode(data){
         var gthLivingTanks=['lt1','lt2','lt3'].map(function(k){return bdata[k]&&pmap[bdata[k]]?pmap[bdata[k]]:null;}).filter(Boolean);
 
         h+='<div style="margin-top:.7rem">';
-        h+='<div style="font-family:Cinzel,serif;font-size:.58rem;color:#7ab0ff;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.4rem">Group Setup \u2014 Odd = Undead Side, Even = Living Side</div>';
+        h+='<div style="font-family:Inter,sans-serif;font-size:.58rem;color:#9fc4f4;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.4rem">Group Setup \u2014 Odd = Undead Side, Even = Living Side</div>';
 
         /* Tank header row: Undead tanks (left) / Living tanks (right) */
         h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:.5rem">';
         h+='<div style="background:#1a0a2a;border:1px solid #4a2880;border-radius:6px;padding:5px 8px">';
-        h+='<div style="font-family:Cinzel,serif;font-size:.6rem;color:#a070d0;margin-bottom:4px">Undead Side Tanks</div>';
+        h+='<div style="font-family:Inter,sans-serif;font-size:.6rem;color:#a070d0;margin-bottom:4px">Undead Side Tanks</div>';
         if(gthUndeadTanks.length){
           gthUndeadTanks.forEach(function(tp){var tc=cd(tp.cls);h+='<div style="display:flex;align-items:center;gap:5px;background:'+tc.bg+';border-radius:3px;padding:3px 6px;margin-bottom:3px">'+ihtml(tp.cls,13,tp.role)+'<span style="font-size:.8rem;font-weight:700;color:#f8f8f8">'+he(tp.name)+'</span></div>';});
-        } else { h+='<div style="font-size:.68rem;color:#3a5080;font-style:italic">No tanks assigned</div>'; }
+        } else { h+='<div style="font-size:.68rem;color:#525a6a;font-style:italic">No tanks assigned</div>'; }
         h+='</div>';
         h+='<div style="background:#0a1a18;border:1px solid #0f6e56;border-radius:6px;padding:5px 8px">';
-        h+='<div style="font-family:Cinzel,serif;font-size:.6rem;color:#3da888;margin-bottom:4px">Living Side Tanks</div>';
+        h+='<div style="font-family:Inter,sans-serif;font-size:.6rem;color:#3da888;margin-bottom:4px">Living Side Tanks</div>';
         if(gthLivingTanks.length){
           gthLivingTanks.forEach(function(tp){var tc=cd(tp.cls);h+='<div style="display:flex;align-items:center;gap:5px;background:'+tc.bg+';border-radius:3px;padding:3px 6px;margin-bottom:3px">'+ihtml(tp.cls,13,tp.role)+'<span style="font-size:.8rem;font-weight:700;color:#f8f8f8">'+he(tp.name)+'</span></div>';});
-        } else { h+='<div style="font-size:.68rem;color:#3a5080;font-style:italic">No tanks assigned</div>'; }
+        } else { h+='<div style="font-size:.68rem;color:#525a6a;font-style:italic">No tanks assigned</div>'; }
         h+='</div></div>';
 
         /* 8 group cards, odd left / even right (already pre-interleaved in bl) —
@@ -3027,7 +3026,7 @@ function renderViewMode(data){
           h+='<div class="grp-card" style="border:1px solid '+gthBorderCol+'"><div class="grp-hdr">'+he(gthLabel)+'</div>';
           (bl[gthGi]||[]).forEach(function(bp){
             if(bp){var bc=cd(bp.cls);h+='<div class="grp-slot" style="background:'+bc.bg+'">'+ihtml(bp.cls,12,bp.role)+'<span style="font-size:.78rem;font-weight:700;color:#f8f8f8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+he(bp.name)+'</span></div>';}
-            else h+='<div class="grp-slot"><span style="font-size:.6rem;color:#3a5080">\u2014</span></div>';
+            else h+='<div class="grp-slot"><span style="font-size:.6rem;color:#525a6a">\u2014</span></div>';
           });
           h+='</div>';
         }
@@ -3047,20 +3046,20 @@ function renderViewMode(data){
         var WAVE_LABELS_SH={sh1:'Wave 8',sh2:'Wave 11',sh3:'Wave 13',sh4:'Wave 16',sh5:'Wave 18'};
         var WAVE_LABELS_SP={sp1:'Wave 8',sp2:'Wave 10',sp3:'Wave 12',sp4:'Wave 14',sp5:'Wave 18'};
         if(gthShackle.length){
-          h+='<div style="margin-top:.6rem"><div style="font-family:Cinzel,serif;font-size:.58rem;color:#e8e8e8;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.35rem">Shackle \u2014 Undead Side (Priest)</div>';
+          h+='<div style="margin-top:.6rem"><div style="font-family:Inter,sans-serif;font-size:.58rem;color:#e8e8e8;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.35rem">Shackle \u2014 Undead Side (Priest)</div>';
           h+='<div class="mark-cards">';
           gthShackle.forEach(function(s){
             var sc2=cd(s.p.cls);
-            h+='<div class="mark-card" style="background:#0f1322;border:1px solid #c0c0c035"><div class="mark-card-hdr" style="background:#c0c0c014;color:#c0c0c0">'+he(WAVE_LABELS_SH[s.key])+'</div><div class="mark-card-body"><div class="mark-np" style="background:'+sc2.bg+';border:1px solid '+sc2.bd+'">'+ihtml(s.p.cls,14,s.p.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(s.p.name)+'</span></div></div></div>';
+            h+='<div class="mark-card" style="background:#0c0e13;border:1px solid #c0c0c035"><div class="mark-card-hdr" style="background:#c0c0c014;color:#c0c0c0">'+he(WAVE_LABELS_SH[s.key])+'</div><div class="mark-card-body"><div class="mark-np" style="background:'+sc2.bg+';border:1px solid '+sc2.bd+'">'+ihtml(s.p.cls,14,s.p.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(s.p.name)+'</span></div></div></div>';
           });
           h+='</div></div>';
         }
         if(gthSheep.length){
-          h+='<div style="margin-top:.6rem"><div style="font-family:Cinzel,serif;font-size:.58rem;color:#8080e8;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.35rem">Sheep \u2014 Living Side (Mage)</div>';
+          h+='<div style="margin-top:.6rem"><div style="font-family:Inter,sans-serif;font-size:.58rem;color:#8080e8;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.35rem">Sheep \u2014 Living Side (Mage)</div>';
           h+='<div class="mark-cards">';
           gthSheep.forEach(function(s){
             var sc3=cd(s.p.cls);
-            h+='<div class="mark-card" style="background:#0f1322;border:1px solid #8080e835"><div class="mark-card-hdr" style="background:#8080e814;color:#8080e8">'+he(WAVE_LABELS_SP[s.key])+'</div><div class="mark-card-body"><div class="mark-np" style="background:'+sc3.bg+';border:1px solid '+sc3.bd+'">'+ihtml(s.p.cls,14,s.p.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(s.p.name)+'</span></div></div></div>';
+            h+='<div class="mark-card" style="background:#0c0e13;border:1px solid #8080e835"><div class="mark-card-hdr" style="background:#8080e814;color:#8080e8">'+he(WAVE_LABELS_SP[s.key])+'</div><div class="mark-card-body"><div class="mark-np" style="background:'+sc3.bg+';border:1px solid '+sc3.bd+'">'+ihtml(s.p.cls,14,s.p.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(s.p.name)+'</span></div></div></div>';
           });
           h+='</div></div>';
         }
@@ -3075,25 +3074,25 @@ function renderViewMode(data){
         }
 
         h+='<div style="margin-top:.8rem">';
-        h+='<div style="font-family:Cinzel,serif;font-size:.58rem;color:#7ab0ff;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.6rem">Kel\'Thuzad - Phase 2 Positions</div>';
-        h+='<div style="position:relative;width:620px;height:620px;font-family:Crimson Pro,Georgia,serif">';
+        h+='<div style="font-family:Inter,sans-serif;font-size:.58rem;color:#9fc4f4;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.6rem">Kel\'Thuzad - Phase 2 Positions</div>';
+        h+='<div style="position:relative;width:620px;height:620px;font-family:Inter,sans-serif">';
 
         h+='<svg width="620" height="620" style="position:absolute;top:0;left:0" viewBox="0 0 620 620">';
-        h+='<circle cx="310" cy="310" r="290" fill="#0d1525" stroke="#1a2a50" stroke-width="1"/>';
+        h+='<circle cx="310" cy="310" r="290" fill="#0c0e13" stroke="#1a2433" stroke-width="1"/>';
         h+='<circle cx="310" cy="310" r="265" fill="none" stroke="#3a2a10" stroke-width="1" stroke-dasharray="2,5"/>';
-        h+='<circle cx="310" cy="310" r="165" fill="none" stroke="#2a3a6a" stroke-width="1" stroke-dasharray="2,5"/>';
+        h+='<circle cx="310" cy="310" r="165" fill="none" stroke="#378ade" stroke-width="1" stroke-dasharray="2,5"/>';
         h+='<circle cx="310" cy="310" r="80" fill="#0c0a22" stroke="#4a2880" stroke-width="1.5"/>';
-        h+='<text x="310" y="314" text-anchor="middle" font-family="Cinzel,serif" font-size="10" fill="#a070d0">KEL\'THUZAD</text>';
+        h+='<text x="310" y="314" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" fill="#a070d0">KEL\'THUZAD</text>';
         h+='<g font-size="18" text-anchor="middle" dominant-baseline="central"><text x="310" y="254" fill="#4080e0">&#128737;</text></g>';
-        h+='<text x="310" y="274" text-anchor="middle" font-family="Cinzel,serif" font-size="8" fill="#4080e0">MT</text>';
+        h+='<text x="310" y="274" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#4080e0">MT</text>';
         h+='<g font-size="16" text-anchor="middle" dominant-baseline="central">';
         h+='<text x="266" y="310" fill="#e03030">&#10006;</text>';
         h+='<text x="354" y="310" fill="#d0d0d0">&#9789;</text>';
         h+='<text x="310" y="348" fill="#4080e0">&#9632;</text>';
         h+='</g>';
-        h+='<text x="266" y="328" text-anchor="middle" font-family="Cinzel,serif" font-size="7.5" fill="#e03030">Cross</text>';
-        h+='<text x="354" y="328" text-anchor="middle" font-family="Cinzel,serif" font-size="7.5" fill="#d0d0d0">Moon</text>';
-        h+='<text x="310" y="366" text-anchor="middle" font-family="Cinzel,serif" font-size="7.5" fill="#4080e0">Square</text>';
+        h+='<text x="266" y="328" text-anchor="middle" font-family="Inter,sans-serif" font-size="7.5" fill="#e03030">Cross</text>';
+        h+='<text x="354" y="328" text-anchor="middle" font-family="Inter,sans-serif" font-size="7.5" fill="#d0d0d0">Moon</text>';
+        h+='<text x="310" y="366" text-anchor="middle" font-family="Inter,sans-serif" font-size="7.5" fill="#4080e0">Square</text>';
         h+='</svg>';
 
         /* 12 healers — number badge centered exactly on r=165, name directly below */
@@ -3105,7 +3104,7 @@ function renderViewMode(data){
           var khNum=khn+1;
           var khCoord=ktBadgeCoords[khn];
           var khP=ktHealers[khn];
-          h+='<div style="position:absolute;top:'+khCoord[1]+'px;left:'+khCoord[0]+'px;transform:translate(-50%,-50%);width:26px;height:26px;border-radius:50%;background:#1a3a20;border:1.5px solid #30b050;display:flex;align-items:center;justify-content:center;color:#80d870;font-weight:700;font-size:.7rem;font-family:Cinzel,serif">'+khNum+'</div>';
+          h+='<div style="position:absolute;top:'+khCoord[1]+'px;left:'+khCoord[0]+'px;transform:translate(-50%,-50%);width:26px;height:26px;border-radius:50%;background:#1a3a20;border:1.5px solid #30b050;display:flex;align-items:center;justify-content:center;color:#80d870;font-weight:700;font-size:.7rem;font-family:Inter,sans-serif">'+khNum+'</div>';
           if(khP){
             var khC=cd(khP.cls);
             h+='<div style="position:absolute;top:'+(khCoord[1]+20)+'px;left:'+khCoord[0]+'px;transform:translate(-50%,0);font-size:.6rem;font-weight:700;color:#f8f8f8;background:'+khC.bg+';border-radius:3px;padding:2px 5px;white-space:nowrap">'+he(khP.name)+'</div>';
@@ -3120,7 +3119,7 @@ function renderViewMode(data){
         ktDpsCoords.forEach(function(c,idx){
           h+='<div style="position:absolute;top:'+c[1]+'px;left:'+c[0]+'px;transform:translate(-50%,-50%);font-size:.95rem;color:#e08020">&#127993;</div>';
           if(idx===0){
-            h+='<div style="position:absolute;top:'+(c[1]+15)+'px;left:'+c[0]+'px;transform:translate(-50%,0);font-size:.5rem;color:#e08020;font-family:Cinzel,serif">Throne</div>';
+            h+='<div style="position:absolute;top:'+(c[1]+15)+'px;left:'+c[0]+'px;transform:translate(-50%,0);font-size:.5rem;color:#e08020;font-family:Inter,sans-serif">Throne</div>';
           }
         });
 
@@ -3128,15 +3127,15 @@ function renderViewMode(data){
 
         /* 3 melee groups below the diagram: Cross / Square / Moon */
         h+='<div style="margin-top:.7rem">';
-        h+='<div style="font-family:Cinzel,serif;font-size:.58rem;color:#7ab0ff;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.4rem">Melee Sub-Groups</div>';
+        h+='<div style="font-family:Inter,sans-serif;font-size:.58rem;color:#9fc4f4;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.4rem">Melee Sub-Groups</div>';
         h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">';
         var ktGroupInfo=[['Cross Group','\u2716','#e03030'],['Square Group','\u25a0','#4080e0'],['Moon Group','\u263d','#d0d0d0']];
         for(var ktgi=0;ktgi<3;ktgi++){
           var ktgMembers=bl[ktgi]||[];
-          h+='<div style="background:#0f1322;border:1px solid '+ktGroupInfo[ktgi][2]+'30;border-radius:6px;overflow:hidden">';
+          h+='<div style="background:#0c0e13;border:1px solid '+ktGroupInfo[ktgi][2]+'30;border-radius:6px;overflow:hidden">';
           h+='<div style="background:'+ktGroupInfo[ktgi][2]+'18;padding:5px 9px;display:flex;align-items:center;gap:6px;border-bottom:1px solid '+ktGroupInfo[ktgi][2]+'25">';
           h+='<span style="font-size:1rem;color:'+ktGroupInfo[ktgi][2]+'">'+ktGroupInfo[ktgi][1]+'</span>';
-          h+='<span style="font-family:Cinzel,serif;font-size:.74rem;font-weight:700;color:'+ktGroupInfo[ktgi][2]+'">'+ktGroupInfo[ktgi][0]+'</span>';
+          h+='<span style="font-family:Inter,sans-serif;font-size:.74rem;font-weight:700;color:'+ktGroupInfo[ktgi][2]+'">'+ktGroupInfo[ktgi][0]+'</span>';
           h+='</div>';
           h+='<div style="padding:4px 0">';
           ktgMembers.forEach(function(bp){
@@ -3155,7 +3154,7 @@ function renderViewMode(data){
         if((boss.id==='sapphiron'||boss.id==='gothik')&&gc===8){glCols='repeat(2,1fr)';for(var sdi=0;sdi<8;sdi++)shDisplayOrder.push(sdi);}
         else{for(var sdi=0;sdi<bl.length;sdi++)shDisplayOrder.push(sdi);}
         h+='<div style="margin-top:.6rem">';
-        h+='<div style="font-family:Cinzel,serif;font-size:.58rem;color:#7ab0ff;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.35rem">Group Setup</div>';
+        h+='<div style="font-family:Inter,sans-serif;font-size:.58rem;color:#9fc4f4;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.35rem">Group Setup</div>';
         h+='<div class="grp-grid" style="grid-template-columns:'+glCols+'">';
         for(var sdOrderIdx=0;sdOrderIdx<shDisplayOrder.length;sdOrderIdx++){
           var bgi=shDisplayOrder[sdOrderIdx];
@@ -3163,7 +3162,7 @@ function renderViewMode(data){
           h+='<div class="grp-card"><div class="grp-hdr">'+he(bgLabel)+'</div>';
           bl[bgi].forEach(function(bp){
             if(bp){var bc=cd(bp.cls);h+='<div class="grp-slot" style="background:'+bc.bg+'">'+ihtml(bp.cls,12,bp.role)+'<span style="font-size:.78rem;font-weight:700;color:#f8f8f8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+he(bp.name)+'</span></div>';}
-            else h+='<div class="grp-slot"><span style="font-size:.6rem;color:#3a5080">—</span></div>';
+            else h+='<div class="grp-slot"><span style="font-size:.6rem;color:#525a6a">—</span></div>';
           });
           h+='</div>';
         }
@@ -3192,7 +3191,7 @@ function renderViewMode(data){
     var data=decodePayload(viewData);
     if(!data){
       document.documentElement.style.visibility='';
-      document.body.innerHTML='<div style="color:#e06060;padding:2rem;font-family:sans-serif;background:#0a0d18;min-height:100vh;font-size:1.2rem">Invalid or expired view link.</div>';
+      document.body.innerHTML='<div style="color:#e06060;padding:2rem;font-family:sans-serif;background:#0c0e13;min-height:100vh;font-size:1.2rem">Invalid or expired view link.</div>';
       return;
     }
     data=expandSlimPayload(data); /* expand v2 slim format if needed */
