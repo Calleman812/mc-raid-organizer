@@ -120,7 +120,7 @@ textarea{width:100%;background:#0c0e13;border:1px solid #262a36;color:#e4e6ea;pa
 <div class="app">
 <h1>WoW Classic Raid Organizer</h1>
 <div class="sub">Organize your 40-man raid &mdash; select a raid below</div>
-<div style="text-align:center;font-size:.6rem;color:#525a6a;font-family:Inter,sans-serif;letter-spacing:.08em;margin-top:-.3rem;margin-bottom:.5rem">v2.1.1</div>
+<div style="text-align:center;font-size:.6rem;color:#525a6a;font-family:Inter,sans-serif;letter-spacing:.08em;margin-top:-.3rem;margin-bottom:.5rem">v2.1.2</div>
 <div style="display:flex;gap:6px;justify-content:center;margin-bottom:.9rem;flex-wrap:wrap">
   <button class="btn raid-sel-btn" data-raid="mc"   id="rsMC"   style="font-family:Inter,sans-serif;font-size:.74rem;padding:5px 14px;border-radius:6px;cursor:pointer;border:1px solid #378ade;background:#1a2433;color:#9fc4f4">&#128293; Molten Core</button>
   <button class="btn raid-sel-btn" data-raid="bwl"  id="rsBWL"  style="font-family:Inter,sans-serif;font-size:.74rem;padding:5px 14px;border-radius:4px;cursor:pointer;border:1px solid #262a36;background:#15171e;color:#9fc4f4">&#128009; Blackwing Lair</button>
@@ -2217,11 +2217,11 @@ function loadFullSaveData(data){
   tentativeList=(data.tentativeList||[]).map(rebuildP).filter(Boolean);
   originalStatus=data.originalStatus||{};
 
-  groups=(data.groups||[]).map(function(slotArr){
-    return{slots:(slotArr||[]).map(function(p){return{p:rebuildP(p)};})};
+  groups=(data.groups||[]).map(function(slotArr,gi){
+    return{id:gi+1,slots:(slotArr||[]).map(function(p){return{p:rebuildP(p)};})};
   });
   /* Pad to 8 groups of 5 if the save has fewer (defensive) */
-  while(groups.length<8)groups.push({slots:[{p:null},{p:null},{p:null},{p:null},{p:null}]});
+  while(groups.length<8)groups.push({id:groups.length+1,slots:[{p:null},{p:null},{p:null},{p:null},{p:null}]});
   groups.forEach(function(g){while(g.slots.length<5)g.slots.push({p:null});});
 
   trashMarks=(data.trashMarks||[]).map(function(m){
@@ -2251,7 +2251,8 @@ function loadFullSaveData(data){
     });
   }
 
-  activeTab='trash';sel=null;
+  activeTab='trash';sel=null;hideBan();
+  showUI();
   rAllNow();
   return true;
 }
