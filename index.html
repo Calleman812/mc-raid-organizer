@@ -121,7 +121,7 @@ textarea{width:100%;background:#0d1020;border:1px solid #2a3050;color:#e0d8f8;pa
 <div class="app">
 <h1>WoW Classic Raid Organizer</h1>
 <div class="sub">Organize your 40-man raid &mdash; select a raid below</div>
-<div style="text-align:center;font-size:.6rem;color:#4a6890;font-family:Cinzel,serif;letter-spacing:.08em;margin-top:-.3rem;margin-bottom:.5rem">v1.6.1</div>
+<div style="text-align:center;font-size:.6rem;color:#4a6890;font-family:Cinzel,serif;letter-spacing:.08em;margin-top:-.3rem;margin-bottom:.5rem">v1.6.2</div>
 <div style="display:flex;gap:6px;justify-content:center;margin-bottom:.9rem;flex-wrap:wrap">
   <button class="btn raid-sel-btn" data-raid="mc"   id="rsMC"   style="font-family:Cinzel,serif;font-size:.74rem;padding:5px 14px;border-radius:4px;cursor:pointer;border:1px solid #3a6ae0;background:#1a3a80;color:#c8d8ff">&#128293; Molten Core</button>
   <button class="btn raid-sel-btn" data-raid="bwl"  id="rsBWL"  style="font-family:Cinzel,serif;font-size:.74rem;padding:5px 14px;border-radius:4px;cursor:pointer;border:1px solid #2a3050;background:#131726;color:#7ab0ff">&#128009; Blackwing Lair</button>
@@ -475,6 +475,9 @@ function initSapphironGroups(gc){
   /* Group 1: assigned Tank + 2 Paladins + 1 healer.
      Groups 2-8: 1 healer each.
      Mages and Druids evenly distributed between groups 7 and 8 (in addition to their healer).
+     A Holy Paladin or Resto Druid still counts as a Paladin/Druid for these placement
+     rules — class membership matters here, not just spec/role. The same person can
+     fulfil both the "Paladin in group 1" slot AND the "healer in this group" slot.
      Everyone else fills remaining slots, mixed. Every group capped at 5. */
   var bd=bossData['sapphiron']||{};
   var tankId=bd.mt?bd.mt.id:null;
@@ -487,10 +490,12 @@ function initSapphironGroups(gc){
   var tankP=tankId?allPlayers.filter(function(p){return p.id===tankId;})[0]:null;
   var pool=allPlayers.filter(function(p){return p.id!==tankId;});
 
-  var healers=pool.filter(function(p){return p.role==='healer';});
-  var paladins=pool.filter(function(p){return p.cls==='Paladin'&&p.role!=='healer';});
-  var mages=pool.filter(function(p){return p.cls==='Mage'&&p.role!=='healer';});
-  var druids=pool.filter(function(p){return p.cls==='Druid'&&p.role!=='healer';});
+  /* Class-based buckets — independent of role/spec, since a Paladin or Druid healer
+     still counts as that class for placement purposes */
+  var paladins=pool.filter(function(p){return p.cls==='Paladin';});
+  var mages=pool.filter(function(p){return p.cls==='Mage';});
+  var druids=pool.filter(function(p){return p.cls==='Druid';});
+  var healers=pool.filter(function(p){return p.role==='healer'&&p.cls!=='Paladin'&&p.cls!=='Druid';});
   var rest=pool.filter(function(p){
     return p.role!=='healer'&&p.cls!=='Paladin'&&p.cls!=='Mage'&&p.cls!=='Druid';
   });
@@ -500,17 +505,13 @@ function initSapphironGroups(gc){
 
   var bg=[[],[],[],[],[],[],[],[]];
 
-  /* Step 1: Group 1 = tank + up to 2 paladins */
+  /* Step 1: Group 1 = tank + up to 2 paladins (any spec) */
   if(tankP)bg[0].push(tankP);
   for(var pp=0;pp<2&&paladins.length;pp++)bg[0].push(paladins.shift());
 
-  /* Step 2: 1 healer in EVERY group (0-7), including group 1 */
-  for(var hg=0;hg<8;hg++){
-    if(healers.length&&bg[hg].length<5)bg[hg].push(healers.shift());
-  }
-  var leftoverHealers=healers; /* extra healers beyond 8 fall into the general pool */
-
-  /* Step 3: Mages and Druids evenly alternated into group 7 (idx6) and group 8 (idx7) */
+  /* Step 2: Mages and Druids evenly alternated into group 7 (idx6) and group 8 (idx7) —
+     done BEFORE the healer pass so a Resto Druid placed here can satisfy that
+     group's healer requirement without needing a second healer added on top */
   var mdPool=mages.concat(druids);
   shuffleS(mdPool);
   var mdIdx=0,mdOverflow=[];
@@ -520,6 +521,17 @@ function initSapphironGroups(gc){
     else{mdOverflow.push(mdPool.shift());}
     mdIdx++;
   }
+
+  /* Step 3: ensure 1 healer in EVERY group (0-7). A group already containing a
+     healer-role Paladin (group 1) or healer-role Druid (groups 7/8) counts as
+     satisfied and is skipped — only groups with zero healers pull from the pool. */
+  function groupHasHealer(arr){return arr.some(function(p){return p.role==='healer';});}
+  for(var hg=0;hg<8;hg++){
+    if(!groupHasHealer(bg[hg])&&healers.length&&bg[hg].length<5){
+      bg[hg].push(healers.shift());
+    }
+  }
+  var leftoverHealers=healers; /* extra healers beyond what's needed fall into the general pool */
 
   /* Step 4: remaining paladins, rest, leftover healers, md overflow —
      round-robin across all 8 groups, capped at 5 each, skipping full groups */
