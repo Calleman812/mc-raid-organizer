@@ -120,7 +120,7 @@ textarea{width:100%;background:#0c0e13;border:1px solid #262a36;color:#e4e6ea;pa
 <div class="app">
 <h1>WoW Classic Raid Organizer</h1>
 <div class="sub">Organize your 40-man raid &mdash; select a raid below</div>
-<div style="text-align:center;font-size:.6rem;color:#525a6a;font-family:Inter,sans-serif;letter-spacing:.08em;margin-top:-.3rem;margin-bottom:.5rem">v2.2.1</div>
+<div style="text-align:center;font-size:.6rem;color:#525a6a;font-family:Inter,sans-serif;letter-spacing:.08em;margin-top:-.3rem;margin-bottom:.5rem">v2.2.2</div>
 <div style="display:flex;gap:6px;justify-content:center;margin-bottom:.9rem;flex-wrap:wrap">
   <button class="btn raid-sel-btn" data-raid="mc"   id="rsMC"   style="font-family:Inter,sans-serif;font-size:.74rem;padding:5px 14px;border-radius:6px;cursor:pointer;border:1px solid #378ade;background:#1a2433;color:#9fc4f4">&#128293; Molten Core</button>
   <button class="btn raid-sel-btn" data-raid="bwl"  id="rsBWL"  style="font-family:Inter,sans-serif;font-size:.74rem;padding:5px 14px;border-radius:4px;cursor:pointer;border:1px solid #262a36;background:#15171e;color:#9fc4f4">&#128009; Blackwing Lair</button>
@@ -3459,6 +3459,19 @@ function renderViewMode(data){
       document.body.innerHTML=newDoc.body.innerHTML;
       document.documentElement.style.visibility='';
       document.title=newDoc.title||'Raid View';
+      /* Scripts inserted via innerHTML never auto-execute (browser security
+         behavior) — re-create and append any <script> tags so they actually run.
+         This is what makes the Command Center boss-panel click switching work. */
+      var oldScripts=document.body.querySelectorAll('script');
+      oldScripts.forEach(function(oldScript){
+        var newScript=document.createElement('script');
+        for(var i=0;i<oldScript.attributes.length;i++){
+          var attr=oldScript.attributes[i];
+          newScript.setAttribute(attr.name,attr.value);
+        }
+        newScript.textContent=oldScript.textContent;
+        oldScript.parentNode.replaceChild(newScript,oldScript);
+      });
     }catch(e){
       /* Fallback: blob URL redirect */
       var blob=new Blob([html],{type:'text/html'});
