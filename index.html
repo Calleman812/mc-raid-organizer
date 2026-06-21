@@ -120,7 +120,7 @@ textarea{width:100%;background:#0c0e13;border:1px solid #262a36;color:#e4e6ea;pa
 <div class="app">
 <h1>WoW Classic Raid Organizer</h1>
 <div class="sub">Organize your 40-man raid &mdash; select a raid below</div>
-<div style="text-align:center;font-size:.6rem;color:#525a6a;font-family:Inter,sans-serif;letter-spacing:.08em;margin-top:-.3rem;margin-bottom:.5rem">v2.2.2</div>
+<div style="text-align:center;font-size:.6rem;color:#525a6a;font-family:Inter,sans-serif;letter-spacing:.08em;margin-top:-.3rem;margin-bottom:.5rem">v2.3.0</div>
 <div style="display:flex;gap:6px;justify-content:center;margin-bottom:.9rem;flex-wrap:wrap">
   <button class="btn raid-sel-btn" data-raid="mc"   id="rsMC"   style="font-family:Inter,sans-serif;font-size:.74rem;padding:5px 14px;border-radius:6px;cursor:pointer;border:1px solid #378ade;background:#1a2433;color:#9fc4f4">&#128293; Molten Core</button>
   <button class="btn raid-sel-btn" data-raid="bwl"  id="rsBWL"  style="font-family:Inter,sans-serif;font-size:.74rem;padding:5px 14px;border-radius:4px;cursor:pointer;border:1px solid #262a36;background:#15171e;color:#9fc4f4">&#128009; Blackwing Lair</button>
@@ -2661,7 +2661,12 @@ function renderViewMode(data){
     +'.rail-item.on{border-color:#378ade;color:#fff;background:#1a2433;}'
     +'.rail-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-left:6px;}'
     +'.dash-panel{display:none;}'
-    +'.dash-panel.on{display:block;}';
+    +'.dash-panel.on{display:block;}'
+    +'details.section>summary{outline:none;}'
+    +'details.section>summary::-webkit-details-marker{display:none;}'
+    +'.fold-arrow{display:inline-block;font-size:.6rem;transition:transform .15s;color:#666c7a;}'
+    +'details.section:not([open])>summary .fold-arrow{transform:rotate(-90deg);}'
+    +'details.section:not([open]){padding-bottom:.9rem;}';
 
   var h='<!DOCTYPE html><html lang="en"><head>'
     +'<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
@@ -2700,7 +2705,8 @@ function renderViewMode(data){
 
   /* ── Raid Groups ── */
   if(viewGroups.length){
-    h+='<div class="section"><div class="sh">Raid Groups</div><div class="ggrid">';
+    h+='<details class="section" open><summary class="sh" style="cursor:pointer;list-style:none;display:flex;align-items:center;gap:6px">'
+      +'<span class="fold-arrow">&#9660;</span> Raid Groups</summary><div class="ggrid" style="margin-top:.6rem">';
     viewGroups.forEach(function(g){
       h+='<div class="gc"><div class="gh">Group '+g.idx+'</div><div class="gs">';
       g.slots.forEach(function(pid){
@@ -2712,7 +2718,7 @@ function renderViewMode(data){
       });
       h+='</div></div>';
     });
-    h+='</div></div>';
+    h+='</div></details>';
   }
 
   /* ── Benched ── */
@@ -2731,8 +2737,9 @@ function renderViewMode(data){
 
   /* ── Trash marks ── */
   if(trashDefs.length){
-    h+='<div class="section"><div class="sh">Trash \u2014 Tank Marks &amp; Healing</div>';
-    h+='<div class="trash-grid">';
+    h+='<details class="section" open><summary class="sh" style="cursor:pointer;list-style:none;display:flex;align-items:center;gap:6px">'
+      +'<span class="fold-arrow">&#9660;</span> Trash \u2014 Tank Marks &amp; Healing</summary>';
+    h+='<div class="trash-grid" style="margin-top:.6rem">';
     trashDefs.forEach(function(m,i){
       var tankP=trash[i]&&trash[i].tank?pmap[trash[i].tank]:null;
       var healP=trash[i]&&trash[i].healer?pmap[trash[i].healer]:null;
@@ -2762,7 +2769,7 @@ function renderViewMode(data){
       h+='<div class="mark-np" style="background:'+pc2.bg+';border:1px solid '+pc2.bd+'">'+ihtml(pullerP.cls,13,pullerP.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(pullerP.name)+'</span></div>';
       h+='</div>';
     }
-    h+='</div>';
+    h+='</details>';
   }
 
   /* ── Boss Assignments (Command Center: rail + click-switchable panels) ── */
@@ -2802,7 +2809,7 @@ function renderViewMode(data){
     var shownHealerKeys={};
 
     /* Non-healer segments → mark cards (skipped for Four Horsemen and Maexxna — custom layouts below) */
-    if(boss.id!=='horsemen'&&boss.id!=='maexxna'&&boss.id!=='gothik'&&boss.id!=='patchwerk'&&boss.id!=='thaddius'){
+    if(boss.id!=='horsemen'&&boss.id!=='maexxna'&&boss.id!=='gothik'&&boss.id!=='patchwerk'&&boss.id!=='thaddius'&&boss.id!=='garr'&&boss.id!=='sulfuron'&&boss.id!=='domo'&&boss.id!=='nefarian'&&boss.id!=='skeram'&&boss.id!=='bugs'&&boss.id!=='twins'&&boss.id!=='faerlina'){
     boss.segments.forEach(function(seg){
       if(seg.isHealRow)return;
       var assignedSlots=seg.slots.filter(function(sl){
@@ -2860,13 +2867,13 @@ function renderViewMode(data){
       h+='<div class="healer-chips">';
       healers.forEach(function(sl){
         var hp=pmap[bdata[sl.key]];var hc=cd(hp.cls);
-        var numLabel='';
+        var numBadge='';
         if(boss.id==='loatheb'||boss.id==='kelthuzad'){
           var numMatch=sl.key.match(/(\d+)$/);
-          if(numMatch)numLabel='<span style="font-size:.62rem;color:rgba(248,248,248,.55);font-family:Inter,sans-serif;margin-right:3px">['+numMatch[1]+']</span>';
+          if(numMatch)numBadge='<span style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:rgba(0,0,0,.35);color:#fff;font-size:.62rem;font-weight:700;font-family:Inter,sans-serif;flex-shrink:0">'+numMatch[1]+'</span>';
         }
         h+='<div class="healer-chip" style="background:'+hc.bg+';border:1px solid '+hc.bd+'">';
-        h+=numLabel;
+        h+=numBadge;
         h+=ihtml(hp.cls,13,hp.role);
         h+='<span style="font-size:.85rem;font-weight:700;color:#f8f8f8">'+he(hp.name)+'</span>';
         h+='</div>';
@@ -2990,6 +2997,299 @@ function renderViewMode(data){
       }
       h+='</div>';
       h+='</div>';
+    }
+
+    /* ── Garr custom layout: Garr full-width, then 2 rows of 4 adds ── */
+    if(boss.id==='garr'){
+      var garrMt=bdata.mt&&pmap[bdata.mt]?pmap[bdata.mt]:null;
+      var garrMtH=bdata.mth&&pmap[bdata.mth]?pmap[bdata.mth]:null;
+      if(garrMt||garrMtH){
+        h+='<div class="mark-cards" style="margin-bottom:.5rem">';
+        h+='<div class="mark-card" style="background:#0c0e13;border:1px solid #5a7ab035;width:100%;grid-column:1/-1">';
+        h+='<div class="mark-card-hdr" style="background:#5a7ab014;color:#5a7ab0">Garr</div>';
+        h+='<div class="mark-card-body" style="display:flex;flex-wrap:wrap;gap:5px">';
+        if(garrMt){var gmc=cd(garrMt.cls);h+='<div class="mark-np" style="background:'+gmc.bg+';border:1px solid '+gmc.bd+'">'+ihtml(garrMt.cls,14,garrMt.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(garrMt.name)+'</span><span class="mark-np-label">tank</span></div>';}
+        if(garrMtH){var gmh=cd(garrMtH.cls);h+='<div class="mark-np" style="background:'+gmh.bg+';border:1px solid '+gmh.bd+'">'+ihtml(garrMtH.cls,14,garrMtH.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(garrMtH.name)+'</span></div>';}
+        h+='</div></div></div>';
+      }
+      var garrAdds=[1,2,3,4,5,6,7,8].map(function(n){
+        var tp=bdata['ot'+n]&&pmap[bdata['ot'+n]]?pmap[bdata['ot'+n]]:null;
+        var hp=bdata['ot'+n+'h']&&pmap[bdata['ot'+n+'h']]?pmap[bdata['ot'+n+'h']]:null;
+        var banKey=n===7?'ban7':(n===8?'ban8':null);
+        var ban=banKey&&bdata[banKey]&&pmap[bdata[banKey]]?pmap[bdata[banKey]]:null;
+        return{n:n,tank:tp,heal:hp,ban:ban,mark:vMS[n-1],col:vMC[n-1]};
+      }).filter(function(a){return a.tank||a.heal||a.ban;});
+      if(garrAdds.length){
+        h+='<div class="mark-cards" style="grid-template-columns:repeat(4,1fr)">';
+        garrAdds.forEach(function(a){
+          h+='<div class="mark-card" style="background:#0c0e13;border:1px solid '+a.col+'35">';
+          h+='<div class="mark-card-hdr" style="background:'+a.col+'14;color:'+a.col+'">'+a.mark+' Add '+a.n+'</div>';
+          h+='<div class="mark-card-body">';
+          if(a.tank){var tc7=cd(a.tank.cls);h+='<div class="mark-np" style="background:'+tc7.bg+';border:1px solid '+tc7.bd+'">'+ihtml(a.tank.cls,13,a.tank.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(a.tank.name)+'</span></div>';}
+          if(a.heal){var hc7=cd(a.heal.cls);h+='<div class="mark-np" style="background:'+hc7.bg+';border:1px solid '+hc7.bd+'">'+ihtml(a.heal.cls,13,a.heal.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(a.heal.name)+'</span></div>';}
+          if(a.ban){var bc7=cd(a.ban.cls);h+='<div class="mark-np" style="background:'+bc7.bg+';border:1px solid '+bc7.bd+'">'+ihtml(a.ban.cls,13,a.ban.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(a.ban.name)+'</span><span class="mark-np-label">banish</span></div>';}
+          h+='</div></div>';
+        });
+        h+='</div>';
+      }
+    }
+
+    /* ── Sulfuron custom layout: Sulfuron full-width, then 1 row of 5 priests ── */
+    if(boss.id==='sulfuron'){
+      var sulMt=bdata.mt&&pmap[bdata.mt]?pmap[bdata.mt]:null;
+      var sulMtH=bdata.mth&&pmap[bdata.mth]?pmap[bdata.mth]:null;
+      if(sulMt||sulMtH){
+        h+='<div class="mark-cards" style="margin-bottom:.5rem">';
+        h+='<div class="mark-card" style="background:#0c0e13;border:1px solid #5a7ab035;width:100%;grid-column:1/-1">';
+        h+='<div class="mark-card-hdr" style="background:#5a7ab014;color:#5a7ab0">'+vMS[7]+' Sulfuron</div>';
+        h+='<div class="mark-card-body" style="display:flex;flex-wrap:wrap;gap:5px">';
+        if(sulMt){var smc=cd(sulMt.cls);h+='<div class="mark-np" style="background:'+smc.bg+';border:1px solid '+smc.bd+'">'+ihtml(sulMt.cls,14,sulMt.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(sulMt.name)+'</span><span class="mark-np-label">tank</span></div>';}
+        if(sulMtH){var smh=cd(sulMtH.cls);h+='<div class="mark-np" style="background:'+smh.bg+';border:1px solid '+smh.bd+'">'+ihtml(sulMtH.cls,14,sulMtH.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(sulMtH.name)+'</span></div>';}
+        h+='</div></div></div>';
+      }
+      var sulPriests=[1,2,3,4,5].map(function(n){
+        var tp=bdata['ot'+n]&&pmap[bdata['ot'+n]]?pmap[bdata['ot'+n]]:null;
+        var hp=bdata['ot'+n+'h']&&pmap[bdata['ot'+n+'h']]?pmap[bdata['ot'+n+'h']]:null;
+        var ip=bdata['int'+n]&&pmap[bdata['int'+n]]?pmap[bdata['int'+n]]:null;
+        return{n:n,tank:tp,heal:hp,interrupt:ip,mark:vMS[n-1],col:vMC[n-1]};
+      }).filter(function(a){return a.tank||a.heal||a.interrupt;});
+      if(sulPriests.length){
+        h+='<div class="mark-cards" style="grid-template-columns:repeat(5,1fr)">';
+        sulPriests.forEach(function(a){
+          h+='<div class="mark-card" style="background:#0c0e13;border:1px solid '+a.col+'35">';
+          h+='<div class="mark-card-hdr" style="background:'+a.col+'14;color:'+a.col+'">'+a.mark+' Priest '+a.n+'</div>';
+          h+='<div class="mark-card-body">';
+          if(a.tank){var tc8=cd(a.tank.cls);h+='<div class="mark-np" style="background:'+tc8.bg+';border:1px solid '+tc8.bd+'">'+ihtml(a.tank.cls,13,a.tank.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(a.tank.name)+'</span></div>';}
+          if(a.heal){var hc8=cd(a.heal.cls);h+='<div class="mark-np" style="background:'+hc8.bg+';border:1px solid '+hc8.bd+'">'+ihtml(a.heal.cls,13,a.heal.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(a.heal.name)+'</span></div>';}
+          if(a.interrupt){var ic8=cd(a.interrupt.cls);h+='<div class="mark-np" style="background:'+ic8.bg+';border:1px solid '+ic8.bd+'">'+ihtml(a.interrupt.cls,13,a.interrupt.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(a.interrupt.name)+'</span><span class="mark-np-label">int</span></div>';}
+          h+='</div></div>';
+        });
+        h+='</div>';
+      }
+    }
+
+    /* ── Domo custom layout: Domo full-width, then 2 rows of 4 adds ── */
+    if(boss.id==='domo'){
+      var domoMt=bdata.mt&&pmap[bdata.mt]?pmap[bdata.mt]:null;
+      var domoMtH=bdata.mth&&pmap[bdata.mth]?pmap[bdata.mth]:null;
+      if(domoMt||domoMtH){
+        h+='<div class="mark-cards" style="margin-bottom:.5rem">';
+        h+='<div class="mark-card" style="background:#0c0e13;border:1px solid #5a7ab035;width:100%;grid-column:1/-1">';
+        h+='<div class="mark-card-hdr" style="background:#5a7ab014;color:#5a7ab0">Domo</div>';
+        h+='<div class="mark-card-body" style="display:flex;flex-wrap:wrap;gap:5px">';
+        if(domoMt){var dmc=cd(domoMt.cls);h+='<div class="mark-np" style="background:'+dmc.bg+';border:1px solid '+dmc.bd+'">'+ihtml(domoMt.cls,14,domoMt.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(domoMt.name)+'</span><span class="mark-np-label">tank</span></div>';}
+        if(domoMtH){var dmh=cd(domoMtH.cls);h+='<div class="mark-np" style="background:'+dmh.bg+';border:1px solid '+dmh.bd+'">'+ihtml(domoMtH.cls,14,domoMtH.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(domoMtH.name)+'</span></div>';}
+        h+='</div></div></div>';
+      }
+      var domoAdds=[1,2,3,4,5,6,7,8].map(function(n){
+        var tp=bdata['ot'+n]&&pmap[bdata['ot'+n]]?pmap[bdata['ot'+n]]:null;
+        var hp=bdata['ot'+n+'h']&&pmap[bdata['ot'+n+'h']]?pmap[bdata['ot'+n+'h']]:null;
+        var shKey=n>=5?'sh'+(n-4):null;
+        var sheep=shKey&&bdata[shKey]&&pmap[bdata[shKey]]?pmap[bdata[shKey]]:null;
+        return{n:n,tank:tp,heal:hp,sheep:sheep,mark:vMS[n-1],col:vMC[n-1]};
+      }).filter(function(a){return a.tank||a.heal||a.sheep;});
+      if(domoAdds.length){
+        h+='<div class="mark-cards" style="grid-template-columns:repeat(4,1fr)">';
+        domoAdds.forEach(function(a){
+          h+='<div class="mark-card" style="background:#0c0e13;border:1px solid '+a.col+'35">';
+          h+='<div class="mark-card-hdr" style="background:'+a.col+'14;color:'+a.col+'">'+a.mark+' Add '+a.n+'</div>';
+          h+='<div class="mark-card-body">';
+          if(a.tank){var tc9=cd(a.tank.cls);h+='<div class="mark-np" style="background:'+tc9.bg+';border:1px solid '+tc9.bd+'">'+ihtml(a.tank.cls,13,a.tank.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(a.tank.name)+'</span></div>';}
+          if(a.heal){var hc9=cd(a.heal.cls);h+='<div class="mark-np" style="background:'+hc9.bg+';border:1px solid '+hc9.bd+'">'+ihtml(a.heal.cls,13,a.heal.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(a.heal.name)+'</span></div>';}
+          if(a.sheep){var sc9=cd(a.sheep.cls);h+='<div class="mark-np" style="background:'+sc9.bg+';border:1px solid '+sc9.bd+'">'+ihtml(a.sheep.cls,13,a.sheep.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(a.sheep.name)+'</span><span class="mark-np-label">sheep</span></div>';}
+          h+='</div></div>';
+        });
+        h+='</div>';
+      }
+    }
+
+    /* ── Nefarian custom layout: Throne tanks left, Entrance tanks right ── */
+    if(boss.id==='nefarian'){
+      h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:.5rem">';
+      var throneTanks=['at1','at2'].map(function(k){return bdata[k]&&pmap[bdata[k]]?pmap[bdata[k]]:null;}).filter(Boolean);
+      var entranceTanks=['at3','at4'].map(function(k){return bdata[k]&&pmap[bdata[k]]?pmap[bdata[k]]:null;}).filter(Boolean);
+      h+='<div>';
+      if(throneTanks.length){
+        h+='<div style="font-family:Inter,sans-serif;font-size:.58rem;color:#666c7a;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.35rem">Throne Side</div>';
+        h+='<div class="mark-card" style="background:#0c0e13;border:1px solid #5a7ab035">';
+        h+='<div class="mark-card-hdr" style="background:#5a7ab014;color:#5a7ab0">Throne Tanks</div>';
+        h+='<div class="mark-card-body" style="display:flex;flex-direction:column;gap:4px">';
+        throneTanks.forEach(function(tp){var tc10=cd(tp.cls);h+='<div class="mark-np" style="background:'+tc10.bg+';border:1px solid '+tc10.bd+'">'+ihtml(tp.cls,14,tp.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(tp.name)+'</span></div>';});
+        h+='</div></div>';
+      }
+      h+='</div><div>';
+      if(entranceTanks.length){
+        h+='<div style="font-family:Inter,sans-serif;font-size:.58rem;color:#666c7a;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.35rem">Entrance Side</div>';
+        h+='<div class="mark-card" style="background:#0c0e13;border:1px solid #5a7ab035">';
+        h+='<div class="mark-card-hdr" style="background:#5a7ab014;color:#5a7ab0">Entrance Tanks</div>';
+        h+='<div class="mark-card-body" style="display:flex;flex-direction:column;gap:4px">';
+        entranceTanks.forEach(function(tp){var tc11=cd(tp.cls);h+='<div class="mark-np" style="background:'+tc11.bg+';border:1px solid '+tc11.bd+'">'+ihtml(tp.cls,14,tp.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(tp.name)+'</span></div>';});
+        h+='</div></div>';
+      }
+      h+='</div></div>';
+      var nefMt=bdata.mt&&pmap[bdata.mt]?pmap[bdata.mt]:null;
+      var nefHeals=['mth1','mth2','mth3'].map(function(k){return bdata[k]&&pmap[bdata[k]]?pmap[bdata[k]]:null;}).filter(Boolean);
+      if(nefMt||nefHeals.length){
+        h+='<div class="mark-cards"><div class="mark-card" style="background:#0c0e13;border:1px solid #5a7ab035;width:100%;grid-column:1/-1">';
+        h+='<div class="mark-card-hdr" style="background:#5a7ab014;color:#5a7ab0">Nefarian MT &amp; Healers</div>';
+        h+='<div class="mark-card-body" style="display:flex;flex-wrap:wrap;gap:5px">';
+        if(nefMt){var nmc=cd(nefMt.cls);h+='<div class="mark-np" style="background:'+nmc.bg+';border:1px solid '+nmc.bd+'">'+ihtml(nefMt.cls,14,nefMt.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(nefMt.name)+'</span><span class="mark-np-label">tank</span></div>';}
+        nefHeals.forEach(function(hp){var hc10=cd(hp.cls);h+='<div class="mark-np" style="background:'+hc10.bg+';border:1px solid '+hc10.bd+'">'+ihtml(hp.cls,14,hp.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(hp.name)+'</span></div>';});
+        h+='</div></div></div>';
+      }
+    }
+
+    /* ── Skeram custom layout: Left / Middle / Right as 3 columns ── */
+    if(boss.id==='skeram'){
+      h+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">';
+      var skColumns=[
+        {label:'Left',tank:'ot1',heal:'ot1h',int1:'il1',int2:'il2'},
+        {label:'Middle',tank:'mt',heal:'mth',int1:'im1',int2:'im2'},
+        {label:'Right',tank:'ot2',heal:'ot2h',int1:'ir1',int2:'ir2'}
+      ];
+      skColumns.forEach(function(col){
+        var tp=bdata[col.tank]&&pmap[bdata[col.tank]]?pmap[bdata[col.tank]]:null;
+        var hp=bdata[col.heal]&&pmap[bdata[col.heal]]?pmap[bdata[col.heal]]:null;
+        var i1=bdata[col.int1]&&pmap[bdata[col.int1]]?pmap[bdata[col.int1]]:null;
+        var i2=bdata[col.int2]&&pmap[bdata[col.int2]]?pmap[bdata[col.int2]]:null;
+        h+='<div>';
+        if(tp||hp||i1||i2){
+          h+='<div style="font-family:Inter,sans-serif;font-size:.58rem;color:#666c7a;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.35rem">'+col.label+'</div>';
+          h+='<div class="mark-card" style="background:#0c0e13;border:1px solid #5a7ab035">';
+          h+='<div class="mark-card-hdr" style="background:#5a7ab014;color:#5a7ab0">'+col.label+'</div>';
+          h+='<div class="mark-card-body" style="display:flex;flex-direction:column;gap:4px">';
+          if(tp){var tc12=cd(tp.cls);h+='<div class="mark-np" style="background:'+tc12.bg+';border:1px solid '+tc12.bd+'">'+ihtml(tp.cls,14,tp.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(tp.name)+'</span><span class="mark-np-label">tank</span></div>';}
+          if(hp){var hc11=cd(hp.cls);h+='<div class="mark-np" style="background:'+hc11.bg+';border:1px solid '+hc11.bd+'">'+ihtml(hp.cls,14,hp.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(hp.name)+'</span></div>';}
+          [i1,i2].forEach(function(ip){if(!ip)return;var ic9=cd(ip.cls);h+='<div class="mark-np" style="background:'+ic9.bg+';border:1px solid '+ic9.bd+'">'+ihtml(ip.cls,14,ip.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(ip.name)+'</span><span class="mark-np-label">int</span></div>';});
+          h+='</div></div>';
+        }
+        h+='</div>';
+      });
+      h+='</div>';
+    }
+
+    /* ── Bug Trio custom layout: horizontal, interrupt under Yauj tank ── */
+    if(boss.id==='bugs'){
+      h+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">';
+      var bugCols=[
+        {label:'Kri',tank:'tkri',heal:'hkri'},
+        {label:'Yauj',tank:'tyauj',heal:'hyauj',interrupt:'iyauj'},
+        {label:'Vem',tank:'tvem',heal:'hvem'}
+      ];
+      bugCols.forEach(function(col){
+        var tp=bdata[col.tank]&&pmap[bdata[col.tank]]?pmap[bdata[col.tank]]:null;
+        var hp=bdata[col.heal]&&pmap[bdata[col.heal]]?pmap[bdata[col.heal]]:null;
+        var ip=col.interrupt&&bdata[col.interrupt]&&pmap[bdata[col.interrupt]]?pmap[bdata[col.interrupt]]:null;
+        h+='<div>';
+        if(tp||hp||ip){
+          h+='<div style="font-family:Inter,sans-serif;font-size:.58rem;color:#666c7a;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.35rem">'+col.label+'</div>';
+          h+='<div class="mark-card" style="background:#0c0e13;border:1px solid #5a7ab035">';
+          h+='<div class="mark-card-hdr" style="background:#5a7ab014;color:#5a7ab0">'+col.label+'</div>';
+          h+='<div class="mark-card-body" style="display:flex;flex-direction:column;gap:4px">';
+          if(tp){var tc13=cd(tp.cls);h+='<div class="mark-np" style="background:'+tc13.bg+';border:1px solid '+tc13.bd+'">'+ihtml(tp.cls,14,tp.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(tp.name)+'</span><span class="mark-np-label">tank</span></div>';}
+          if(hp){var hc12=cd(hp.cls);h+='<div class="mark-np" style="background:'+hc12.bg+';border:1px solid '+hc12.bd+'">'+ihtml(hp.cls,14,hp.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(hp.name)+'</span></div>';}
+          if(ip){var ic10=cd(ip.cls);h+='<div class="mark-np" style="background:'+ic10.bg+';border:1px solid '+ic10.bd+'">'+ihtml(ip.cls,14,ip.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(ip.name)+'</span><span class="mark-np-label">int</span></div>';}
+          h+='</div></div>';
+        }
+        h+='</div>';
+      });
+      h+='</div>';
+    }
+
+    /* ── Twin Emperors custom layout: Veklor left, Veknilash right ── */
+    if(boss.id==='twins'){
+      h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:.5rem">';
+      var twinSides=[
+        {label:'Veklor',mt:'vmt',wl:'vwl',heals:['vh1','vh2','vh3','vh4','vh5']},
+        {label:'Veknilash',mt:'nmt',wl:'nwl',heals:['nh1','nh2','nh3','nh4','nh5']}
+      ];
+      twinSides.forEach(function(side){
+        var mtP=bdata[side.mt]&&pmap[bdata[side.mt]]?pmap[bdata[side.mt]]:null;
+        var wlP=bdata[side.wl]&&pmap[bdata[side.wl]]?pmap[bdata[side.wl]]:null;
+        h+='<div>';
+        if(mtP||wlP){
+          h+='<div style="font-family:Inter,sans-serif;font-size:.58rem;color:#666c7a;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.35rem">'+side.label+'</div>';
+          h+='<div class="mark-card" style="background:#0c0e13;border:1px solid #5a7ab035">';
+          h+='<div class="mark-card-hdr" style="background:#5a7ab014;color:#5a7ab0">'+side.label+'</div>';
+          h+='<div class="mark-card-body" style="display:flex;flex-direction:column;gap:4px">';
+          if(mtP){var tmc2=cd(mtP.cls);h+='<div class="mark-np" style="background:'+tmc2.bg+';border:1px solid '+tmc2.bd+'">'+ihtml(mtP.cls,14,mtP.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(mtP.name)+'</span><span class="mark-np-label">MT</span></div>';}
+          if(wlP){var wlc=cd(wlP.cls);h+='<div class="mark-np" style="background:'+wlc.bg+';border:1px solid '+wlc.bd+'">'+ihtml(wlP.cls,14,wlP.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(wlP.name)+'</span><span class="mark-np-label">WL tank</span></div>';}
+          h+='</div></div>';
+        }
+        h+='</div>';
+      });
+      h+='</div>';
+      h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
+      twinSides.forEach(function(side){
+        var heals=side.heals.map(function(k){return bdata[k]&&pmap[bdata[k]]?pmap[bdata[k]]:null;}).filter(Boolean);
+        h+='<div>';
+        if(heals.length){
+          h+='<div class="mark-card" style="background:#0c0e13;border:1px solid #5a7ab035">';
+          h+='<div class="mark-card-hdr" style="background:#5a7ab014;color:#5a7ab0">'+side.label+' Healers</div>';
+          h+='<div class="mark-card-body" style="display:flex;flex-direction:column;gap:4px">';
+          heals.forEach(function(hp){var hc13=cd(hp.cls);h+='<div class="mark-np" style="background:'+hc13.bg+';border:1px solid '+hc13.bd+'">'+ihtml(hp.cls,14,hp.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(hp.name)+'</span></div>';});
+          h+='</div></div>';
+        }
+        h+='</div>';
+      });
+      h+='</div>';
+    }
+
+    /* ── Faerlina custom layout: Faerlina row, then OT1+OT2 row, then OT3-6 row ── */
+    if(boss.id==='faerlina'){
+      var faeMt=bdata.mt&&pmap[bdata.mt]?pmap[bdata.mt]:null;
+      var faeMtH=bdata.mth&&pmap[bdata.mth]?pmap[bdata.mth]:null;
+      if(faeMt||faeMtH){
+        h+='<div class="mark-cards" style="margin-bottom:.5rem">';
+        h+='<div class="mark-card" style="background:#0c0e13;border:1px solid #5a7ab035;width:100%;grid-column:1/-1">';
+        h+='<div class="mark-card-hdr" style="background:#5a7ab014;color:#5a7ab0">'+vMS[7]+' Faerlina</div>';
+        h+='<div class="mark-card-body" style="display:flex;flex-wrap:wrap;gap:5px">';
+        if(faeMt){var fmc=cd(faeMt.cls);h+='<div class="mark-np" style="background:'+fmc.bg+';border:1px solid '+fmc.bd+'">'+ihtml(faeMt.cls,14,faeMt.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(faeMt.name)+'</span><span class="mark-np-label">tank</span></div>';}
+        if(faeMtH){var fmh=cd(faeMtH.cls);h+='<div class="mark-np" style="background:'+fmh.bg+';border:1px solid '+fmh.bd+'">'+ihtml(faeMtH.cls,14,faeMtH.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(faeMtH.name)+'</span></div>';}
+        h+='</div></div></div>';
+      }
+      var faeOt12=[1,2].map(function(n){
+        var tp=bdata['ot'+n]&&pmap[bdata['ot'+n]]?pmap[bdata['ot'+n]]:null;
+        var hp=bdata['oh'+n]&&pmap[bdata['oh'+n]]?pmap[bdata['oh'+n]]:null;
+        return{n:n,tank:tp,heal:hp};
+      }).filter(function(a){return a.tank||a.heal;});
+      if(faeOt12.length){
+        h+='<div class="mark-cards" style="grid-template-columns:repeat(2,1fr);margin-bottom:.5rem">';
+        faeOt12.forEach(function(a){
+          h+='<div class="mark-card" style="background:#0c0e13;border:1px solid #5a7ab035">';
+          h+='<div class="mark-card-hdr" style="background:#5a7ab014;color:#5a7ab0">OT '+a.n+'</div>';
+          h+='<div class="mark-card-body">';
+          if(a.tank){var tc14=cd(a.tank.cls);h+='<div class="mark-np" style="background:'+tc14.bg+';border:1px solid '+tc14.bd+'">'+ihtml(a.tank.cls,13,a.tank.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(a.tank.name)+'</span></div>';}
+          if(a.heal){var hc14=cd(a.heal.cls);h+='<div class="mark-np" style="background:'+hc14.bg+';border:1px solid '+hc14.bd+'">'+ihtml(a.heal.cls,13,a.heal.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(a.heal.name)+'</span></div>';}
+          h+='</div></div>';
+        });
+        h+='</div>';
+      }
+      var faeOt36=[3,4,5,6].map(function(n){
+        var tp=bdata['ot'+n]&&pmap[bdata['ot'+n]]?pmap[bdata['ot'+n]]:null;
+        var hp=bdata['oh'+n]&&pmap[bdata['oh'+n]]?pmap[bdata['oh'+n]]:null;
+        return{n:n,tank:tp,heal:hp};
+      }).filter(function(a){return a.tank||a.heal;});
+      if(faeOt36.length){
+        h+='<div class="mark-cards" style="grid-template-columns:repeat(4,1fr)">';
+        faeOt36.forEach(function(a){
+          h+='<div class="mark-card" style="background:#0c0e13;border:1px solid #5a7ab035">';
+          h+='<div class="mark-card-hdr" style="background:#5a7ab014;color:#5a7ab0">OT '+a.n+'</div>';
+          h+='<div class="mark-card-body">';
+          if(a.tank){var tc15=cd(a.tank.cls);h+='<div class="mark-np" style="background:'+tc15.bg+';border:1px solid '+tc15.bd+'">'+ihtml(a.tank.cls,13,a.tank.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(a.tank.name)+'</span></div>';}
+          if(a.heal){var hc15=cd(a.heal.cls);h+='<div class="mark-np" style="background:'+hc15.bg+';border:1px solid '+hc15.bd+'">'+ihtml(a.heal.cls,13,a.heal.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(a.heal.name)+'</span></div>';}
+          h+='</div></div>';
+        });
+        h+='</div>';
+      }
+      var faeMc=bdata.mc&&pmap[bdata.mc]?pmap[bdata.mc]:null;
+      if(faeMc){
+        h+='<div class="mark-cards" style="margin-top:.5rem"><div class="mark-card" style="background:#0c0e13;border:1px solid '+vMC[6]+'35;width:100%;grid-column:1/-1">';
+        h+='<div class="mark-card-hdr" style="background:'+vMC[6]+'14;color:'+vMC[6]+'">'+vMS[6]+' Mind Controller</div>';
+        h+='<div class="mark-card-body">';
+        var mcc=cd(faeMc.cls);h+='<div class="mark-np" style="background:'+mcc.bg+';border:1px solid '+mcc.bd+'">'+ihtml(faeMc.cls,14,faeMc.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(faeMc.name)+'</span></div>';
+        h+='</div></div></div>';
+      }
     }
 
     if(bdata.notes)h+='<div class="note-box">'+he(bdata.notes)+'</div>';
