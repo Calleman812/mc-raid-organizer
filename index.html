@@ -120,7 +120,7 @@ textarea{width:100%;background:#0c0e13;border:1px solid #262a36;color:#e4e6ea;pa
 <div class="app">
 <h1>WoW Classic Raid Organizer</h1>
 <div class="sub">Organize your 40-man raid &mdash; select a raid below</div>
-<div style="text-align:center;font-size:.6rem;color:#525a6a;font-family:Inter,sans-serif;letter-spacing:.08em;margin-top:-.3rem;margin-bottom:.5rem">v2.3.1</div>
+<div style="text-align:center;font-size:.6rem;color:#525a6a;font-family:Inter,sans-serif;letter-spacing:.08em;margin-top:-.3rem;margin-bottom:.5rem">v2.3.2</div>
 <div style="display:flex;gap:6px;justify-content:center;margin-bottom:.9rem;flex-wrap:wrap">
   <button class="btn raid-sel-btn" data-raid="mc"   id="rsMC"   style="font-family:Inter,sans-serif;font-size:.74rem;padding:5px 14px;border-radius:6px;cursor:pointer;border:1px solid #378ade;background:#1a2433;color:#9fc4f4">&#128293; Molten Core</button>
   <button class="btn raid-sel-btn" data-raid="bwl"  id="rsBWL"  style="font-family:Inter,sans-serif;font-size:.74rem;padding:5px 14px;border-radius:4px;cursor:pointer;border:1px solid #262a36;background:#15171e;color:#9fc4f4">&#128009; Blackwing Lair</button>
@@ -3047,10 +3047,10 @@ function renderViewMode(data){
       var sulMtH=bdata.mth&&pmap[bdata.mth]?pmap[bdata.mth]:null;
       if(sulMt||sulMtH){
         h+='<div class="mark-cards" style="margin-bottom:.5rem">';
-        h+='<div class="mark-card" style="background:#0c0e13;border:1px solid #5a7ab035;width:100%;grid-column:1/-1">';
-        h+='<div class="mark-card-hdr" style="background:#5a7ab014;color:#5a7ab0">'+vMS[7]+' Sulfuron</div>';
+        h+='<div class="mark-card" style="background:#0c0e13;border:1px solid '+vMC[7]+'35;width:100%;grid-column:1/-1">';
+        h+='<div class="mark-card-hdr" style="background:'+vMC[7]+'14;color:'+vMC[7]+'">'+vMS[7]+' Sulfuron</div>';
         h+='<div class="mark-card-body" style="display:flex;flex-wrap:wrap;gap:5px">';
-        if(sulMt){var smc=cd(sulMt.cls);h+='<div class="mark-np" style="background:'+smc.bg+';border:1px solid '+smc.bd+'">'+ihtml(sulMt.cls,14,sulMt.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(sulMt.name)+'</span><span class="mark-np-label">tank</span></div>';}
+        if(sulMt){var smc=cd(sulMt.cls);h+='<div class="mark-np" style="background:'+smc.bg+';border:1px solid '+smc.bd+'"><span style="font-size:.9rem;color:'+vMC[7]+'">'+vMS[7]+'</span>'+ihtml(sulMt.cls,14,sulMt.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(sulMt.name)+'</span><span class="mark-np-label">tank</span></div>';}
         if(sulMtH){var smh=cd(sulMtH.cls);h+='<div class="mark-np" style="background:'+smh.bg+';border:1px solid '+smh.bd+'">'+ihtml(sulMtH.cls,14,sulMtH.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(sulMtH.name)+'</span></div>';}
         h+='</div></div></div>';
       }
@@ -3216,15 +3216,14 @@ function renderViewMode(data){
       twinSides.forEach(function(side){
         var mtP=bdata[side.mt]&&pmap[bdata[side.mt]]?pmap[bdata[side.mt]]:null;
         var wlP=bdata[side.wl]&&pmap[bdata[side.wl]]?pmap[bdata[side.wl]]:null;
-        var mtCol=vMC[side.mtMark],mtSym=vMS[side.mtMark]+' ';
         h+='<div>';
         if(mtP||wlP){
           h+='<div style="font-family:Inter,sans-serif;font-size:.58rem;color:#666c7a;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.35rem">'+side.label+'</div>';
-          h+='<div class="mark-card" style="background:#0c0e13;border:1px solid '+mtCol+'35">';
-          h+='<div class="mark-card-hdr" style="background:'+mtCol+'14;color:'+mtCol+'">'+mtSym+side.label+'</div>';
+          h+='<div class="mark-card" style="background:#0c0e13;border:1px solid #5a7ab035">';
+          h+='<div class="mark-card-hdr" style="background:#5a7ab014;color:#5a7ab0">'+side.label+'</div>';
           h+='<div class="mark-card-body" style="display:flex;flex-direction:column;gap:4px">';
-          if(mtP){var tmc2=cd(mtP.cls);h+='<div class="mark-np" style="background:'+tmc2.bg+';border:1px solid '+tmc2.bd+'">'+vMS[side.mtMark]+' '+ihtml(mtP.cls,14,mtP.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(mtP.name)+'</span><span class="mark-np-label">MT</span></div>';}
-          if(wlP){var wlc=cd(wlP.cls);h+='<div class="mark-np" style="background:'+wlc.bg+';border:1px solid '+wlc.bd+'">'+vMS[side.wlMark]+' '+ihtml(wlP.cls,14,wlP.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(wlP.name)+'</span><span class="mark-np-label">WL tank</span></div>';}
+          if(mtP){var tmc2=cd(mtP.cls);h+='<div class="mark-np" style="background:'+tmc2.bg+';border:1px solid '+tmc2.bd+'"><span style="font-size:.9rem;color:'+vMC[side.mtMark]+'">'+vMS[side.mtMark]+'</span>'+ihtml(mtP.cls,14,mtP.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(mtP.name)+'</span><span class="mark-np-label">MT</span></div>';}
+          if(wlP){var wlc=cd(wlP.cls);h+='<div class="mark-np" style="background:'+wlc.bg+';border:1px solid '+wlc.bd+'"><span style="font-size:.9rem;color:'+vMC[side.wlMark]+'">'+vMS[side.wlMark]+'</span>'+ihtml(wlP.cls,14,wlP.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(wlP.name)+'</span><span class="mark-np-label">WL tank</span></div>';}
           h+='</div></div>';
         }
         h+='</div>';
@@ -3252,10 +3251,10 @@ function renderViewMode(data){
       var faeMtH=bdata.mth&&pmap[bdata.mth]?pmap[bdata.mth]:null;
       if(faeMt||faeMtH){
         h+='<div class="mark-cards" style="margin-bottom:.5rem">';
-        h+='<div class="mark-card" style="background:#0c0e13;border:1px solid #5a7ab035;width:100%;grid-column:1/-1">';
-        h+='<div class="mark-card-hdr" style="background:#5a7ab014;color:#5a7ab0">'+vMS[7]+' Faerlina</div>';
+        h+='<div class="mark-card" style="background:#0c0e13;border:1px solid '+vMC[7]+'35;width:100%;grid-column:1/-1">';
+        h+='<div class="mark-card-hdr" style="background:'+vMC[7]+'14;color:'+vMC[7]+'">'+vMS[7]+' Faerlina</div>';
         h+='<div class="mark-card-body" style="display:flex;flex-wrap:wrap;gap:5px">';
-        if(faeMt){var fmc=cd(faeMt.cls);h+='<div class="mark-np" style="background:'+fmc.bg+';border:1px solid '+fmc.bd+'">'+ihtml(faeMt.cls,14,faeMt.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(faeMt.name)+'</span><span class="mark-np-label">tank</span></div>';}
+        if(faeMt){var fmc=cd(faeMt.cls);h+='<div class="mark-np" style="background:'+fmc.bg+';border:1px solid '+fmc.bd+'"><span style="font-size:.9rem;color:'+vMC[7]+'">'+vMS[7]+'</span>'+ihtml(faeMt.cls,14,faeMt.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(faeMt.name)+'</span><span class="mark-np-label">tank</span></div>';}
         if(faeMtH){var fmh=cd(faeMtH.cls);h+='<div class="mark-np" style="background:'+fmh.bg+';border:1px solid '+fmh.bd+'">'+ihtml(faeMtH.cls,14,faeMtH.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(faeMtH.name)+'</span></div>';}
         h+='</div></div></div>';
       }
