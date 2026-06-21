@@ -120,7 +120,7 @@ textarea{width:100%;background:#0c0e13;border:1px solid #262a36;color:#e4e6ea;pa
 <div class="app">
 <h1>WoW Classic Raid Organizer</h1>
 <div class="sub">Organize your 40-man raid &mdash; select a raid below</div>
-<div style="text-align:center;font-size:.6rem;color:#525a6a;font-family:Inter,sans-serif;letter-spacing:.08em;margin-top:-.3rem;margin-bottom:.5rem">v2.3.0</div>
+<div style="text-align:center;font-size:.6rem;color:#525a6a;font-family:Inter,sans-serif;letter-spacing:.08em;margin-top:-.3rem;margin-bottom:.5rem">v2.3.1</div>
 <div style="display:flex;gap:6px;justify-content:center;margin-bottom:.9rem;flex-wrap:wrap">
   <button class="btn raid-sel-btn" data-raid="mc"   id="rsMC"   style="font-family:Inter,sans-serif;font-size:.74rem;padding:5px 14px;border-radius:6px;cursor:pointer;border:1px solid #378ade;background:#1a2433;color:#9fc4f4">&#128293; Molten Core</button>
   <button class="btn raid-sel-btn" data-raid="bwl"  id="rsBWL"  style="font-family:Inter,sans-serif;font-size:.74rem;padding:5px 14px;border-radius:4px;cursor:pointer;border:1px solid #262a36;background:#15171e;color:#9fc4f4">&#128009; Blackwing Lair</button>
@@ -2896,27 +2896,34 @@ function renderViewMode(data){
         h+='</div>';
       }
       var webGroups=[['Left Web','lw1','lw2','lwh'],['Middle Web','mw1','mw2','mwh'],['Right Web','rw1','rw2','rwh']];
-      webGroups.forEach(function(wg){
-        var d1=bdata[wg[1]]&&pmap[bdata[wg[1]]]?pmap[bdata[wg[1]]]:null;
-        var d2=bdata[wg[2]]&&pmap[bdata[wg[2]]]?pmap[bdata[wg[2]]]:null;
-        var dh=bdata[wg[3]]&&pmap[bdata[wg[3]]]?pmap[bdata[wg[3]]]:null;
-        if(!d1&&!d2&&!dh)return;
-        h+='<div style="font-family:Inter,sans-serif;font-size:.58rem;color:#5a7ab0;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.35rem">'+he(wg[0])+'</div>';
-        h+='<div class="mark-cards" style="margin-bottom:.65rem">';
-        h+='<div class="mark-card" style="background:#0c0e13;border:1px solid #5a7ab035">';
-        h+='<div class="mark-card-hdr" style="background:#5a7ab014;color:#5a7ab0">'+he(wg[0])+'</div>';
-        h+='<div class="mark-card-body">';
-        [d1,d2].forEach(function(dp){
-          if(!dp)return;
-          var dc=cd(dp.cls);
-          h+='<div class="mark-np" style="background:'+dc.bg+';border:1px solid '+dc.bd+'">'+ihtml(dp.cls,14,dp.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(dp.name)+'</span></div>';
+      var anyWeb=webGroups.some(function(wg){return (bdata[wg[1]]&&pmap[bdata[wg[1]]])||(bdata[wg[2]]&&pmap[bdata[wg[2]]])||(bdata[wg[3]]&&pmap[bdata[wg[3]]]);});
+      if(anyWeb){
+        h+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">';
+        webGroups.forEach(function(wg){
+          var d1=bdata[wg[1]]&&pmap[bdata[wg[1]]]?pmap[bdata[wg[1]]]:null;
+          var d2=bdata[wg[2]]&&pmap[bdata[wg[2]]]?pmap[bdata[wg[2]]]:null;
+          var dh=bdata[wg[3]]&&pmap[bdata[wg[3]]]?pmap[bdata[wg[3]]]:null;
+          h+='<div>';
+          if(d1||d2||dh){
+            h+='<div style="font-family:Inter,sans-serif;font-size:.58rem;color:#666c7a;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.35rem">'+he(wg[0])+'</div>';
+            h+='<div class="mark-card" style="background:#0c0e13;border:1px solid #5a7ab035">';
+            h+='<div class="mark-card-hdr" style="background:#5a7ab014;color:#5a7ab0">'+he(wg[0])+'</div>';
+            h+='<div class="mark-card-body" style="display:flex;flex-direction:column;gap:4px">';
+            [d1,d2].forEach(function(dp){
+              if(!dp)return;
+              var dc=cd(dp.cls);
+              h+='<div class="mark-np" style="background:'+dc.bg+';border:1px solid '+dc.bd+'">'+ihtml(dp.cls,14,dp.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(dp.name)+'</span></div>';
+            });
+            if(dh){
+              var hc4=cd(dh.cls);
+              h+='<div class="mark-np" style="background:'+hc4.bg+';border:1px solid '+hc4.bd+'">'+ihtml(dh.cls,14,dh.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(dh.name)+'</span><span class="mark-np-label" style="color:rgba(248,248,248,.5)">heal</span></div>';
+            }
+            h+='</div></div>';
+          }
+          h+='</div>';
         });
-        if(dh){
-          var hc4=cd(dh.cls);
-          h+='<div class="mark-np" style="background:'+hc4.bg+';border:1px solid '+hc4.bd+'">'+ihtml(dh.cls,14,dh.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(dh.name)+'</span><span class="mark-np-label" style="color:rgba(248,248,248,.5)">heal</span></div>';
-        }
-        h+='</div></div></div>';
-      });
+        h+='</div>';
+      }
       var mxSpecial=[['T2 Heal','t2h'],['Abolish Poison','ap']];
       var mxSpecialHtml='';
       mxSpecial.forEach(function(sp){
@@ -3128,7 +3135,7 @@ function renderViewMode(data){
       }
       h+='</div></div>';
       var nefMt=bdata.mt&&pmap[bdata.mt]?pmap[bdata.mt]:null;
-      var nefHeals=['mth1','mth2','mth3'].map(function(k){return bdata[k]&&pmap[bdata[k]]?pmap[bdata[k]]:null;}).filter(Boolean);
+      var nefHeals=['mth','mth2','mth3'].map(function(k){return bdata[k]&&pmap[bdata[k]]?pmap[bdata[k]]:null;}).filter(Boolean);
       if(nefMt||nefHeals.length){
         h+='<div class="mark-cards"><div class="mark-card" style="background:#0c0e13;border:1px solid #5a7ab035;width:100%;grid-column:1/-1">';
         h+='<div class="mark-card-hdr" style="background:#5a7ab014;color:#5a7ab0">Nefarian MT &amp; Healers</div>';
@@ -3143,20 +3150,22 @@ function renderViewMode(data){
     if(boss.id==='skeram'){
       h+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">';
       var skColumns=[
-        {label:'Left',tank:'ot1',heal:'ot1h',int1:'il1',int2:'il2'},
-        {label:'Middle',tank:'mt',heal:'mth',int1:'im1',int2:'im2'},
-        {label:'Right',tank:'ot2',heal:'ot2h',int1:'ir1',int2:'ir2'}
+        {label:'Left',tank:'ot1',heal:'ot1h',int1:'il1',int2:'il2',mark:null},
+        {label:'Middle',tank:'mt',heal:'mth',int1:'im1',int2:'im2',mark:5},
+        {label:'Right',tank:'ot2',heal:'ot2h',int1:'ir1',int2:'ir2',mark:null}
       ];
       skColumns.forEach(function(col){
         var tp=bdata[col.tank]&&pmap[bdata[col.tank]]?pmap[bdata[col.tank]]:null;
         var hp=bdata[col.heal]&&pmap[bdata[col.heal]]?pmap[bdata[col.heal]]:null;
         var i1=bdata[col.int1]&&pmap[bdata[col.int1]]?pmap[bdata[col.int1]]:null;
         var i2=bdata[col.int2]&&pmap[bdata[col.int2]]?pmap[bdata[col.int2]]:null;
+        var mCol2=col.mark!=null?vMC[col.mark]:'#5a7ab0';
+        var mSym2=col.mark!=null?vMS[col.mark]+' ':'';
         h+='<div>';
         if(tp||hp||i1||i2){
           h+='<div style="font-family:Inter,sans-serif;font-size:.58rem;color:#666c7a;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.35rem">'+col.label+'</div>';
-          h+='<div class="mark-card" style="background:#0c0e13;border:1px solid #5a7ab035">';
-          h+='<div class="mark-card-hdr" style="background:#5a7ab014;color:#5a7ab0">'+col.label+'</div>';
+          h+='<div class="mark-card" style="background:#0c0e13;border:1px solid '+mCol2+'35">';
+          h+='<div class="mark-card-hdr" style="background:'+mCol2+'14;color:'+mCol2+'">'+mSym2+col.label+'</div>';
           h+='<div class="mark-card-body" style="display:flex;flex-direction:column;gap:4px">';
           if(tp){var tc12=cd(tp.cls);h+='<div class="mark-np" style="background:'+tc12.bg+';border:1px solid '+tc12.bd+'">'+ihtml(tp.cls,14,tp.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(tp.name)+'</span><span class="mark-np-label">tank</span></div>';}
           if(hp){var hc11=cd(hp.cls);h+='<div class="mark-np" style="background:'+hc11.bg+';border:1px solid '+hc11.bd+'">'+ihtml(hp.cls,14,hp.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(hp.name)+'</span></div>';}
@@ -3172,19 +3181,20 @@ function renderViewMode(data){
     if(boss.id==='bugs'){
       h+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">';
       var bugCols=[
-        {label:'Kri',tank:'tkri',heal:'hkri'},
-        {label:'Yauj',tank:'tyauj',heal:'hyauj',interrupt:'iyauj'},
-        {label:'Vem',tank:'tvem',heal:'hvem'}
+        {label:'Kri',tank:'tkri',heal:'hkri',mark:0},
+        {label:'Yauj',tank:'tyauj',heal:'hyauj',interrupt:'iyauj',mark:1},
+        {label:'Vem',tank:'tvem',heal:'hvem',mark:2}
       ];
       bugCols.forEach(function(col){
         var tp=bdata[col.tank]&&pmap[bdata[col.tank]]?pmap[bdata[col.tank]]:null;
         var hp=bdata[col.heal]&&pmap[bdata[col.heal]]?pmap[bdata[col.heal]]:null;
         var ip=col.interrupt&&bdata[col.interrupt]&&pmap[bdata[col.interrupt]]?pmap[bdata[col.interrupt]]:null;
+        var mCol3=vMC[col.mark],mSym3=vMS[col.mark]+' ';
         h+='<div>';
         if(tp||hp||ip){
           h+='<div style="font-family:Inter,sans-serif;font-size:.58rem;color:#666c7a;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.35rem">'+col.label+'</div>';
-          h+='<div class="mark-card" style="background:#0c0e13;border:1px solid #5a7ab035">';
-          h+='<div class="mark-card-hdr" style="background:#5a7ab014;color:#5a7ab0">'+col.label+'</div>';
+          h+='<div class="mark-card" style="background:#0c0e13;border:1px solid '+mCol3+'35">';
+          h+='<div class="mark-card-hdr" style="background:'+mCol3+'14;color:'+mCol3+'">'+mSym3+col.label+'</div>';
           h+='<div class="mark-card-body" style="display:flex;flex-direction:column;gap:4px">';
           if(tp){var tc13=cd(tp.cls);h+='<div class="mark-np" style="background:'+tc13.bg+';border:1px solid '+tc13.bd+'">'+ihtml(tp.cls,14,tp.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(tp.name)+'</span><span class="mark-np-label">tank</span></div>';}
           if(hp){var hc12=cd(hp.cls);h+='<div class="mark-np" style="background:'+hc12.bg+';border:1px solid '+hc12.bd+'">'+ihtml(hp.cls,14,hp.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(hp.name)+'</span></div>';}
@@ -3200,20 +3210,21 @@ function renderViewMode(data){
     if(boss.id==='twins'){
       h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:.5rem">';
       var twinSides=[
-        {label:'Veklor',mt:'vmt',wl:'vwl',heals:['vh1','vh2','vh3','vh4','vh5']},
-        {label:'Veknilash',mt:'nmt',wl:'nwl',heals:['nh1','nh2','nh3','nh4','nh5']}
+        {label:'Veklor',mt:'vmt',wl:'vwl',mtMark:3,wlMark:4,heals:['vh1','vh2','vh3','vh4','vh5']},
+        {label:'Veknilash',mt:'nmt',wl:'nwl',mtMark:2,wlMark:5,heals:['nh1','nh2','nh3','nh4','nh5']}
       ];
       twinSides.forEach(function(side){
         var mtP=bdata[side.mt]&&pmap[bdata[side.mt]]?pmap[bdata[side.mt]]:null;
         var wlP=bdata[side.wl]&&pmap[bdata[side.wl]]?pmap[bdata[side.wl]]:null;
+        var mtCol=vMC[side.mtMark],mtSym=vMS[side.mtMark]+' ';
         h+='<div>';
         if(mtP||wlP){
           h+='<div style="font-family:Inter,sans-serif;font-size:.58rem;color:#666c7a;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.35rem">'+side.label+'</div>';
-          h+='<div class="mark-card" style="background:#0c0e13;border:1px solid #5a7ab035">';
-          h+='<div class="mark-card-hdr" style="background:#5a7ab014;color:#5a7ab0">'+side.label+'</div>';
+          h+='<div class="mark-card" style="background:#0c0e13;border:1px solid '+mtCol+'35">';
+          h+='<div class="mark-card-hdr" style="background:'+mtCol+'14;color:'+mtCol+'">'+mtSym+side.label+'</div>';
           h+='<div class="mark-card-body" style="display:flex;flex-direction:column;gap:4px">';
-          if(mtP){var tmc2=cd(mtP.cls);h+='<div class="mark-np" style="background:'+tmc2.bg+';border:1px solid '+tmc2.bd+'">'+ihtml(mtP.cls,14,mtP.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(mtP.name)+'</span><span class="mark-np-label">MT</span></div>';}
-          if(wlP){var wlc=cd(wlP.cls);h+='<div class="mark-np" style="background:'+wlc.bg+';border:1px solid '+wlc.bd+'">'+ihtml(wlP.cls,14,wlP.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(wlP.name)+'</span><span class="mark-np-label">WL tank</span></div>';}
+          if(mtP){var tmc2=cd(mtP.cls);h+='<div class="mark-np" style="background:'+tmc2.bg+';border:1px solid '+tmc2.bd+'">'+vMS[side.mtMark]+' '+ihtml(mtP.cls,14,mtP.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(mtP.name)+'</span><span class="mark-np-label">MT</span></div>';}
+          if(wlP){var wlc=cd(wlP.cls);h+='<div class="mark-np" style="background:'+wlc.bg+';border:1px solid '+wlc.bd+'">'+vMS[side.wlMark]+' '+ihtml(wlP.cls,14,wlP.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(wlP.name)+'</span><span class="mark-np-label">WL tank</span></div>';}
           h+='</div></div>';
         }
         h+='</div>';
@@ -3251,13 +3262,14 @@ function renderViewMode(data){
       var faeOt12=[1,2].map(function(n){
         var tp=bdata['ot'+n]&&pmap[bdata['ot'+n]]?pmap[bdata['ot'+n]]:null;
         var hp=bdata['oh'+n]&&pmap[bdata['oh'+n]]?pmap[bdata['oh'+n]]:null;
-        return{n:n,tank:tp,heal:hp};
+        return{n:n,tank:tp,heal:hp,mark:n-1};
       }).filter(function(a){return a.tank||a.heal;});
       if(faeOt12.length){
         h+='<div class="mark-cards" style="grid-template-columns:repeat(2,1fr);margin-bottom:.5rem">';
         faeOt12.forEach(function(a){
-          h+='<div class="mark-card" style="background:#0c0e13;border:1px solid #5a7ab035">';
-          h+='<div class="mark-card-hdr" style="background:#5a7ab014;color:#5a7ab0">OT '+a.n+'</div>';
+          var mc1=vMC[a.mark],ms1=vMS[a.mark]+' ';
+          h+='<div class="mark-card" style="background:#0c0e13;border:1px solid '+mc1+'35">';
+          h+='<div class="mark-card-hdr" style="background:'+mc1+'14;color:'+mc1+'">'+ms1+'OT '+a.n+'</div>';
           h+='<div class="mark-card-body">';
           if(a.tank){var tc14=cd(a.tank.cls);h+='<div class="mark-np" style="background:'+tc14.bg+';border:1px solid '+tc14.bd+'">'+ihtml(a.tank.cls,13,a.tank.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(a.tank.name)+'</span></div>';}
           if(a.heal){var hc14=cd(a.heal.cls);h+='<div class="mark-np" style="background:'+hc14.bg+';border:1px solid '+hc14.bd+'">'+ihtml(a.heal.cls,13,a.heal.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(a.heal.name)+'</span></div>';}
@@ -3268,13 +3280,14 @@ function renderViewMode(data){
       var faeOt36=[3,4,5,6].map(function(n){
         var tp=bdata['ot'+n]&&pmap[bdata['ot'+n]]?pmap[bdata['ot'+n]]:null;
         var hp=bdata['oh'+n]&&pmap[bdata['oh'+n]]?pmap[bdata['oh'+n]]:null;
-        return{n:n,tank:tp,heal:hp};
+        return{n:n,tank:tp,heal:hp,mark:n-1};
       }).filter(function(a){return a.tank||a.heal;});
       if(faeOt36.length){
         h+='<div class="mark-cards" style="grid-template-columns:repeat(4,1fr)">';
         faeOt36.forEach(function(a){
-          h+='<div class="mark-card" style="background:#0c0e13;border:1px solid #5a7ab035">';
-          h+='<div class="mark-card-hdr" style="background:#5a7ab014;color:#5a7ab0">OT '+a.n+'</div>';
+          var mc2=vMC[a.mark],ms2=vMS[a.mark]+' ';
+          h+='<div class="mark-card" style="background:#0c0e13;border:1px solid '+mc2+'35">';
+          h+='<div class="mark-card-hdr" style="background:'+mc2+'14;color:'+mc2+'">'+ms2+'OT '+a.n+'</div>';
           h+='<div class="mark-card-body">';
           if(a.tank){var tc15=cd(a.tank.cls);h+='<div class="mark-np" style="background:'+tc15.bg+';border:1px solid '+tc15.bd+'">'+ihtml(a.tank.cls,13,a.tank.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(a.tank.name)+'</span></div>';}
           if(a.heal){var hc15=cd(a.heal.cls);h+='<div class="mark-np" style="background:'+hc15.bg+';border:1px solid '+hc15.bd+'">'+ihtml(a.heal.cls,13,a.heal.role)+'<span class="mark-np-name" style="color:#f8f8f8">'+he(a.heal.name)+'</span></div>';}
